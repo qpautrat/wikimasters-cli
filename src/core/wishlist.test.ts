@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { parseCardId } from './card-id.js';
 import { WikiMastersError } from './errors.js';
-import { signIn } from './session.js';
-import { ACCESS_TOKEN, USER_ID, fakeFetch, passwordSignIn, type Route } from './testing/fake-supabase.js';
+import { resumeSession } from './session.js';
+import { ACCESS_TOKEN, USER_ID, fakeFetch, tokenRefresh, type Route } from './testing/fake-supabase.js';
 import { removeFromWishlist } from './wishlist.js';
 
 const cardId = parseCardId('3fc9a132-31db-4b14-832c-04823e02113d');
@@ -15,8 +15,8 @@ function wishlistDelete(deletedRows: number): Route {
 }
 
 async function sessionWith(...routes: Route[]) {
-  const { fetch, requests } = fakeFetch(passwordSignIn, ...routes);
-  const session = await signIn({ anonKey: 'anon-key', credentials: { email: 'player@example.test', password: 'secret' }, fetch });
+  const { fetch, requests } = fakeFetch(tokenRefresh, ...routes);
+  const session = await resumeSession({ anonKey: 'anon-key', refreshToken: 'stored-token', fetch });
   return { session, requests };
 }
 

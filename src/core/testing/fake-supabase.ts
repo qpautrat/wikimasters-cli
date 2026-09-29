@@ -15,9 +15,10 @@ export type Route = (request: RecordedRequest) => FakeResponse | undefined;
 
 export const USER_ID = '5d14f22b-ea20-4a25-bc4a-fa879af3d0ee';
 export const ACCESS_TOKEN = 'fake-access-token';
+export const ROTATED_REFRESH_TOKEN = 'rotated-refresh-token';
 
-export const passwordSignIn: Route = ({ method, url }) => {
-  if (method !== 'POST' || url.pathname !== '/auth/v1/token') return undefined;
+export const tokenRefresh: Route = ({ method, url }) => {
+  if (method !== 'POST' || url.pathname !== '/auth/v1/token' || url.searchParams.get('grant_type') !== 'refresh_token') return undefined;
   return {
     status: 200,
     body: {
@@ -25,7 +26,7 @@ export const passwordSignIn: Route = ({ method, url }) => {
       token_type: 'bearer',
       expires_in: 3600,
       expires_at: Math.floor(Date.now() / 1000) + 3600,
-      refresh_token: 'fake-refresh-token',
+      refresh_token: ROTATED_REFRESH_TOKEN,
       user: { id: USER_ID, aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {} },
     },
   };

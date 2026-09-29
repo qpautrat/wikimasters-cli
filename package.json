@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
-    "commander": "^15.0.0"
+    "commander": "^15.0.0",
+    "playwright-core": "^1.63.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.4",
