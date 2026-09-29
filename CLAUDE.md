@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `wkm-cli` lets an AI agent interact with [WikiMasters](https://www.wiki-masters.com), a collectible card game built from Wikipedia articles (packs, collection, duels, trades, auctions, guilds, messaging). The site has no public API: this project wraps the internal HTTP API used by its web front-end.
 
+That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Endpoints are discovered from HAR captures of the manual flows, stored sanitized in `capture-reseau-har/`.
+
 Status: greenfield, no code yet. Add build, lint and test commands here once the project is scaffolded.
 
 ## Stack
