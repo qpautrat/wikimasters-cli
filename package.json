@@ -1,0 +1,28 @@
+{
+  "name": "wkm-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Interact with WikiMasters from the command line",
+  "type": "module",
+  "bin": {
+    "wkm": "dist/cli/main.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "wkm": "node dist/cli/main.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
