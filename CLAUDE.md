@@ -10,7 +10,7 @@ That front-end is a Next.js app whose data layer is Supabase: the browser calls 
 
 ## Stack and commands
 
-TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `playwright-core` driving the installed Google Chrome for login, `commander` for the CLI, Vitest for tests.
+TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
 
 | Task | Command |
 |---|---|
@@ -22,7 +22,7 @@ TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth
 
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. Test files and `testing/` are excluded from the build, so `npm run typecheck` does not cover them.
 
-Supabase auth on this project requires a captcha, so there is no password sign-in: `wkm login` opens a headed Chrome window, the user signs in there, and the refresh token is read from the `sb-<ref>-auth-token` cookie. Every command then exchanges that refresh token for a session. Supabase rotates refresh tokens on each use, so the CLI writes the new one back to `.env` right after the exchange, before doing anything else. Never solve or bypass the captcha programmatically.
+Supabase auth on this project requires a captcha, so there is no password sign-in: `wkm login` starts the installed Firefox, unautomated, on a throwaway profile; the user signs in there, and the CLI reads the refresh token from the `sb-<ref>-auth-token` cookies in the profile's `cookies.sqlite` (through the `sqlite3` CLI), then closes Firefox and deletes the profile. A browser driven by Playwright/WebDriver fails the captcha. Every command then exchanges that refresh token for a session. Supabase rotates refresh tokens on each use, so the CLI writes the new one back to `.env` right after the exchange, before doing anything else. Never solve the captcha programmatically or hide browser automation from it.
 
 The CLI reads `WKM_SUPABASE_ANON_KEY` (the site's public Supabase key, found in its JavaScript bundle) and `WKM_REFRESH_TOKEN` (managed by `wkm login`) from `.env` at the repo root, falling back to the environment. The file wins because it holds the latest rotated token. `.env` is gitignored; the template is `.env.example`. Never print the refresh token.
 
