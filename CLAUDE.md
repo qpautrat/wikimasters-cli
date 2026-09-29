@@ -10,7 +10,7 @@ That front-end is a Next.js app whose data layer is Supabase: the browser calls 
 
 ## Stack and commands
 
-TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
+TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `playwright-core` driving the installed Google Chrome for login, `commander` for the CLI, Vitest for tests.
 
 | Task | Command |
 |---|---|
@@ -18,11 +18,13 @@ TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth
 | Typecheck | `npm run typecheck` |
 | All tests | `npm test` |
 | One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
-| Run the CLI after a build | `npm run -s wkm -- wishlist remove <card-uuid>` |
+| Run the CLI after a build | `npm run -s wkm -- login`, then `npm run -s wkm -- wishlist remove <card-uuid>` |
 
-Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `signIn`, which simulates Supabase's auth and PostgREST responses. Test files and `testing/` are excluded from the build, so `npm run typecheck` does not cover them.
+Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. Test files and `testing/` are excluded from the build, so `npm run typecheck` does not cover them.
 
-The CLI reads `WKM_EMAIL`, `WKM_PASSWORD` and `WKM_SUPABASE_ANON_KEY` from the environment, falling back to `.env` at the repo root (gitignored; template in `.env.example`). The anon key is the site's public Supabase key, found in its JavaScript bundle. Never read or print the password.
+Supabase auth on this project requires a captcha, so there is no password sign-in: `wkm login` opens a headed Chrome window, the user signs in there, and the refresh token is read from the `sb-<ref>-auth-token` cookie. Every command then exchanges that refresh token for a session. Supabase rotates refresh tokens on each use, so the CLI writes the new one back to `.env` right after the exchange, before doing anything else. Never solve or bypass the captcha programmatically.
+
+The CLI reads `WKM_SUPABASE_ANON_KEY` (the site's public Supabase key, found in its JavaScript bundle) and `WKM_REFRESH_TOKEN` (managed by `wkm login`) from `.env` at the repo root, falling back to the environment. The file wins because it holds the latest rotated token. `.env` is gitignored; the template is `.env.example`. Never print the refresh token.
 
 ## Architecture
 
