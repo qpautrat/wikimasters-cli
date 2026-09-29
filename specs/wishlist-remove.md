@@ -17,7 +17,3 @@ En tant que joueur, je donne l'identifiant unique d'une carte et elle est retir�
 ## Hors périmètre
 
 La recherche d'une carte pour obtenir son identifiant fera l'objet d'une spec séparée.
-
-## Questions ouvertes
-
-- **Authentification** : comment la CLI obtient-elle les identifiants du compte ?
