@@ -17,7 +17,7 @@ program
   .description('Sign in through a browser window and store the session in .env')
   .action(async () => {
     loadConfig();
-    console.error('Sign in to WikiMasters in the browser window that just opened…');
+    console.error('Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…');
     const session = await openSession(await loginInBrowser());
     console.log(`Logged in as user ${session.userId}.`);
   });
