@@ -8,20 +8,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Endpoints are discovered from HAR captures of the manual flows, stored sanitized in `capture-reseau-har/`.
 
-Status: greenfield, no code yet. Add build, lint and test commands here once the project is scaffolded.
+## Stack and commands
 
-## Stack
+TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
 
-TypeScript on Node.
+| Task | Command |
+|---|---|
+| Build to `dist/` | `npm run build` |
+| Typecheck | `npm run typecheck` |
+| All tests | `npm test` |
+| One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
+| Run the CLI after a build | `npm run -s wkm -- wishlist remove <card-uuid>` |
+
+Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `signIn`, which simulates Supabase's auth and PostgREST responses. Test files and `testing/` are excluded from the build, so `npm run typecheck` does not cover them.
+
+The CLI reads `WKM_EMAIL`, `WKM_PASSWORD` and `WKM_SUPABASE_ANON_KEY` from the environment, falling back to `.env` at the repo root (gitignored; template in `.env.example`). The anon key is the site's public Supabase key, found in its JavaScript bundle. Never read or print the password.
 
 ## Architecture
 
 Two layers, kept strictly separate:
 
-1. **Core client**: a typed wrapper over WikiMasters' internal HTTP endpoints, covering session/auth, requests and parsing responses into domain types. It is the only place that knows endpoint URLs and payload shapes, so a change on the site is fixed in one spot. It does no terminal output and no argument parsing.
-2. **Adapters**: thin consumers of the core that map input to core calls and format output, with no business logic. The CLI (`wkm`) is the only adapter in scope. An MCP server is planned and must reuse the core unchanged.
+1. **Core client** (`src/core/`, public surface in `index.ts`): a typed wrapper over WikiMasters' internal HTTP endpoints, covering session/auth, requests and parsing responses into domain types. It is the only place that knows endpoint URLs and payload shapes, so a change on the site is fixed in one spot. It does no terminal output and no argument parsing.
+2. **Adapters** (`src/cli/`): thin consumers of the core that map input to core calls and format output, with no business logic. The CLI (`wkm`) is the only adapter in scope. An MCP server is planned and must reuse the core unchanged.
 
-A feature lands in the core first, then gets exposed through the CLI.
+A feature lands in the core first, then gets exposed through the CLI. Core failures throw `WikiMastersError`; the CLI prints its message to stderr and exits 1.
 
 ## Specification-driven workflow
 
