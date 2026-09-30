@@ -33,7 +33,7 @@ Two layers, kept strictly separate:
 1. **Core client** (`src/core/`, public surface in `index.ts`): a typed wrapper over WikiMasters' internal HTTP endpoints, covering session/auth, requests and parsing responses into domain types. It is the only place that knows endpoint URLs and payload shapes, so a change on the site is fixed in one spot. It does no terminal output and no argument parsing.
 2. **Adapters** (`src/cli/`): thin consumers of the core that map input to core calls and format output, with no business logic. The CLI (`wkm`) is the only adapter in scope. An MCP server is planned and must reuse the core unchanged.
 
-A feature lands in the core first, then gets exposed through the CLI. Core failures throw `WikiMastersError`; the CLI prints its message to stderr and exits 1.
+A feature lands in the core first, then gets exposed through the CLI. Core failures throw `WikiMastersError`; the CLI prints its message to stderr and exits 1. Output formatting lives in `src/cli/output.ts`: text by default, and with the global `--json` flag stdout carries only the JSON result.
 
 ## Specification-driven workflow
 
