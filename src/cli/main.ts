@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { listWishlist, loginInBrowser, parseCardId, removeFromWishlist, resumeSession, type Session } from '../core/index.js';
 import { loadConfig, requireRefreshToken, saveRefreshToken } from './config.js';
+import { formatLogin, formatRemoval, formatWishlist, type Format } from './output.js';
 
 async function openSession(refreshToken?: string): Promise<Session> {
   const config = loadConfig();
@@ -10,7 +11,14 @@ async function openSession(refreshToken?: string): Promise<Session> {
   return session;
 }
 
-const program = new Command('wkm').description('Interact with WikiMasters');
+const program = new Command('wkm')
+  .description('Interact with WikiMasters')
+  .option('--json', 'print the result as JSON on stdout')
+  .configureHelp({ showGlobalOptions: true });
+
+function format(): Format {
+  return program.opts<{ json?: boolean }>().json ? 'json' : 'text';
+}
 
 program
   .command('login')
@@ -19,7 +27,7 @@ program
     loadConfig();
     console.error('Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…');
     const session = await openSession(await loginInBrowser());
-    console.log(`Logged in as user ${session.userId}.`);
+    console.log(formatLogin(session.userId, format()));
   });
 
 const wishlist = program.command('wishlist').description('Manage your wishlist');
@@ -28,14 +36,7 @@ wishlist
   .command('list')
   .description('List the cards of your wishlist, most recently added first')
   .action(async () => {
-    const cards = await listWishlist(await openSession());
-    if (cards.length === 0) {
-      console.log('The wishlist is empty.');
-      return;
-    }
-    for (const { id, title, rarity } of cards) {
-      console.log(`${id}  ${title} (${rarity})`);
-    }
+    console.log(formatWishlist(await listWishlist(await openSession()), format()));
   });
 
 wishlist
@@ -45,8 +46,7 @@ wishlist
   .action(async (rawCardId: string) => {
     const cardId = parseCardId(rawCardId);
     const session = await openSession();
-    const { removed } = await removeFromWishlist(session, cardId);
-    console.log(removed ? `Card ${cardId} removed from the wishlist.` : `Card ${cardId} was not in the wishlist.`);
+    console.log(formatRemoval(await removeFromWishlist(session, cardId), format()));
   });
 
 try {
