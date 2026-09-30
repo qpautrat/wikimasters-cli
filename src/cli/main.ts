@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { loginInBrowser, parseCardId, removeFromWishlist, resumeSession, type Session } from '../core/index.js';
+import { listWishlist, loginInBrowser, parseCardId, removeFromWishlist, resumeSession, type Session } from '../core/index.js';
 import { loadConfig, requireRefreshToken, saveRefreshToken } from './config.js';
 
 async function openSession(refreshToken?: string): Promise<Session> {
@@ -23,6 +23,20 @@ program
   });
 
 const wishlist = program.command('wishlist').description('Manage your wishlist');
+
+wishlist
+  .command('list')
+  .description('List the cards of your wishlist, most recently added first')
+  .action(async () => {
+    const cards = await listWishlist(await openSession());
+    if (cards.length === 0) {
+      console.log('The wishlist is empty.');
+      return;
+    }
+    for (const { id, title, rarity } of cards) {
+      console.log(`${id}  ${title} (${rarity})`);
+    }
+  });
 
 wishlist
   .command('remove')
