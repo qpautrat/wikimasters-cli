@@ -7,6 +7,37 @@ export interface WishlistRemoval {
   removed: boolean;
 }
 
+export interface WishlistCard {
+  id: CardId;
+  title: string;
+  rarity: string;
+}
+
+interface WishlistRow {
+  card_id: string;
+  cards: { id: string; wikipedia_title: string; rarity: string } | null;
+}
+
+export async function listWishlist(session: Session): Promise<WishlistCard[]> {
+  const { data, error, status } = await session.client
+    .from('wishlist_items')
+    .select('card_id, cards(id, wikipedia_title, rarity)')
+    .eq('user_id', session.userId)
+    .order('created_at', { ascending: false })
+    .overrideTypes<WishlistRow[], { merge: false }>();
+
+  if (error) {
+    throw new WikiMastersError(`Listing the wishlist failed (HTTP ${status}): ${error.message}`);
+  }
+
+  return data.map(({ card_id, cards }) => {
+    if (!cards) {
+      throw new WikiMastersError(`Wishlist card ${card_id} has no readable card details`);
+    }
+    return { id: cards.id as CardId, title: cards.wikipedia_title, rarity: cards.rarity };
+  });
+}
+
 export async function removeFromWishlist(session: Session, cardId: CardId): Promise<WishlistRemoval> {
   const { error, status, count } = await session.client
     .from('wishlist_items')

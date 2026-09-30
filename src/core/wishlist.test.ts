@@ -3,7 +3,7 @@ import { parseCardId } from './card-id.js';
 import { WikiMastersError } from './errors.js';
 import { resumeSession } from './session.js';
 import { ACCESS_TOKEN, USER_ID, fakeFetch, tokenRefresh, type Route } from './testing/fake-supabase.js';
-import { removeFromWishlist } from './wishlist.js';
+import { listWishlist, removeFromWishlist } from './wishlist.js';
 
 const cardId = parseCardId('3fc9a132-31db-4b14-832c-04823e02113d');
 
@@ -56,5 +56,42 @@ describe('parseCardId', () => {
 
   it('rejects anything that is not a UUID', () => {
     expect(() => parseCardId('Pointe d’Arcalod')).toThrow(WikiMastersError);
+  });
+});
+
+function wishlistSelect(rows: unknown[]): Route {
+  return ({ method, url }) =>
+    method === 'GET' && url.pathname === '/rest/v1/wishlist_items' ? { status: 200, body: rows } : undefined;
+}
+
+describe('listWishlist', () => {
+  it('lists the cards of the signed-in user, most recently added first', async () => {
+    const { session, requests } = await sessionWith(
+      wishlistSelect([
+        { card_id: cardId, cards: { id: cardId, wikipedia_title: 'Pointe d’Arcalod', rarity: 'PC' } },
+        { card_id: '3dec5858-2054-4b3a-98f9-dfc35180165e', cards: { id: '3dec5858-2054-4b3a-98f9-dfc35180165e', wikipedia_title: 'Cervin', rarity: 'UR' } },
+      ]),
+    );
+
+    await expect(listWishlist(session)).resolves.toEqual([
+      { id: cardId, title: 'Pointe d’Arcalod', rarity: 'PC' },
+      { id: '3dec5858-2054-4b3a-98f9-dfc35180165e', title: 'Cervin', rarity: 'UR' },
+    ]);
+    const request = requests.find(({ method }) => method === 'GET');
+    expect(request?.url.searchParams.get('user_id')).toBe(`eq.${USER_ID}`);
+    expect(request?.url.searchParams.get('order')).toBe('created_at.desc');
+    expect(request?.url.searchParams.get('select')).toContain('cards(id,wikipedia_title,rarity)');
+  });
+
+  it('returns an empty list for an empty wishlist', async () => {
+    const { session } = await sessionWith(wishlistSelect([]));
+
+    await expect(listWishlist(session)).resolves.toEqual([]);
+  });
+
+  it('fails when a card of the wishlist cannot be read', async () => {
+    const { session } = await sessionWith(wishlistSelect([{ card_id: cardId, cards: null }]));
+
+    await expect(listWishlist(session)).rejects.toThrow(WikiMastersError);
   });
 });

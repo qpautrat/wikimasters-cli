@@ -3,4 +3,4 @@ export { FIREFOX_BINARY, loginInBrowser, readRefreshTokenFromFirefoxProfile, typ
 export { parseCardId, type CardId } from './card-id.js';
 export { WikiMastersError } from './errors.js';
 export { resumeSession, type ResumeSessionOptions, type Session } from './session.js';
-export { removeFromWishlist, type WishlistRemoval } from './wishlist.js';
+export { listWishlist, removeFromWishlist, type WishlistCard, type WishlistRemoval } from './wishlist.js';
