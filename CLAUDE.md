@@ -37,4 +37,4 @@ A feature lands in the core first, then gets exposed through the CLI. Core failu
 
 ## Specification-driven workflow
 
-The user states requirements as user-facing specs in `specs/`, one Markdown file per feature (context, user stories, acceptance criteria). Implement from the acceptance criteria. When a spec is ambiguous or conflicts with existing code, ask instead of guessing.
+The user states requirements as user-facing specs in `specs/`, one Markdown file per feature (context, user stories, acceptance criteria). Implement from the acceptance criteria. When a spec is ambiguous or conflicts with existing code, ask instead of guessing. Specs in `specs/backlog/` are accepted but not scheduled: do not implement them until the user schedules one, which moves it up to `specs/`.
