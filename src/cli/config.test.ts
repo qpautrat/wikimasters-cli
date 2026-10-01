@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { AuthRequiredError } from '../core/index.js';
 import { loadConfig, requireRefreshToken, saveRefreshToken } from './config.js';
 
 function envFile(content?: string): string {
@@ -32,6 +33,7 @@ describe('loadConfig', () => {
   });
 
   it('asks to log in when no refresh token is stored', () => {
+    expect(() => requireRefreshToken({ anonKey: 'anon-key', refreshToken: undefined })).toThrow(AuthRequiredError);
     expect(() => requireRefreshToken({ anonKey: 'anon-key', refreshToken: undefined })).toThrow(/wkm login/);
   });
 });

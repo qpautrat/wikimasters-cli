@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
-import { WikiMastersError } from '../core/index.js';
+import { AuthRequiredError, WikiMastersError } from '../core/index.js';
 
 export const DEFAULT_ENV_FILE = fileURLToPath(new URL('../../.env', import.meta.url));
 
@@ -28,7 +28,7 @@ export function loadConfig(envFile = DEFAULT_ENV_FILE, env: Env = process.env): 
 
 export function requireRefreshToken(config: Config): string {
   if (!config.refreshToken) {
-    throw new WikiMastersError('Not logged in: run `wkm login`');
+    throw new AuthRequiredError('Not logged in');
   }
   return config.refreshToken;
 }
