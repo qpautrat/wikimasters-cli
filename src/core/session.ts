@@ -1,6 +1,8 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { WikiMastersError } from './errors.js';
+import { createClient, isAuthApiError, type SupabaseClient } from '@supabase/supabase-js';
+import { AuthRequiredError, WikiMastersError } from './errors.js';
 import { SUPABASE_URL } from './supabase.js';
+
+const SESSION_REJECTED_STATUSES = new Set([400, 401, 403]);
 
 export interface ResumeSessionOptions {
   anonKey: string;
@@ -22,7 +24,9 @@ export async function resumeSession({ anonKey, refreshToken, fetch }: ResumeSess
 
   const { data, error } = await client.auth.refreshSession({ refresh_token: refreshToken });
   if (error) {
-    throw new WikiMastersError(`Resuming the session failed: ${error.message}`);
+    throw isAuthApiError(error) && SESSION_REJECTED_STATUSES.has(error.status)
+      ? new AuthRequiredError(`The stored session is expired or revoked (${error.message})`)
+      : new WikiMastersError(`Resuming the session failed: ${error.message}`);
   }
   if (!data.session || !data.user) {
     throw new WikiMastersError('Resuming the session returned no session');

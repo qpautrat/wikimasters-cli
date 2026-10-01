@@ -1,5 +1,5 @@
 import type { CardId } from './card-id.js';
-import { WikiMastersError } from './errors.js';
+import { WikiMastersError, apiFailure } from './errors.js';
 import type { Session } from './session.js';
 
 export interface WishlistRemoval {
@@ -27,7 +27,7 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
     .overrideTypes<WishlistRow[], { merge: false }>();
 
   if (error) {
-    throw new WikiMastersError(`Listing the wishlist failed (HTTP ${status}): ${error.message}`);
+    throw apiFailure('Listing the wishlist', status, error.message);
   }
 
   return data.map(({ card_id, cards }) => {
@@ -46,7 +46,7 @@ export async function removeFromWishlist(session: Session, cardId: CardId): Prom
     .eq('card_id', cardId);
 
   if (error) {
-    throw new WikiMastersError(`Removing card ${cardId} from the wishlist failed (HTTP ${status}): ${error.message}`);
+    throw apiFailure(`Removing card ${cardId} from the wishlist`, status, error.message);
   }
   if (count === null) {
     throw new WikiMastersError(`Removing card ${cardId} from the wishlist returned no row count (HTTP ${status})`);

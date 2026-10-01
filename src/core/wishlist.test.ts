@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseCardId } from './card-id.js';
-import { WikiMastersError } from './errors.js';
+import { AuthRequiredError, WikiMastersError } from './errors.js';
 import { resumeSession } from './session.js';
 import { ACCESS_TOKEN, USER_ID, fakeFetch, tokenRefresh, type Route } from './testing/fake-supabase.js';
 import { listWishlist, removeFromWishlist } from './wishlist.js';
@@ -45,7 +45,18 @@ describe('removeFromWishlist', () => {
       method === 'DELETE' ? { status: 525, body: { message: 'SSL handshake failed' } } : undefined,
     );
 
-    await expect(removeFromWishlist(session, cardId)).rejects.toThrow(/HTTP 525/);
+    const failure = removeFromWishlist(session, cardId);
+
+    await expect(failure).rejects.toThrow(/HTTP 525/);
+    await expect(failure).rejects.not.toThrow(AuthRequiredError);
+  });
+
+  it('requires a new login when the API rejects the session', async () => {
+    const { session } = await sessionWith(({ method }) =>
+      method === 'DELETE' ? { status: 401, body: { code: 'PGRST303', message: 'JWT expired' } } : undefined,
+    );
+
+    await expect(removeFromWishlist(session, cardId)).rejects.toThrow(AuthRequiredError);
   });
 });
 
