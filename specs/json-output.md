@@ -14,4 +14,5 @@ En tant qu'agent, j'obtiens le résultat de chaque commande sous forme de JSON, 
 2. Avec `--json`, la sortie standard contient uniquement le résultat en JSON.
 3. `wkm wishlist list --json` écrit `[{ "id": "…", "title": "…", "rarity": "…" }]`, et `[]` pour une liste vide.
 4. `wkm wishlist remove <card-id> --json` écrit `{ "id": "…", "removed": true }`, ou `false` si la carte était déjà absente.
-5. En cas d'erreur, le message part sur la sortie d'erreur et le code de sortie vaut 1, avec ou sans `--json`.
+5. `wkm login --json` écrit `{ "userId": "…" }`.
+6. En cas d'erreur, la sortie standard reste vide, le message part sur la sortie d'erreur et le code de sortie est non nul, avec ou sans `--json`.
