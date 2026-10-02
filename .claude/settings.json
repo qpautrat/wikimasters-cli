@@ -12,5 +12,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "session-report@claude-plugins-official": true
   }
 }
