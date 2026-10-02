@@ -34,7 +34,3 @@ Two layers, kept strictly separate:
 2. **Adapters** (`src/cli/`): thin consumers of the core that map input to core calls and format output, with no business logic. The CLI (`wkm`) is the only adapter in scope. An MCP server is planned and must reuse the core unchanged.
 
 A feature lands in the core first, then gets exposed through the CLI. Core failures throw `WikiMastersError`; the CLI prints its message to stderr and exits 1, or 4 for its `AuthRequiredError` subclass (no session, refresh token expired or revoked, HTTP 401), which tells the agent to run `wkm login`. Build API errors with `apiFailure` so a 401 maps to `AuthRequiredError`. Output formatting lives in `src/cli/output.ts`: text by default, and with the global `--json` flag stdout carries only the JSON result.
-
-## Specification-driven workflow
-
-The user states requirements as user-facing specs in `specs/`, one Markdown file per feature (context, user stories, acceptance criteria). Implement from the acceptance criteria. When a spec is ambiguous or conflicts with existing code, ask instead of guessing. Specs in `specs/backlog/` are accepted but not scheduled: do not implement them until the user schedules one, which moves it up to `specs/`.
