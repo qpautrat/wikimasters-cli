@@ -1,3 +1,5 @@
+lefthook: mise exec -- lefthook
+
 pre-commit:
   jobs:
     - name: refuse .env
