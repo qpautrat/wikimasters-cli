@@ -14,5 +14,5 @@ En tant que développeur, un commit qui laisserait le dépôt dans un état inva
 
 1. lefthook est épinglé dans `mise.toml`, et `mise install` installe le hook de pre-commit.
 2. Le hook refuse le commit si le build, la vérification des types, le linter, le formateur ou les tests échouent.
-3. Le hook vérifie le contenu indexé : une modification non indexée ou un fichier non suivi ne change pas son verdict.
+3. Le hook vérifie le contenu indexé, dépendances comprises : une modification non indexée, un fichier non suivi ou une dépendance installée mais absente de `package-lock.json` indexé ne change pas son verdict.
 4. Le hook est documenté dans `CLAUDE.md`.
