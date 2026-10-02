@@ -1,4 +1,10 @@
 export {
+  parseAuctionId,
+  placeMinimumBid,
+  type AuctionId,
+  type PlacedBid,
+} from "./auction.js";
+export {
   AUTH_COOKIE_NAME,
   refreshTokenFromAuthCookies,
   type Cookie,

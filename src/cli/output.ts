@@ -1,5 +1,6 @@
 import type {
   CommonsDiscard,
+  PlacedBid,
   WishlistCard,
   WishlistRemoval,
 } from "../core/index.js";
@@ -67,4 +68,13 @@ export function formatDiscard(
   return failed.length === 0
     ? summary
     : `${summary}\n${cards(failed.length, "card")} could not be discarded: ${JSON.stringify(failed)}`;
+}
+
+export function formatBid(
+  { auctionId, amount, balance }: PlacedBid,
+  format: Format,
+): string {
+  if (format === "json")
+    return JSON.stringify({ id: auctionId, amount, balance });
+  return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
 }

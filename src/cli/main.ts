@@ -4,11 +4,14 @@ import {
   discardCommons,
   listWishlist,
   loginInBrowser,
+  parseAuctionId,
   parseCardId,
+  placeMinimumBid,
   removeFromWishlist,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
+  formatBid,
   formatDiscard,
   formatLogin,
   formatRemoval,
@@ -36,6 +39,20 @@ program
     );
     const session = await openSession(await loginInBrowser());
     console.log(formatLogin(session.userId, format()));
+  });
+
+const auction = program.command("auction").description("Take part in auctions");
+
+auction
+  .command("bid")
+  .description(
+    "Place the minimum bid the game accepts on an auction: its base amount while nobody has bid, else the current bid plus 10% rounded up",
+  )
+  .argument("<auction-id>", "auction UUID")
+  .action(async (rawAuctionId: string) => {
+    const auctionId = parseAuctionId(rawAuctionId);
+    const session = await openSession();
+    console.log(formatBid(await placeMinimumBid(session, auctionId), format()));
   });
 
 const collection = program

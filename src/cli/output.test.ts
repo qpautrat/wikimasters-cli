@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parseCardId } from "../core/index.js";
+import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
+  formatBid,
   formatDiscard,
   formatLogin,
   formatRemoval,
@@ -15,9 +16,22 @@ const card = {
   owned: false,
 };
 const cards = [card];
+const bid = {
+  auctionId: parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f"),
+  amount: 359,
+  balance: 7743,
+};
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
+  it("reports the auction id, the amount bid and the balance", () => {
+    expect(JSON.parse(formatBid(bid, "json"))).toEqual({
+      id: bid.auctionId,
+      amount: 359,
+      balance: 7743,
+    });
+  });
+
   it("lists the wishlist as an array of id, title, rarity and ownership", () => {
     expect(JSON.parse(formatWishlist(cards, "json"))).toEqual([
       { id: cardId, title: "Pointe de la Sambuy", rarity: "PC", owned: false },
@@ -49,6 +63,12 @@ describe("JSON output", () => {
 });
 
 describe("text output", () => {
+  it("prints the amount bid and the balance", () => {
+    expect(formatBid(bid, "text")).toBe(
+      `Bid 359 wikibidous on auction ${bid.auctionId}; balance 7743 wikibidous.`,
+    );
+  });
+
   it("prints the discard count, gain and balance", () => {
     expect(formatDiscard(discard, "text")).toBe(
       "Discarded 3 common cards for 3 wikibidous; balance 7430 wikibidous.",

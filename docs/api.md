@@ -90,3 +90,28 @@ Source: capture `discard-cards.har`.
 
 - Query `sort=rarity&rarity=<code>&page=<n>&stats=0`; returns `collection` (one page of entries with their card) and `pendingTradeCardIds`, the cards engaged in a pending trade, empty in the capture.
 - `discardCommons`: reads `pendingTradeCardIds` and keeps every entry whose `id` or `card_id` it lists, the capture not telling which of the two it holds.
+
+## `auctions`: the auctions
+
+Source: read-only query, 2026-10-02.
+
+| Column | Meaning |
+|---|---|
+| `id` | auction UUID, also in the auction page URL `/marketplace/<id>` |
+| `seller_id` | user who put the card up for auction |
+| `status` | `active`, `settled_sold`, `settled_unsold`, `cancelled` |
+| `end_at` | when bidding closes; an `active` auction past it awaits settlement |
+| `base_amount` | starting price, which the seller can lower once |
+| `current_bid` | highest bid, `null` while nobody has bid |
+| `current_bidder_id` | author of `current_bid` |
+
+- `placeMinimumBid`: `GET` filtered on `id`, to check the auction is running and not the user's own, and to compute the minimum bid.
+
+## `POST /api/marketplace/<auction id>/bid`: bid on an auction
+
+Source: capture `place-bid.har`, and the auction page's JavaScript for the error codes.
+
+- Body `{"amount": <wikibidous>}`; response `{"auction_id", "current_bid": <amount>, "bidder_balance": <wikibidous left>}`.
+- Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The page handles `bid_too_low` (with `min`, the minimum it accepts), `insufficient_balance` and `human_verification_required` (the page then shows a captcha).
+- The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
+- `placeMinimumBid`: sends the minimum bid and reports `bidder_balance`.
