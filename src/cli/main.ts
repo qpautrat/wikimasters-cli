@@ -1,33 +1,19 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import {
-  AuthRequiredError,
   listWishlist,
   loginInBrowser,
   parseCardId,
   removeFromWishlist,
-  resumeSession,
-  type Session,
 } from "../core/index.js";
-import { loadConfig, requireRefreshToken, saveRefreshToken } from "./config.js";
+import { loadConfig } from "./config.js";
 import {
   formatLogin,
   formatRemoval,
   formatWishlist,
   type Format,
 } from "./output.js";
-
-async function openSession(refreshToken?: string): Promise<Session> {
-  const config = loadConfig();
-  const session = await resumeSession({
-    anonKey: config.anonKey,
-    refreshToken: refreshToken ?? requireRefreshToken(config),
-  });
-  saveRefreshToken(session.refreshToken);
-  return session;
-}
-
-const EXIT_AUTH_REQUIRED = 4;
+import { openSession, reportFailure } from "./session.js";
 
 const program = new Command("wkm")
   .description("Interact with WikiMasters")
@@ -82,9 +68,5 @@ wishlist
 try {
   await program.parseAsync();
 } catch (error) {
-  console.error(
-    `wkm: ${error instanceof Error ? error.message : String(error)}`,
-  );
-  process.exitCode =
-    error instanceof AuthRequiredError ? EXIT_AUTH_REQUIRED : 1;
+  reportFailure("wkm", error);
 }
