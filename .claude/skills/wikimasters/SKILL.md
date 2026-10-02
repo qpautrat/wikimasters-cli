@@ -1,6 +1,6 @@
 ---
 name: wikimasters
-description: Act on the user's WikiMasters account through the `wkm` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes") or collection, e.g. "enlève Half Dome de ma liste de souhaits".
+description: Act on the user's WikiMasters account through the `wkm` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes"), collection or auctions ("enchères"), e.g. "enlève Half Dome de ma liste de souhaits".
 ---
 
 # Using `wkm`
@@ -22,6 +22,10 @@ The user names cards in natural language. Resolve each name to its id with the l
 - no match: say so and change nothing.
 
 Report results by card title, never by id alone.
+
+## Auctions named by the user
+
+Take the auction id from the auction page URL the user gives, `https://www.wiki-masters.com/marketplace/<id>`.
 
 ## Limits
 
