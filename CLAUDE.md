@@ -25,6 +25,8 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
 | Run the CLI after a build | `npm run -s wkm -- login`, then `npm run -s wkm -- wishlist remove <card-uuid>` |
 
+`npm install` installs a lefthook pre-commit hook (`lefthook.yml`) that runs `scripts/verify-staged.sh`: it exports the staged content to a temporary directory and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
+
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. `tsconfig.json` covers every file and serves the typecheck and the editor; `tsconfig.build.json` excludes test files and `testing/` from `dist/`.
 
 Supabase auth on this project requires a captcha, so there is no password sign-in: `wkm login` starts the installed Firefox, unautomated, on a throwaway profile; the user signs in there, and the CLI reads the refresh token from the `sb-<ref>-auth-token` cookies in the profile's `cookies.sqlite` (through the `sqlite3` CLI), then closes Firefox and deletes the profile. A browser driven by Playwright/WebDriver fails the captcha. Every command then exchanges that refresh token for a session. Supabase rotates refresh tokens on each use, so the CLI writes the new one back to `.env` right after the exchange, before doing anything else. Never solve the captcha programmatically or hide browser automation from it.

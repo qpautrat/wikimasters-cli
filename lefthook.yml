@@ -1,0 +1,4 @@
+pre-commit:
+  jobs:
+    - name: verify staged content
+      run: scripts/verify-staged.sh
