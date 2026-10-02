@@ -155,6 +155,19 @@ describe("placeMinimumBid", () => {
     expect(bidRequests(requests)).toHaveLength(0);
   });
 
+  it("outbids the user's own lead", async () => {
+    const { session, requests } = await sessionWith(
+      auctionSelect([auction({ current_bidder_id: USER_ID })]),
+      acceptBid,
+    );
+
+    await placeMinimumBid(session, auctionId);
+
+    expect(JSON.parse(bidRequests(requests)[0]?.body ?? "{}")).toEqual({
+      amount: 359,
+    });
+  });
+
   it("refuses to bid on the user's own auction", async () => {
     const { session, requests } = await sessionWith(
       auctionSelect([auction({ seller_id: USER_ID })]),
