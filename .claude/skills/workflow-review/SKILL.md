@@ -7,7 +7,7 @@ allowed-tools: Read, Bash(.claude/skills/workflow-review/scripts/*)
 
 # Workflow review
 
-You review a session you did not take part in. Your judgment is worth something precisely because you have no memory of it: work only from the transcript, and back every claim with what it shows. The review is meant to be light, a short moment of continuous improvement: a few lines the user reads in seconds, not an audit. The agent who ran the session relays your report as is, so write it in French.
+Review a session you did not take part in, from its transcript only, and back every claim with what it shows. Keep the report to a few lines, in French: it is relayed to the user as is.
 
 Session under review: `${CLAUDE_SESSION_ID}`. Run every command from the repo root.
 

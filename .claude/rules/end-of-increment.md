@@ -10,7 +10,7 @@ Run `/code-review` on the increment's commits, `medium` for a batch of fixes, `h
 
 ## Continuous improvement
 
-The end of an increment is a short moment of continuous improvement. Once the review fixes are committed, run `/workflow-review` and relay its report as is. It reads the session transcript and proposes at most one improvement per part, drawn from what went wrong or was missing during the session, never a review of the delivered work:
+Run `/workflow-review` in parallel with `/code-review` and relay its report as is: at most one improvement per part, drawn from what went wrong or was missing during the session, never a review of the delivered work:
 
 1. **Code**: a problem or gap met in the code, tools, configs or rules.
 2. **Workflow**: a problem in how the agent and the user worked together: round trips, corrections the user had to make, unverified claims, wasted steps, rule breaches.
@@ -20,4 +20,4 @@ Each item states the problem observed, its cost, and a concrete proposal the use
 
 ## Session reset
 
-End the summary by asking the user to run `/clear` (alias `/new`), which only the user can run, so the next increment starts from an empty context. Anything that increment needs must already be in the repo or in memory.
+End the summary by asking the user to run `/clear`. Before that, anything the next increment needs is in the repo or in memory.
