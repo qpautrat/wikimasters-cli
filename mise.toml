@@ -1,3 +1,6 @@
+min_version = "2026.9.17"
+
 [tools]
-node = "24.21.0"
+node = { version = "24.21.0", postinstall = { run = "npm ci", when = "always" } }
 "github:betterleaks/betterleaks" = "1.9.0"
+lefthook = { version = "2.1.16", postinstall = { run = "lefthook install", when = "always" } }

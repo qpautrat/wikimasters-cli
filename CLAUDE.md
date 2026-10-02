@@ -12,11 +12,11 @@ That front-end is a Next.js app whose data layer is Supabase: the browser calls 
 
 TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
 
-`mise.toml` pins the exact Node version used to develop; `package.json` `engines` keeps the minimum supported at runtime. Tools distributed through npm stay devDependencies, locked by `package-lock.json`; `mise.toml` only holds what npm does not ship.
+`mise.toml` pins the exact Node version used to develop and the tools git calls (lefthook, `betterleaks`); `package.json` `engines` keeps the minimum Node supported at runtime. Tools called by npm scripts stay devDependencies, locked by `package-lock.json`. `mise install` installs the pinned tools, then runs `npm ci` and `lefthook install`.
 
 | Task | Command |
 |---|---|
-| Install Node, then dependencies | `mise install`, then `npm ci` |
+| Install tools, dependencies and the git hook | `mise install` |
 | Build to `dist/` | `npm run build` |
 | Typecheck | `npm run typecheck` |
 | Lint `src/` / apply safe fixes | `npm run lint` / `npm run lint:fix` |
@@ -25,7 +25,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
 | Run the CLI after a build | `npm run -s wkm -- login`, then `npm run -s wkm -- wishlist remove <card-uuid>` |
 
-`npm install` installs a lefthook pre-commit hook (`lefthook.yml`). It refuses `.env`, any capture that `scripts/sanitize-har.sh --check` flags, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
+The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses `.env`, any capture that `scripts/sanitize-har.sh --check` flags, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
 
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. `tsconfig.json` covers every file and serves the typecheck and the editor; `tsconfig.build.json` excludes test files and `testing/` from `dist/`.
 
