@@ -20,6 +20,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Build to `dist/` | `npm run build` |
 | Typecheck | `npm run typecheck` |
 | Lint `src/` / apply safe fixes | `npm run lint` / `npm run lint:fix` |
+| Check formatting of `src/` / format it | `npm run format:check` / `npm run format` |
 | All tests | `npm test` |
 | One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
 | Run the CLI after a build | `npm run -s wkm -- login`, then `npm run -s wkm -- wishlist remove <card-uuid>` |

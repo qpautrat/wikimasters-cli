@@ -16,6 +16,8 @@
     "test": "vitest run",
     "lint": "biome lint src",
     "lint:fix": "biome lint --write src",
+    "format": "biome format --write src",
+    "format:check": "biome format src",
     "wkm": "node dist/cli/main.js"
   },
   "dependencies": {
