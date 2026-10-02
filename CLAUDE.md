@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `wkm-cli` lets an AI agent interact with [WikiMasters](https://www.wiki-masters.com), a collectible card game built from Wikipedia articles (packs, collection, duels, trades, auctions, guilds, messaging). The site has no public API: this project wraps the internal HTTP API used by its web front-end.
 
-That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Reads are discovered by querying the API read-only; writes, RPC functions and `/api/...` routes from HAR captures of the manual flows, stored sanitized in `capture-reseau-har/` (see `.claude/rules/api-discovery.md`). `docs/api.md` describes every table and route the core uses.
+That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Reads are discovered by querying the API read-only; writes, RPC functions and `/api/...` routes from HAR captures of the manual flows, stored sanitized in `capture-reseau-har/` (see `.claude/rules/api-discovery.md`). `docs/api.md` describes every table and route the core uses. `docs/game-rules.md` records the game rules the user states, which the API does not reveal.
 
 ## Stack and commands
 
