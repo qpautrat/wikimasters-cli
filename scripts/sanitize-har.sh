@@ -20,6 +20,7 @@ readonly FILTER='
     | (.request.cookies[]?, .response.cookies[]?).value |= "REDACTED"
     | if (.request.url | test("/auth/v1/")) then
         (.request.postData.text, .response.content.text | select(. != null)) |= "REDACTED"
+        | .request.postData.params[]?.value |= "REDACTED"
       else . end
   )
   | walk(if type == "string" then
@@ -31,7 +32,7 @@ readonly FILTER='
 if $check; then
   status=0
   for har in "$@"; do
-    if ! jq -e "($FILTER) == ." "$har" > /dev/null; then
+    if ! jq -s -e "length == 1 and (.[0] | (($FILTER) == .))" "$har" > /dev/null; then
       echo "not sanitized or not a HAR: $har (run $0 $har)" >&2
       status=1
     fi
@@ -42,6 +43,7 @@ fi
 for har in "$@"; do
   tmp="$(mktemp)"
   jq "$FILTER" "$har" > "$tmp"
-  mv "$tmp" "$har"
+  cat "$tmp" > "$har"
+  rm "$tmp"
   echo "sanitized: $har"
 done
