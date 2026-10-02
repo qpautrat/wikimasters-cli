@@ -10,10 +10,13 @@ That front-end is a Next.js app whose data layer is Supabase: the browser calls 
 
 ## Stack and commands
 
-TypeScript (ESM, `nodenext`) on Node ≥ 22.12, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
+TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
+
+`mise.toml` pins the exact Node version used to develop; `package.json` `engines` keeps the minimum supported at runtime. Tools distributed through npm stay devDependencies, locked by `package-lock.json`; `mise.toml` only holds what npm does not ship.
 
 | Task | Command |
 |---|---|
+| Install Node, then dependencies | `mise install`, then `npm ci` |
 | Build to `dist/` | `npm run build` |
 | Typecheck | `npm run typecheck` |
 | All tests | `npm test` |
