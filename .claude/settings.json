@@ -23,6 +23,8 @@
     ]
   },
   "enabledPlugins": {
-    "session-report@claude-plugins-official": true
+    "session-report@claude-plugins-official": true,
+    "datadog@claude-plugins-official": false,
+    "csharp-lsp@claude-plugins-official": false
   }
 }
