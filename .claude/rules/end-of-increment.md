@@ -1,0 +1,18 @@
+# End of increment
+
+## Summary
+
+Report only what the user needs: blockers, questions, and decisions taken on their behalf. Leave out build and hook status, commit mechanics, and the steps taken to satisfy the rules.
+
+## Code review
+
+Run `/code-review` on the increment's commits, `medium` for a batch of fixes, `high` for a feature or new tooling, and fix its valid findings within the same increment, with no new review after. Report its findings only through an improvement proposal, when they reveal a gap that remains.
+
+## Improvement proposals
+
+Without being asked, propose improvements drawn from what went wrong or was missing during the session, never a review of the delivered work. Two parts, at most two items each:
+
+1. **Project**: a problem or gap met in the code, tools, configs or rules.
+2. **Agentic workflow**: a problem in how the agent and the user worked together: round trips, corrections the user had to make, unverified claims, wasted steps, rule breaches.
+
+Each item states the problem observed, its cost, and a concrete proposal the user can accept as is: what to change, and where. Leave out an item without a proposal, and a problem already fixed during the session.
