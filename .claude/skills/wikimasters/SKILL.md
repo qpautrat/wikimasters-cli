@@ -1,0 +1,29 @@
+---
+name: wikimasters
+description: Act on the user's WikiMasters account through the `wkm` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes") or collection, e.g. "enlève Half Dome de ma liste de souhaits".
+---
+
+# Using `wkm`
+
+Run every command from the repo root as `npm run -s wkm -- <command> --json`. If `dist/` is missing or older than `src/`, run `npm run -s build` first. `npm run -s wkm -- --help` lists the available commands.
+
+## Results and exit codes
+
+- `0`: success. Read the JSON on stdout.
+- `4`: the user must log in. Tell them a Firefox window is about to open for them to sign in, run `npm run -s wkm -- login --json`, then retry the original command once.
+- Any other code: report the stderr message in one sentence. If it names an HTTP 5xx status, retry once before reporting.
+
+## Cards named by the user
+
+The user names cards in natural language. Resolve each name to its id with the list command that matches the request, e.g. `wishlist list` for a card to remove from the wishlist. Match without regard to case, accents or minor typos:
+
+- exactly one match: act on it;
+- several matches: show their titles and rarities, and act only after the user picks one;
+- no match: say so and change nothing.
+
+Report results by card title, never by id alone.
+
+## Limits
+
+- Change the account only when the user asks for it.
+- Never read or print `.env` or any session token.
