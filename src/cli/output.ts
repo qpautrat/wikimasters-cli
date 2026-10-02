@@ -1,4 +1,8 @@
-import type { WishlistCard, WishlistRemoval } from "../core/index.js";
+import type {
+  CommonsDiscard,
+  WishlistCard,
+  WishlistRemoval,
+} from "../core/index.js";
 
 export type Format = "text" | "json";
 
@@ -39,4 +43,20 @@ export function formatRemoval(
   return removed
     ? `Card ${cardId} removed from the wishlist.`
     : `Card ${cardId} was not in the wishlist.`;
+}
+
+export function formatDiscard(
+  { discarded, gained, balance, failed }: CommonsDiscard,
+  format: Format,
+): string {
+  if (format === "json") {
+    return JSON.stringify({ discarded, gained, balance, failed });
+  }
+  const summary =
+    discarded === 0
+      ? `No common card discarded; balance ${balance} wikibidous.`
+      : `Discarded ${discarded} common cards for ${gained} wikibidous; balance ${balance} wikibidous.`;
+  return failed.length === 0
+    ? summary
+    : `${summary}\n${failed.length} cards could not be discarded: ${JSON.stringify(failed)}`;
 }

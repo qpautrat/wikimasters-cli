@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import {
+  discardCommons,
   listWishlist,
   loginInBrowser,
   parseCardId,
@@ -8,6 +9,7 @@ import {
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
+  formatDiscard,
   formatLogin,
   formatRemoval,
   formatWishlist,
@@ -34,6 +36,21 @@ program
     );
     const session = await openSession(await loginInBrowser());
     console.log(formatLogin(session.userId, format()));
+  });
+
+const collection = program
+  .command("collection")
+  .description("Manage your collection");
+
+collection
+  .command("discard-commons")
+  .description(
+    "Discard every common card of your collection, except favourite and shiny ones, for wikibidous",
+  )
+  .action(async () => {
+    console.log(
+      formatDiscard(await discardCommons(await openSession()), format()),
+    );
   });
 
 const wishlist = program
