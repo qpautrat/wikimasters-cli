@@ -16,6 +16,7 @@ export {
   type ResumeSessionOptions,
   type Session,
 } from "./session.js";
+export { queryTable } from "./table-query.js";
 export {
   listWishlist,
   removeFromWishlist,
