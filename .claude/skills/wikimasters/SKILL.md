@@ -11,7 +11,7 @@ Run every command from the repo root as `npm run -s wkm -- <command> --json`. If
 
 - `0`: success. Read the JSON on stdout.
 - `4`: the user must log in. Tell them a Firefox window is about to open for them to sign in, run `npm run -s wkm -- login --json`, then retry the original command once.
-- Any other code: report the stderr message in one sentence. If it names an HTTP 5xx status, retry once before reporting.
+- Any other code: report the stderr message in one sentence. If it names an HTTP 5xx status, retry once before reporting, except for `auction bid`: never rerun it on your own.
 
 ## Cards named by the user
 
