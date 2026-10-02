@@ -84,6 +84,23 @@ describe("queryTable", () => {
     );
   });
 
+  it("reports PostgREST's details for an unknown relation", async () => {
+    const { session } = await sessionAnswering({
+      status: 400,
+      body: {
+        code: "PGRST200",
+        message:
+          "Could not find a relationship between 'cards' and 'user_card'",
+        details: "Searched for a foreign key relationship",
+        hint: null,
+      },
+    });
+
+    await expect(
+      queryTable(session, "cards?select=id,user_card(card_id)"),
+    ).rejects.toThrow(/user_card'.*Searched for a foreign key relationship/);
+  });
+
   it("requires a new login when the API rejects the session", async () => {
     const { session } = await sessionAnswering({
       status: 401,

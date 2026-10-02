@@ -28,7 +28,7 @@ export async function queryTable(
     throw apiFailure(
       `Querying ${table}`,
       status,
-      [error.message, error.hint].filter(Boolean).join(" "),
+      [error.message, error.details, error.hint].filter(Boolean).join(" "),
     );
   }
   return data;

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { openSession, reportFailure } from "../cli/session.js";
-import { WikiMastersError, queryTable } from "../core/index.js";
+import { WikiMastersError } from "../core/index.js";
+import { queryTable } from "../core/table-query.js";
 
 const COMMAND = "api:get";
 
