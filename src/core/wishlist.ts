@@ -11,18 +11,25 @@ export interface WishlistCard {
   id: CardId;
   title: string;
   rarity: string;
+  owned: boolean;
 }
 
 interface WishlistRow {
   card_id: string;
-  cards: { id: string; wikipedia_title: string; rarity: string } | null;
+  cards: {
+    id: string;
+    wikipedia_title: string;
+    rarity: string;
+    user_cards: { card_id: string }[];
+  } | null;
 }
 
 export async function listWishlist(session: Session): Promise<WishlistCard[]> {
   const { data, error, status } = await session.client
     .from("wishlist_items")
-    .select("card_id, cards(id, wikipedia_title, rarity)")
+    .select("card_id, cards(id, wikipedia_title, rarity, user_cards(card_id))")
     .eq("user_id", session.userId)
+    .eq("cards.user_cards.user_id", session.userId)
     .order("created_at", { ascending: false })
     .overrideTypes<WishlistRow[], { merge: false }>();
 
@@ -40,6 +47,7 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
       id: cards.id as CardId,
       title: cards.wikipedia_title,
       rarity: cards.rarity,
+      owned: cards.user_cards.length > 0,
     };
   });
 }

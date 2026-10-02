@@ -108,6 +108,7 @@ describe("listWishlist", () => {
             id: cardId,
             wikipedia_title: "Pointe d’Arcalod",
             rarity: "PC",
+            user_cards: [],
           },
         },
         {
@@ -116,24 +117,29 @@ describe("listWishlist", () => {
             id: "3dec5858-2054-4b3a-98f9-dfc35180165e",
             wikipedia_title: "Cervin",
             rarity: "UR",
+            user_cards: [{ card_id: "3dec5858-2054-4b3a-98f9-dfc35180165e" }],
           },
         },
       ]),
     );
 
     await expect(listWishlist(session)).resolves.toEqual([
-      { id: cardId, title: "Pointe d’Arcalod", rarity: "PC" },
+      { id: cardId, title: "Pointe d’Arcalod", rarity: "PC", owned: false },
       {
         id: "3dec5858-2054-4b3a-98f9-dfc35180165e",
         title: "Cervin",
         rarity: "UR",
+        owned: true,
       },
     ]);
     const request = requests.find(({ method }) => method === "GET");
     expect(request?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
     expect(request?.url.searchParams.get("order")).toBe("created_at.desc");
     expect(request?.url.searchParams.get("select")).toContain(
-      "cards(id,wikipedia_title,rarity)",
+      "cards(id,wikipedia_title,rarity,user_cards(card_id))",
+    );
+    expect(request?.url.searchParams.get("cards.user_cards.user_id")).toBe(
+      `eq.${USER_ID}`,
     );
   });
 

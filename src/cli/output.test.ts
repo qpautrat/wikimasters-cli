@@ -3,7 +3,9 @@ import { parseCardId } from "../core/index.js";
 import { formatLogin, formatRemoval, formatWishlist } from "./output.js";
 
 const cardId = parseCardId("093ba47b-6b5d-4d29-9992-c2bdc172f62c");
-const cards = [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }];
+const cards = [
+  { id: cardId, title: "Pointe de la Sambuy", rarity: "PC", owned: false },
+];
 
 describe("JSON output", () => {
   it("lists the wishlist as an array of id, title and rarity", () => {
