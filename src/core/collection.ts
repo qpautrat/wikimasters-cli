@@ -6,7 +6,7 @@ const COLLECTION_PAGE = "/collection";
 
 const COMMON = "C";
 const WIKIBIDOUS_PER_DISCARD = 1;
-const DISCARD_BATCH_SIZE = 50;
+const DISCARD_BATCH_SIZE = 100;
 const PAGE_SIZE = 1000;
 
 export interface CommonsDiscard {

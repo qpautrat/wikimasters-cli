@@ -111,14 +111,14 @@ describe("discardCommons", () => {
     expect(params?.get("count")).toBe("gt.0");
   });
 
-  it("discards every common across pages, 50 at a time, for 1 wikibidou each", async () => {
+  it("discards every common across pages, 100 at a time, for 1 wikibidou each", async () => {
     const rows = commons(1003);
     const { session, requests } = await collectionWith(rows);
 
     const result = await discardCommons(session);
 
     const batches = discardedIds(requests);
-    expect(batches.every((batch) => batch.length <= 50)).toBe(true);
+    expect(batches.every((batch) => batch.length <= 100)).toBe(true);
     expect(batches.flat()).toEqual(rows.map(({ id }) => id));
     expect(result).toEqual({
       discarded: 1003,
@@ -186,7 +186,7 @@ describe("discardCommons", () => {
     const discard = bulkDiscard();
     let calls = 0;
     const { session } = await sessionWith(
-      collectionSelect(commons(120)),
+      collectionSelect(commons(250)),
       myCollection(),
       (request) =>
         request.url.pathname.endsWith("/bulk-discard") && ++calls === 3
@@ -195,7 +195,7 @@ describe("discardCommons", () => {
     );
 
     await expect(discardCommons(session)).rejects.toThrow(
-      /HTTP 500.*100 cards were discarded before the failure/,
+      /HTTP 500.*200 cards were discarded before the failure/,
     );
   });
 

@@ -71,7 +71,7 @@ Source: capture `discard-cards.har`.
 - Body `{"card_ids": [<user_cards.id>, …]}`: collection entry ids, not `cards.id`.
 - Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [...]}`; the capture only shows an empty `failed`.
 - Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCommons` reports the gain as `discarded_count`.
-- The site's collection page sends at most 50 ids per call, one page; `discardCommons` keeps that batch size, no larger batch having been observed.
+- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCommons` sends batches of 100.
 
 ## `GET /api/my-collection`: the collection page
 
