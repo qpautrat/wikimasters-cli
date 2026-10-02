@@ -2,7 +2,7 @@
 
 ## Contexte
 
-L'interface permet de marquer une carte de ma collection en favori (`user_cards.starred`). Une carte en favori est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux marquer et démarquer un favori depuis le terminal.
+L'interface permet de marquer une carte de ma collection en favori (`user_cards.starred`). Une carte en favori est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux marquer un favori depuis le terminal.
 
 L'écriture n'est pas encore connue : elle demande une capture HAR du parcours dans l'interface.
 
@@ -10,17 +10,17 @@ Dépend de : [Défausser toutes mes cartes communes](../discard-commons.md).
 
 ## User story
 
-En tant que joueur, je marque une carte de ma collection en favori, ou je retire ce marquage, pour choisir les cartes que je protège.
+En tant que joueur, je marque une carte de ma collection en favori, pour la protéger.
 
 ## Critères d'acceptation
 
 1. `wikimasters collection star <card-id>` marque en favori la carte de ma collection qui porte cet identifiant de carte.
-2. `wikimasters collection unstar <card-id>` retire ce marquage.
-3. Marquer une carte déjà en favori, ou démarquer une carte qui ne l'est pas, réussit sans rien modifier et le signale.
-4. Une carte absente de ma collection est refusée sans rien modifier, avec un message qui le dit.
-5. Le marquage fait depuis la commande apparaît dans l'interface.
+2. Marquer une carte déjà en favori réussit sans rien modifier et le signale.
+3. Une carte absente de ma collection est refusée sans rien modifier, avec un message qui le dit.
+4. Le marquage fait depuis la commande apparaît dans l'interface.
 
 ## Hors périmètre
 
+- Retirer une carte de mes favoris.
 - Lister mes cartes en favori.
 - Marquer plusieurs cartes en une commande.
