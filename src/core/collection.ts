@@ -1,7 +1,8 @@
-import { authCookieHeader } from "./auth-cookie.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
-import { SITE_URL } from "./supabase.js";
+import { siteCookie, siteRequest } from "./site.js";
+
+const COLLECTION_PAGE = "/collection";
 
 const COMMON = "C";
 const WIKIBIDOUS_PER_DISCARD = 1;
@@ -29,40 +30,6 @@ interface BulkDiscardResponse {
   failed: unknown[];
 }
 
-async function siteRequest(
-  session: Session,
-  cookie: string,
-  action: string,
-  path: string,
-  init: { method: "GET" } | { method: "POST"; body: unknown },
-): Promise<unknown> {
-  const response = await session.fetch(`${SITE_URL}${path}`, {
-    method: init.method,
-    headers: {
-      Cookie: cookie,
-      Origin: SITE_URL,
-      Referer: `${SITE_URL}/collection`,
-      ...(init.method === "POST" ? { "Content-Type": "application/json" } : {}),
-    },
-    ...(init.method === "POST" ? { body: JSON.stringify(init.body) } : {}),
-  });
-  const text = await response.text();
-  if (!response.ok) throw apiFailure(action, response.status, text);
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new WikiMastersError(`${action} returned no JSON: ${text}`);
-  }
-}
-
-async function sessionCookie(session: Session): Promise<string> {
-  const { data, error } = await session.client.auth.getSession();
-  if (error || !data.session) {
-    throw new WikiMastersError("The session holds no access token");
-  }
-  return authCookieHeader(data.session);
-}
-
 async function pendingTradeIds(
   session: Session,
   cookie: string,
@@ -72,6 +39,7 @@ async function pendingTradeIds(
     session,
     cookie,
     action,
+    COLLECTION_PAGE,
     `/api/my-collection?sort=rarity&rarity=${COMMON}&page=0&stats=0`,
     { method: "GET" },
   );
@@ -153,6 +121,7 @@ async function bulkDiscard(
     session,
     cookie,
     action,
+    COLLECTION_PAGE,
     "/api/user-cards/bulk-discard",
     { method: "POST", body: { card_ids: userCardIds } },
   );
@@ -167,7 +136,7 @@ async function bulkDiscard(
 export async function discardCommons(
   session: Session,
 ): Promise<CommonsDiscard> {
-  const cookie = await sessionCookie(session);
+  const cookie = await siteCookie(session);
   const inTrade = await pendingTradeIds(session, cookie);
   const userCardIds = (await listPlainCommons(session))
     .filter(({ id, card_id }) => !inTrade.has(id) && !inTrade.has(card_id))
