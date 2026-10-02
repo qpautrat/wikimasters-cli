@@ -14,7 +14,7 @@ En tant que joueur, je défausse en une commande toutes les cartes communes de m
 
 1. La commande défausse toutes les cartes de ma collection dont la rareté possédée est commune (`C`), quel que soit le nombre de pages qu'elles occupent dans l'interface.
 2. Aucune carte d'une autre rareté possédée n'est défaussée, même si sa rareté actuelle au catalogue est commune.
-3. Les cartes communes marquées en favori, brillantes ou engagées dans un échange en cours ne sont pas défaussées.
+3. Les cartes communes marquées en favori, brillantes, portant au moins une étiquette ou engagées dans un échange en cours ne sont pas défaussées.
 4. La commande affiche le nombre de cartes défaussées, les wikibidous gagnés et mon nouveau solde de wikibidous.
 5. Sans carte commune à défausser, la commande réussit sans rien modifier.
 
