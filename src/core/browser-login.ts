@@ -1,16 +1,27 @@
-import { execFile, spawn } from 'node:child_process';
-import { copyFileSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { setTimeout as sleep } from 'node:timers/promises';
-import { promisify } from 'node:util';
-import { AUTH_COOKIE_NAME, refreshTokenFromAuthCookies, type Cookie } from './auth-cookie.js';
-import { WikiMastersError } from './errors.js';
-import { SITE_URL } from './supabase.js';
+import { execFile, spawn } from "node:child_process";
+import {
+  copyFileSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
+import { promisify } from "node:util";
+import {
+  AUTH_COOKIE_NAME,
+  refreshTokenFromAuthCookies,
+  type Cookie,
+} from "./auth-cookie.js";
+import { WikiMastersError } from "./errors.js";
+import { SITE_URL } from "./supabase.js";
 
-export const FIREFOX_BINARY = '/Applications/Firefox.app/Contents/MacOS/firefox';
+export const FIREFOX_BINARY =
+  "/Applications/Firefox.app/Contents/MacOS/firefox";
 
-const COOKIES_DB = 'cookies.sqlite';
+const COOKIES_DB = "cookies.sqlite";
 
 const PROFILE_PREFS = [
   'user_pref("browser.shell.checkDefaultBrowser", false);',
@@ -27,17 +38,24 @@ export interface BrowserLoginOptions {
   pollIntervalMs?: number;
 }
 
-export async function readRefreshTokenFromFirefoxProfile(profileDir: string): Promise<string | undefined> {
+export async function readRefreshTokenFromFirefoxProfile(
+  profileDir: string,
+): Promise<string | undefined> {
   const database = join(profileDir, COOKIES_DB);
   if (!existsSync(database)) return undefined;
 
-  const snapshot = mkdtempSync(join(tmpdir(), 'wkm-cookies-'));
+  const snapshot = mkdtempSync(join(tmpdir(), "wkm-cookies-"));
   try {
-    for (const suffix of ['', '-wal']) {
-      if (existsSync(database + suffix)) copyFileSync(database + suffix, join(snapshot, COOKIES_DB + suffix));
+    for (const suffix of ["", "-wal"]) {
+      if (existsSync(database + suffix))
+        copyFileSync(database + suffix, join(snapshot, COOKIES_DB + suffix));
     }
     const query = `SELECT name, value FROM moz_cookies WHERE host LIKE '%wiki-masters.com' AND name LIKE '${AUTH_COOKIE_NAME}%'`;
-    const { stdout } = await execFileAsync('sqlite3', ['-json', join(snapshot, COOKIES_DB), query]);
+    const { stdout } = await execFileAsync("sqlite3", [
+      "-json",
+      join(snapshot, COOKIES_DB),
+      query,
+    ]);
     const cookies: Cookie[] = stdout.trim() ? JSON.parse(stdout) : [];
     return refreshTokenFromAuthCookies(cookies);
   } catch {
@@ -52,15 +70,27 @@ export async function loginInBrowser({
   timeoutMs = 5 * 60_000,
   pollIntervalMs = 1000,
 }: BrowserLoginOptions = {}): Promise<string> {
-  const profileDir = mkdtempSync(join(tmpdir(), 'wkm-firefox-'));
-  writeFileSync(join(profileDir, 'user.js'), `${PROFILE_PREFS.join('\n')}\n`);
+  const profileDir = mkdtempSync(join(tmpdir(), "wkm-firefox-"));
+  writeFileSync(join(profileDir, "user.js"), `${PROFILE_PREFS.join("\n")}\n`);
 
-  const firefox = spawn(firefoxBinary, ['--no-remote', '--profile', profileDir, `${SITE_URL}/login`], { stdio: 'ignore' });
+  const firefox = spawn(
+    firefoxBinary,
+    ["--no-remote", "--profile", profileDir, `${SITE_URL}/login`],
+    { stdio: "ignore" },
+  );
   let exited = false;
-  const exit = new Promise<void>((resolve) => firefox.once('close', () => resolve()));
+  const exit = new Promise<void>((resolve) =>
+    firefox.once("close", () => resolve()),
+  );
   void exit.then(() => (exited = true));
   const launchFailure = new Promise<never>((_, reject) =>
-    firefox.once('error', (error) => reject(new WikiMastersError(`Cannot start Firefox at ${firefoxBinary}: ${error.message}`))),
+    firefox.once("error", (error) =>
+      reject(
+        new WikiMastersError(
+          `Cannot start Firefox at ${firefoxBinary}: ${error.message}`,
+        ),
+      ),
+    ),
   );
 
   try {
@@ -77,9 +107,12 @@ export async function loginInBrowser({
       const closed = exited;
       const refreshToken = await readRefreshTokenFromFirefoxProfile(profileDir);
       if (refreshToken) return refreshToken;
-      if (closed) throw new WikiMastersError('Firefox was closed before signing in');
+      if (closed)
+        throw new WikiMastersError("Firefox was closed before signing in");
       await sleep(pollIntervalMs);
     }
-    throw new WikiMastersError(`No sign-in within ${Math.round(timeoutMs / 1000)} s`);
+    throw new WikiMastersError(
+      `No sign-in within ${Math.round(timeoutMs / 1000)} s`,
+    );
   }
 }

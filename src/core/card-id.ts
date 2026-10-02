@@ -1,6 +1,6 @@
-import { WikiMastersError } from './errors.js';
+import { WikiMastersError } from "./errors.js";
 
-export type CardId = string & { readonly __brand: 'CardId' };
+export type CardId = string & { readonly __brand: "CardId" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

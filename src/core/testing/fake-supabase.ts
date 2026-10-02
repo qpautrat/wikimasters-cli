@@ -13,21 +13,32 @@ export interface FakeResponse {
 
 export type Route = (request: RecordedRequest) => FakeResponse | undefined;
 
-export const USER_ID = '5d14f22b-ea20-4a25-bc4a-fa879af3d0ee';
-export const ACCESS_TOKEN = 'fake-access-token';
-export const ROTATED_REFRESH_TOKEN = 'rotated-refresh-token';
+export const USER_ID = "5d14f22b-ea20-4a25-bc4a-fa879af3d0ee";
+export const ACCESS_TOKEN = "fake-access-token";
+export const ROTATED_REFRESH_TOKEN = "rotated-refresh-token";
 
 export const tokenRefresh: Route = ({ method, url }) => {
-  if (method !== 'POST' || url.pathname !== '/auth/v1/token' || url.searchParams.get('grant_type') !== 'refresh_token') return undefined;
+  if (
+    method !== "POST" ||
+    url.pathname !== "/auth/v1/token" ||
+    url.searchParams.get("grant_type") !== "refresh_token"
+  )
+    return undefined;
   return {
     status: 200,
     body: {
       access_token: ACCESS_TOKEN,
-      token_type: 'bearer',
+      token_type: "bearer",
       expires_in: 3600,
       expires_at: Math.floor(Date.now() / 1000) + 3600,
       refresh_token: ROTATED_REFRESH_TOKEN,
-      user: { id: USER_ID, aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {} },
+      user: {
+        id: USER_ID,
+        aud: "authenticated",
+        role: "authenticated",
+        app_metadata: {},
+        user_metadata: {},
+      },
     },
   };
 };
@@ -45,14 +56,19 @@ export function fakeFetch(...routes: Route[]) {
     };
     requests.push(recorded);
 
-    const response = routes.map((route) => route(recorded)).find((match) => match !== undefined);
+    const response = routes
+      .map((route) => route(recorded))
+      .find((match) => match !== undefined);
     if (!response) {
-      return new Response(JSON.stringify({ message: 'no fake route' }), { status: 599 });
+      return new Response(JSON.stringify({ message: "no fake route" }), {
+        status: 599,
+      });
     }
-    const body = response.body === undefined ? null : JSON.stringify(response.body);
+    const body =
+      response.body === undefined ? null : JSON.stringify(response.body);
     return new Response(body, {
       status: response.status,
-      headers: { 'content-type': 'application/json', ...response.headers },
+      headers: { "content-type": "application/json", ...response.headers },
     });
   };
 
