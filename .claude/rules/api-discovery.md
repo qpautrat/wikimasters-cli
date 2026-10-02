@@ -2,7 +2,7 @@
 
 Discover what a feature needs from the API in this order:
 
-1. **Reads**: query the API read-only from a scratch script outside the repo. Run `npm run build` first, then import from `dist/`: read the config with `loadConfig`, open the session with `resumeSession`, and save the rotated refresh token with `saveRefreshToken` right after, before any query. Besides that token exchange, send only `GET` or `HEAD` requests, and never print the refresh token. An unknown table name returns PostgREST's suggestion (`Perhaps you meant the table 'public.user_cards'`), `select=*&limit=1` returns the columns, and an embed such as `cards(user_cards(card_id))` checks a relation.
+1. **Reads**: query the API read-only with `npm run -s api:get -- '<table>?<PostgREST parameters>'`, which only sends `GET` requests. An unknown table name returns PostgREST's suggestion (`Perhaps you meant the table 'public.user_cards'`), `select=*&limit=1` returns the columns, and an embed such as `select=id,user_cards(card_id)` checks a relation.
 2. **Writes, RPC functions and Next.js `/api/...` routes**: the API reveals neither their name nor their effect. Ask the user for a HAR capture of the manual flow. Never send one of these requests to explore.
 
 Record every table and route the core uses in `docs/api.md`, in the commit that makes the core use it.
