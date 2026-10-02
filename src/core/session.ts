@@ -18,6 +18,7 @@ export interface Session {
   client: SupabaseClient;
   userId: string;
   refreshToken: string;
+  fetch: typeof fetch;
 }
 
 export async function resumeSession({
@@ -52,5 +53,6 @@ export async function resumeSession({
     client,
     userId: data.user.id,
     refreshToken: data.session.refresh_token,
+    fetch: fetch ?? globalThis.fetch,
   };
 }

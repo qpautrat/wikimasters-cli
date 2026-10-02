@@ -53,3 +53,11 @@ export function refreshTokenFromAuthCookies(
   }
   return session.refresh_token;
 }
+
+// @supabase/ssr reads the unchunked cookie before any `.N` chunk; its 3180-byte chunk limit only matters to browsers.
+export function authCookieHeader(session: object): string {
+  const encoded = Buffer.from(JSON.stringify(session), "utf8").toString(
+    "base64url",
+  );
+  return `${AUTH_COOKIE_NAME}=${BASE64_PREFIX}${encoded}`;
+}
