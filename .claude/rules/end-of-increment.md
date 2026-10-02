@@ -20,4 +20,4 @@ Each item states the problem observed, its cost, and a concrete proposal the use
 
 ## Session reset
 
-End the summary by asking the user to run `/clear`. When the user's reply to the summary opens a new subject, apply the accepted proposals, then ask for `/clear` before taking up that subject.
+End the summary by asking the user, for each `/workflow-review` proposal, whether to apply it, then to run `/clear` once the accepted ones are applied. When the user's reply to the summary opens a new subject, apply the accepted proposals, then ask for `/clear` before taking up that subject.
