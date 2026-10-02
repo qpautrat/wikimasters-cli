@@ -110,6 +110,20 @@ describe("placeMinimumBid", () => {
     );
   });
 
+  it("reports the amount the site records", async () => {
+    const { session } = await sessionWith(
+      auctionSelect([auction()]),
+      bidRoute(() => ({
+        status: 200,
+        body: { current_bid: 360, bidder_balance: BALANCE_AFTER_BID },
+      })),
+    );
+
+    const { amount } = await placeMinimumBid(session, auctionId);
+
+    expect(amount).toBe(360);
+  });
+
   it("bids the base amount when nobody has bid yet", async () => {
     const { session, requests } = await sessionWith(
       auctionSelect([auction({ current_bid: null })]),

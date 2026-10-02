@@ -32,7 +32,7 @@ export function minimumBid({
   base_amount,
   current_bid,
 }: Pick<AuctionRow, "base_amount" | "current_bid">): number {
-  // Same expression as the site's front-end, float rounding included: 1.1 * 200 rounds up to 221.
+  // Same expression as the site's front-end, float rounding included (docs/game-rules.md): 1.1 * 200 rounds up to 221.
   return current_bid === null
     ? base_amount
     : Math.max(Math.ceil(1.1 * current_bid), current_bid + 1);
@@ -97,5 +97,5 @@ export async function placeMinimumBid(
       `${action} returned an unexpected response: ${JSON.stringify(body)}`,
     );
   }
-  return { auctionId, amount, balance: body.bidder_balance };
+  return { auctionId, amount: body.current_bid, balance: body.bidder_balance };
 }
