@@ -9,4 +9,4 @@ pre-commit:
     - name: scan staged changes for secrets
       run: mise exec -- betterleaks git --staged --no-banner .
     - name: verify staged content
-      run: scripts/verify-staged.sh
+      run: mise exec -- scripts/verify-staged.sh
