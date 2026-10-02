@@ -18,7 +18,8 @@
     "lint:fix": "biome lint --write src",
     "format": "biome format --write src",
     "format:check": "biome format src",
-    "wkm": "node dist/cli/main.js"
+    "wkm": "node dist/cli/main.js",
+    "api:get": "npm run -s build && node dist/dev/api-get.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
