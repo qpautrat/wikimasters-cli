@@ -2,9 +2,10 @@
 
 The user drives the project through specs in `specs/`, written in French. Implement from their acceptance criteria; when a spec is ambiguous or conflicts with existing code, ask instead of guessing.
 
-## One feature per spec
+## One subject per spec
 
-- Every acceptance criterion must belong to the one feature named in the title. Split anything else out.
+- A spec covers one subject, functional or technical. Every acceptance criterion must belong to the subject named in the title. Split anything else out.
+- A tool or piece of infrastructure that a spec needs (a toolchain, a hook manager) gets its own spec, referenced with `Dépend de : …`, never a criterion inside the spec that first needs it.
 - A cross-cutting capability (an option on every command, an exit-code contract) gets its own spec, never a section inside the first feature that needs it.
 - Never spec an agent workflow that only chains existing commands (e.g. "remove by name" = `list` + `remove`). The agent composes commands itself.
 
