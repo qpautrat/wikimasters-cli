@@ -14,5 +14,5 @@ En tant que développeur, un commit qui contient un secret est refusé avant d'�
 
 1. `betterleaks` est épinglé dans `mise.toml`.
 2. Le hook de pre-commit lance `betterleaks` sur le contenu indexé et refuse le commit s'il détecte un secret.
-3. Le hook refuse une capture HAR qui contient encore un JWT ou une valeur de cookie non masquée.
-4. Le hook refuse `.env`.
+3. Le hook refuse une capture HAR qui contient encore un JWT ou une valeur de cookie non masquée, ou qui n'est pas un HAR lisible.
+4. Le hook refuse tout fichier `.env`, à la racine du dépôt comme dans un sous-dossier.
