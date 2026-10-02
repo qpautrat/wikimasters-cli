@@ -45,9 +45,7 @@ const auction = program.command("auction").description("Take part in auctions");
 
 auction
   .command("bid")
-  .description(
-    "Place the minimum bid the game accepts on an auction: its base amount while nobody has bid, else the current bid plus 10% rounded up",
-  )
+  .description("Place the minimum bid the game accepts on an auction")
   .argument("<auction-id>", "auction UUID")
   .action(async (rawAuctionId: string) => {
     const auctionId = parseAuctionId(rawAuctionId);
