@@ -10,9 +10,13 @@ Run `/code-review` on the increment's commits, `medium` for a batch of fixes, `h
 
 ## Improvement proposals
 
-Without being asked, propose improvements drawn from what went wrong or was missing during the session, never a review of the delivered work. Two parts, at most two items each:
+Once the review fixes are committed, run `/workflow-review` and relay its report as is: a session cost summary, then improvements drawn from what went wrong or was missing during the session, never a review of the delivered work. It reads the session transcript and applies this grid. Two parts, at most two items each:
 
 1. **Project**: a problem or gap met in the code, tools, configs or rules.
 2. **Agentic workflow**: a problem in how the agent and the user worked together: round trips, corrections the user had to make, unverified claims, wasted steps, rule breaches.
 
 Each item states the problem observed, its cost, and a concrete proposal the user can accept as is: what to change, and where. Leave out an item without a proposal, and a problem already fixed during the session.
+
+## Session reset
+
+End the summary by asking the user to run `/clear` (alias `/new`), which only the user can run, so the next increment starts from an empty context. Anything that increment needs must already be in the repo or in memory.
