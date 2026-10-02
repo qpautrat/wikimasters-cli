@@ -11,6 +11,6 @@ pre-commit:
       glob: "capture-reseau-har/*.har"
       run: scripts/sanitize-har.sh --check {staged_files}
     - name: scan staged changes for secrets
-      run: mise exec -- betterleaks git --staged --no-banner .
+      run: betterleaks git --staged --no-banner .
     - name: verify staged content
-      run: mise exec -- scripts/verify-staged.sh
+      run: scripts/verify-staged.sh
