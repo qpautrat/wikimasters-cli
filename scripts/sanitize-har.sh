@@ -16,7 +16,7 @@ readonly FILTER='
   def redact_headers: map(if (.name | ascii_downcase | IN("authorization", "cookie", "set-cookie", "apikey", "x-api-key")) then .value = "REDACTED" else . end);
   def redact_cookies: map(.value = "REDACTED");
 
-  .log.entries[] |= (
+  .log.entries[]? |= (
       .request.headers |= redact_headers
     | .response.headers |= redact_headers
     | .request.cookies |= redact_cookies
@@ -34,8 +34,13 @@ readonly FILTER='
 
 if $check; then
   unsanitized=0
+  sanitized="$(mktemp)"
+  original="$(mktemp)"
+  trap 'rm -f "$sanitized" "$original"' EXIT
   for har in "$@"; do
-    if ! cmp -s <(jq -S "$FILTER" "$har") <(jq -S . "$har"); then
+    jq -S "$FILTER" "$har" > "$sanitized"
+    jq -S . "$har" > "$original"
+    if ! cmp -s "$sanitized" "$original"; then
       echo "not sanitized: $har (run $0 $har)" >&2
       unsanitized=1
     fi
