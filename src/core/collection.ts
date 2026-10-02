@@ -22,6 +22,7 @@ interface CollectionRow {
   snapshot_rarity: string;
   starred: boolean;
   is_shiny: boolean;
+  user_card_tags: unknown[];
 }
 
 interface BulkDiscardResponse {
@@ -58,11 +59,14 @@ async function listPlainCommons(session: Session): Promise<CollectionRow[]> {
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error, status } = await session.client
       .from("user_cards")
-      .select("id, card_id, snapshot_rarity, starred, is_shiny")
+      .select(
+        "id, card_id, snapshot_rarity, starred, is_shiny, user_card_tags(tag_id)",
+      )
       .eq("user_id", session.userId)
       .eq("snapshot_rarity", COMMON)
       .is("starred", false)
       .is("is_shiny", false)
+      .is("user_card_tags", null)
       .gt("count", 0)
       .order("id")
       .range(from, from + PAGE_SIZE - 1)
@@ -75,7 +79,11 @@ async function listPlainCommons(session: Session): Promise<CollectionRow[]> {
   }
 
   const unsafe = rows.find(
-    (row) => row.snapshot_rarity !== COMMON || row.starred || row.is_shiny,
+    (row) =>
+      row.snapshot_rarity !== COMMON ||
+      row.starred ||
+      row.is_shiny ||
+      row.user_card_tags.length > 0,
   );
   if (unsafe) {
     throw new WikiMastersError(

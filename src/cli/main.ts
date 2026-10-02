@@ -45,7 +45,7 @@ const collection = program
 collection
   .command("discard-commons")
   .description(
-    "Discard every common card of your collection, except favourite, shiny and pending-trade ones, for 1 wikibidou each; exits 1 if the site failed to discard some",
+    "Discard every common card of your collection, except favourite, shiny, labelled and pending-trade ones, for 1 wikibidou each; exits 1 if the site failed to discard some",
   )
   .action(async () => {
     const result = await discardCommons(await openSession());

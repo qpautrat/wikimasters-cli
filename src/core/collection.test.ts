@@ -22,6 +22,7 @@ function common(index: number) {
     snapshot_rarity: "C",
     starred: false,
     is_shiny: false,
+    user_card_tags: [],
   };
 }
 
@@ -108,6 +109,8 @@ describe("discardCommons", () => {
     expect(params?.get("snapshot_rarity")).toBe("eq.C");
     expect(params?.get("starred")).toBe("is.false");
     expect(params?.get("is_shiny")).toBe("is.false");
+    expect(params?.get("select")).toContain("user_card_tags(tag_id)");
+    expect(params?.get("user_card_tags")).toBe("is.null");
     expect(params?.get("count")).toBe("gt.0");
   });
 
@@ -176,6 +179,16 @@ describe("discardCommons", () => {
     const { session, requests } = await collectionWith([
       common(0),
       { ...common(1), snapshot_rarity: "PC" },
+    ]);
+
+    await expect(discardCommons(session)).rejects.toThrow(WikiMastersError);
+    expect(discardRequests(requests)).toEqual([]);
+  });
+
+  it("discards nothing when a selected card has a label", async () => {
+    const { session, requests } = await collectionWith([
+      common(0),
+      { ...common(1), user_card_tags: [{ tag_id: "label" }] },
     ]);
 
     await expect(discardCommons(session)).rejects.toThrow(WikiMastersError);

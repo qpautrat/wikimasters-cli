@@ -54,8 +54,19 @@ Source: read-only query, 2026-10-02.
 
 - One row per owned card: no `card_id` appears twice.
 - Row-level security returns only the user's own rows.
-- `discardCommons`: `GET`, filtered on `user_id`, `snapshot_rarity=eq.C`, `starred=is.false`, `is_shiny=is.false` and `count=gt.0`, paged by 1000.
+- `discardCommons`: `GET`, filtered on `user_id`, `snapshot_rarity=eq.C`, `starred=is.false`, `is_shiny=is.false`, `count=gt.0` and, embedding `user_card_tags(tag_id)`, `user_card_tags=is.null`, paged by 1000.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
+
+## `user_card_tags`: the labels put on collection entries
+
+Source: read-only query, 2026-10-02.
+
+| Column | Meaning |
+|---|---|
+| `user_card_id` | labelled collection entry, relation to `user_cards.id` |
+| `tag_id` | the label, relation to `tags.id` (`name`, `color`, one row per label the user created) |
+
+- `discardCommons` embeds it in `user_cards` to keep labelled entries out of the discard.
 
 ## `rpc/get_my_profile`: the signed-in user's profile
 
