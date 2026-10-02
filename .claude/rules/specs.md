@@ -6,6 +6,7 @@ The user drives the project through specs in `specs/`, written in French. Implem
 
 - A spec covers one subject, functional or technical. Every acceptance criterion must belong to the subject named in the title. Split anything else out.
 - A tool or piece of infrastructure that a spec needs (a toolchain, a hook manager) gets its own spec, referenced with `Dépend de : …`, never a criterion inside the spec that first needs it.
+- Undoing an action (unmark a favourite, remove a label) gets its own spec, referencing the action's spec with `Dépend de : …`, never a criterion inside it.
 - A cross-cutting capability (an option on every command, an exit-code contract) gets its own spec, never a section inside the first feature that needs it.
 - Never spec an agent workflow that only chains existing commands (e.g. "remove by name" = `list` + `remove`). The agent composes commands itself.
 
