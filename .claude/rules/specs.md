@@ -11,7 +11,7 @@ The user drives the project through specs in `specs/`, written in French. Implem
 
 ## Spec before code
 
-- Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first and submit it.
+- Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first.
 - Work in small batches: one atomic spec, implemented and delivered, before the next. Atomicity is mandatory, submission is not.
 - When confident in a spec, commit it and implement it without waiting, then name each decision taken on the user's behalf in the end-of-increment summary. Submit it first when confidence is low, all the more for a functional spec.
 
