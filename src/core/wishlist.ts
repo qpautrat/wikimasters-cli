@@ -30,6 +30,7 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
     .select("card_id, cards(id, wikipedia_title, rarity, user_cards(card_id))")
     .eq("user_id", session.userId)
     .eq("cards.user_cards.user_id", session.userId)
+    .gt("cards.user_cards.count", 0)
     .order("created_at", { ascending: false })
     .overrideTypes<WishlistRow[], { merge: false }>();
 

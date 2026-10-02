@@ -141,6 +141,9 @@ describe("listWishlist", () => {
     expect(request?.url.searchParams.get("cards.user_cards.user_id")).toBe(
       `eq.${USER_ID}`,
     );
+    expect(request?.url.searchParams.get("cards.user_cards.count")).toBe(
+      "gt.0",
+    );
   });
 
   it("returns an empty list for an empty wishlist", async () => {
