@@ -15,6 +15,7 @@ En tant que joueur, je donne l'identifiant d'une enchère et la commande y place
 3. La commande affiche le montant misé et mon nouveau solde de wikibidous.
 4. La commande échoue sans rien miser, avec un message explicite, quand l'enchère n'est plus en cours ou quand j'en suis le vendeur.
 5. Quand le jeu refuse la mise (solde insuffisant, mise dépassée entre-temps, vérification humaine demandée), la commande échoue en affichant le motif donné par le jeu.
+6. La commande mise même quand je suis déjà le meilleur enchérisseur : surenchérir sur ma propre mise décourage les concurrents.
 
 ## Hors périmètre
 
