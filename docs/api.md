@@ -2,7 +2,7 @@
 
 PostgREST tables live at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>`, called with the user's session JWT. Row-level security limits what a user can read.
 
-Next.js routes live at `https://www.wiki-masters.com/api/...` and read the session from the `sb-<ref>-auth-token` cookie, not from an `Authorization` header. The core sends the whole session as one unchunked cookie, `base64-` followed by the base64url-encoded session JSON, the `@supabase/ssr` format.
+Next.js routes live at `https://www.wiki-masters.com/api/...` and read the session from the `sb-<ref>-auth-token` cookie, not from an `Authorization` header. The core sends the whole session as one unchunked cookie, `base64-` followed by the base64url-encoded session JSON, the `@supabase/ssr` format. It also sends the browser's `Origin` and `Referer`.
 
 ## Auth
 
@@ -62,7 +62,7 @@ Source: read-only query, 2026-10-02.
 Source: capture `discard-cards.har`.
 
 - `POST` with an empty JSON body; returns one object holding, among others, `username` and `wikibidous_balance`.
-- `discardCommons`: reads `wikibidous_balance` before discarding, to compute the gain.
+- `discardCommons`: reads `wikibidous_balance` only when there is nothing to discard; otherwise the last `bulk-discard` response gives the balance.
 
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 
@@ -70,4 +70,12 @@ Source: capture `discard-cards.har`.
 
 - Body `{"card_ids": [<user_cards.id>, …]}`: collection entry ids, not `cards.id`.
 - Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [...]}`; the capture only shows an empty `failed`.
+- Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCommons` reports the gain as `discarded_count`.
 - The site's collection page sends at most 50 ids per call, one page; `discardCommons` keeps that batch size, no larger batch having been observed.
+
+## `GET /api/my-collection`: the collection page
+
+Source: capture `discard-cards.har`.
+
+- Query `sort=rarity&rarity=<code>&page=<n>&stats=0`; returns `collection` (one page of entries with their card) and `pendingTradeCardIds`, the cards engaged in a pending trade, empty in the capture.
+- `discardCommons`: reads `pendingTradeCardIds` and keeps every entry whose `id` or `card_id` it lists, the capture not telling which of the two it holds.
