@@ -13,17 +13,13 @@ if [[ $# -eq 0 ]]; then
 fi
 
 readonly FILTER='
-  def redact_headers: map(if (.name | ascii_downcase | IN("authorization", "cookie", "set-cookie", "apikey", "x-api-key")) then .value = "REDACTED" else . end);
-  def redact_cookies: map(.value = "REDACTED");
+  def redact_header: if (.name | ascii_downcase | IN("authorization", "cookie", "set-cookie", "apikey", "x-api-key")) then .value = "REDACTED" else . end;
 
-  .log.entries[]? |= (
-      .request.headers |= redact_headers
-    | .response.headers |= redact_headers
-    | .request.cookies |= redact_cookies
-    | .response.cookies |= redact_cookies
+  .log.entries[] |= (
+      (.request.headers[]?, .response.headers[]?) |= redact_header
+    | (.request.cookies[]?, .response.cookies[]?).value |= "REDACTED"
     | if (.request.url | test("/auth/v1/")) then
-        (.request.postData.text? |= (if . == null then null else "REDACTED" end))
-        | (.response.content.text? |= (if . == null then null else "REDACTED" end))
+        (.request.postData.text, .response.content.text | select(. != null)) |= "REDACTED"
       else . end
   )
   | walk(if type == "string" then
@@ -33,19 +29,14 @@ readonly FILTER='
 '
 
 if $check; then
-  unsanitized=0
-  sanitized="$(mktemp)"
-  original="$(mktemp)"
-  trap 'rm -f "$sanitized" "$original"' EXIT
+  status=0
   for har in "$@"; do
-    jq -S "$FILTER" "$har" > "$sanitized"
-    jq -S . "$har" > "$original"
-    if ! cmp -s "$sanitized" "$original"; then
-      echo "not sanitized: $har (run $0 $har)" >&2
-      unsanitized=1
+    if ! jq -e "($FILTER) == ." "$har" > /dev/null; then
+      echo "not sanitized or not a HAR: $har (run $0 $har)" >&2
+      status=1
     fi
   done
-  exit "$unsanitized"
+  exit "$status"
 fi
 
 for har in "$@"; do
