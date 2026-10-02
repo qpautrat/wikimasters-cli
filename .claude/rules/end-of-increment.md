@@ -18,6 +18,6 @@ Run `/workflow-review` in parallel with `/code-review` and relay its report as i
 
 Each item states the problem observed, its cost, and a concrete proposal the user can accept as is: what to change, and where. Leave out an item without a proposal, and a problem already fixed during the session.
 
-## Session reset
+## Next subject
 
-End the summary by asking the user, for each `/workflow-review` proposal, whether to apply it, then to run `/clear` once the accepted ones are applied. When the user's reply to the summary opens a new subject, apply the accepted proposals, then ask for `/clear` before taking up that subject.
+End the summary by asking the user, for each `/workflow-review` proposal, whether to apply it. When the user's reply to the summary opens a new subject, apply the accepted proposals, then hand the subject to a `general-purpose` subagent with a self-contained brief: the request in the user's words, every decision they gave on it, and the repo rules it falls under. Relay its questions and results to the user, and send their answers back to it with `SendMessage`. Never ask the user to run `/clear` or to repeat a request.
