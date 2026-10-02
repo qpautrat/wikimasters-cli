@@ -1,4 +1,12 @@
 pre-commit:
   jobs:
+    - name: refuse .env
+      glob: ".env"
+      run: echo ".env holds the WikiMasters refresh token and must never be committed" >&2; exit 1
+    - name: refuse unsanitized captures
+      glob: "capture-reseau-har/*.har"
+      run: scripts/sanitize-har.sh --check {staged_files}
+    - name: scan staged changes for secrets
+      run: mise exec -- betterleaks git --staged --no-banner .
     - name: verify staged content
       run: scripts/verify-staged.sh
