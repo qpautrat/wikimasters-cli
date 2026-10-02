@@ -14,12 +14,20 @@ export function formatWishlist(
 ): string {
   if (format === "json") {
     return JSON.stringify(
-      cards.map(({ id, title, rarity }) => ({ id, title, rarity })),
+      cards.map(({ id, title, rarity, owned }) => ({
+        id,
+        title,
+        rarity,
+        owned,
+      })),
     );
   }
   if (cards.length === 0) return "The wishlist is empty.";
   return cards
-    .map(({ id, title, rarity }) => `${id}  ${title} (${rarity})`)
+    .map(
+      ({ id, title, rarity, owned }) =>
+        `${id}  ${title} (${rarity})${owned ? "  [owned]" : ""}`,
+    )
     .join("\n");
 }
 

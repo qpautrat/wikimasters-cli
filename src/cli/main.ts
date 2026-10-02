@@ -56,7 +56,9 @@ const wishlist = program
 
 wishlist
   .command("list")
-  .description("List the cards of your wishlist, most recently added first")
+  .description(
+    "List the cards of your wishlist, most recently added first, marking those already in your collection",
+  )
   .action(async () => {
     console.log(
       formatWishlist(await listWishlist(await openSession()), format()),
