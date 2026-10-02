@@ -15,7 +15,7 @@ const card = {
   owned: false,
 };
 const cards = [card];
-const discard = { discarded: 3, gained: 6, balance: 7430, failed: [] };
+const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
   it("lists the wishlist as an array of id, title, rarity and ownership", () => {
@@ -51,7 +51,13 @@ describe("JSON output", () => {
 describe("text output", () => {
   it("prints the discard count, gain and balance", () => {
     expect(formatDiscard(discard, "text")).toBe(
-      "Discarded 3 common cards for 6 wikibidous; balance 7430 wikibidous.",
+      "Discarded 3 common cards for 3 wikibidous; balance 7430 wikibidous.",
+    );
+  });
+
+  it("uses the singular for one card", () => {
+    expect(formatDiscard({ ...discard, discarded: 1, gained: 1 }, "text")).toBe(
+      "Discarded 1 common card for 1 wikibidou; balance 7430 wikibidous.",
     );
   });
 
@@ -64,7 +70,7 @@ describe("text output", () => {
   it("lists the cards the site failed to discard", () => {
     expect(
       formatDiscard({ ...discard, failed: ["entry-id"] }, "text"),
-    ).toContain('1 cards could not be discarded: ["entry-id"]');
+    ).toContain('1 card could not be discarded: ["entry-id"]');
   });
 
   it("prints one line per wishlist card", () => {

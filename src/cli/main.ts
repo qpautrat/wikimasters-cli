@@ -45,12 +45,12 @@ const collection = program
 collection
   .command("discard-commons")
   .description(
-    "Discard every common card of your collection, except favourite and shiny ones, for wikibidous",
+    "Discard every common card of your collection, except favourite, shiny and pending-trade ones, for 1 wikibidou each; exits 1 if the site failed to discard some",
   )
   .action(async () => {
-    console.log(
-      formatDiscard(await discardCommons(await openSession()), format()),
-    );
+    const result = await discardCommons(await openSession());
+    console.log(formatDiscard(result, format()));
+    if (result.failed.length > 0) process.exitCode = 1;
   });
 
 const wishlist = program

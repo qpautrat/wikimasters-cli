@@ -45,6 +45,14 @@ export function formatRemoval(
     : `Card ${cardId} was not in the wishlist.`;
 }
 
+function cards(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
+function wikibidous(count: number): string {
+  return `${count} wikibidou${count === 1 ? "" : "s"}`;
+}
+
 export function formatDiscard(
   { discarded, gained, balance, failed }: CommonsDiscard,
   format: Format,
@@ -54,9 +62,9 @@ export function formatDiscard(
   }
   const summary =
     discarded === 0
-      ? `No common card discarded; balance ${balance} wikibidous.`
-      : `Discarded ${discarded} common cards for ${gained} wikibidous; balance ${balance} wikibidous.`;
+      ? `No common card discarded; balance ${wikibidous(balance)}.`
+      : `Discarded ${cards(discarded, "common card")} for ${wikibidous(gained)}; balance ${wikibidous(balance)}.`;
   return failed.length === 0
     ? summary
-    : `${summary}\n${failed.length} cards could not be discarded: ${JSON.stringify(failed)}`;
+    : `${summary}\n${cards(failed.length, "card")} could not be discarded: ${JSON.stringify(failed)}`;
 }
