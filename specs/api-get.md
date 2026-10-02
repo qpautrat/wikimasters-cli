@@ -16,5 +16,5 @@ En tant que développeur, j'envoie une requête de lecture à l'API avec la sess
 2. La commande n'envoie que des requêtes `GET` : elle n'offre aucun moyen d'écrire.
 3. Le jeton de rafraîchissement renouvelé est enregistré dans `.env` avant la requête. Aucun jeton n'est affiché.
 4. Sur une réponse HTTP en erreur, le statut et le message de l'API, dont la suggestion de PostgREST pour une table inconnue, partent sur la sortie d'erreur, et la commande sort avec le code 1.
-5. Sans session valide, la commande sort avec le code 4, comme `wkm`.
+5. Sans session valide, la commande sort avec le code 4, comme `wikimasters`.
 6. La règle `.claude/rules/api-discovery.md` indique cette commande pour les lectures.

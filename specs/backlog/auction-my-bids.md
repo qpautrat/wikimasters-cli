@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Pour remiser sur une enchère, `wkm auction bid` demande son identifiant, que je dois aujourd'hui retrouver dans l'interface. Je veux voir depuis le terminal les enchères en cours sur lesquelles j'ai misé, avec leur identifiant et l'état de ma mise.
+Pour remiser sur une enchère, `wikimasters auction bid` demande son identifiant, que je dois aujourd'hui retrouver dans l'interface. Je veux voir depuis le terminal les enchères en cours sur lesquelles j'ai misé, avec leur identifiant et l'état de ma mise.
 
 Dépend de : [Miser sur une enchère](../auction-bid.md).
 
@@ -12,7 +12,7 @@ En tant que joueur, je consulte les enchères en cours sur lesquelles j'ai misé
 
 ## Critères d'acceptation
 
-1. `wkm auction bids` affiche une ligne par enchère en cours sur laquelle j'ai misé au moins une fois, même si plusieurs de mes mises portent sur la même enchère.
+1. `wikimasters auction bids` affiche une ligne par enchère en cours sur laquelle j'ai misé au moins une fois, même si plusieurs de mes mises portent sur la même enchère.
 2. Chaque ligne donne l'identifiant de l'enchère, le titre de la carte, ma mise la plus haute, la mise actuelle, si je suis le meilleur enchérisseur, et l'heure de fin.
 3. Une enchère est en cours tant que son statut est `active` et que son heure de fin n'est pas passée ; les autres n'apparaissent pas.
 4. Les enchères sont triées par heure de fin, la plus proche en premier.

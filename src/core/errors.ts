@@ -6,7 +6,7 @@ export class AuthRequiredError extends WikiMastersError {
   override name = "AuthRequiredError";
 
   constructor(reason: string) {
-    super(`${reason}: run \`wkm login\``);
+    super(`${reason}: run \`wikimasters login\``);
   }
 }
 

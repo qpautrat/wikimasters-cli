@@ -12,7 +12,7 @@ En tant que joueur, je donne l'identifiant d'une enchère et un budget, et la co
 
 ## Critères d'acceptation
 
-1. `wkm auction autobid <auction-id> --budget <n>` prend l'identifiant unique de l'enchère et un budget en wikibidous, entier strictement positif : le montant maximal que j'accepte de payer pour cette carte.
+1. `wikimasters auction autobid <auction-id> --budget <n>` prend l'identifiant unique de l'enchère et un budget en wikibidous, entier strictement positif : le montant maximal que j'accepte de payer pour cette carte.
 2. Un budget qui n'est pas un entier strictement positif est refusé sans rien miser.
 3. La commande échoue sans rien miser, avec un message explicite, quand l'enchère n'est plus en cours ou quand j'en suis le vendeur.
 4. La commande reste active et vérifie l'enchère au plus 10 secondes après la vérification précédente.

@@ -11,7 +11,7 @@ const session = `base64-${Buffer.from(JSON.stringify({ refresh_token: "refresh-t
 function profileWithCookies(
   rows: Array<[host: string, name: string, value: string]>,
 ): string {
-  const profileDir = mkdtempSync(join(tmpdir(), "wkm-profile-"));
+  const profileDir = mkdtempSync(join(tmpdir(), "wikimasters-profile-"));
   const inserts = rows
     .map(
       ([host, name, value]) =>
@@ -51,7 +51,7 @@ describe("readRefreshTokenFromFirefoxProfile", () => {
   it("returns undefined while the profile has no cookie database", async () => {
     await expect(
       readRefreshTokenFromFirefoxProfile(
-        mkdtempSync(join(tmpdir(), "wkm-profile-")),
+        mkdtempSync(join(tmpdir(), "wikimasters-profile-")),
       ),
     ).resolves.toBeUndefined();
   });

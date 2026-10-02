@@ -1,11 +1,11 @@
 {
-  "name": "wkm-cli",
+  "name": "wikimasters-cli",
   "version": "0.1.0",
   "private": true,
   "description": "Interact with WikiMasters from the command line",
   "type": "module",
   "bin": {
-    "wkm": "dist/cli/main.js"
+    "wikimasters": "dist/cli/main.js"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -18,7 +18,7 @@
     "lint:fix": "biome lint --write src",
     "format": "biome format --write src",
     "format:check": "biome format src",
-    "wkm": "node dist/cli/main.js",
+    "wikimasters": "node dist/cli/main.js",
     "api:get": "npm run -s build && node dist/dev/api-get.js"
   },
   "dependencies": {

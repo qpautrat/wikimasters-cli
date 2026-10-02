@@ -44,7 +44,7 @@ export async function readRefreshTokenFromFirefoxProfile(
   const database = join(profileDir, COOKIES_DB);
   if (!existsSync(database)) return undefined;
 
-  const snapshot = mkdtempSync(join(tmpdir(), "wkm-cookies-"));
+  const snapshot = mkdtempSync(join(tmpdir(), "wikimasters-cookies-"));
   try {
     for (const suffix of ["", "-wal"]) {
       if (existsSync(database + suffix))
@@ -70,7 +70,7 @@ export async function loginInBrowser({
   timeoutMs = 5 * 60_000,
   pollIntervalMs = 1000,
 }: BrowserLoginOptions = {}): Promise<string> {
-  const profileDir = mkdtempSync(join(tmpdir(), "wkm-firefox-"));
+  const profileDir = mkdtempSync(join(tmpdir(), "wikimasters-firefox-"));
   writeFileSync(join(profileDir, "user.js"), `${PROFILE_PREFS.join("\n")}\n`);
 
   const firefox = spawn(

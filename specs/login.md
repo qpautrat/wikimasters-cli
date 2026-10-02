@@ -2,7 +2,7 @@
 
 ## Contexte
 
-La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. Ensuite, les commandes `wkm` doivent fonctionner sans redemander de connexion tant que la session est valide. L'agent lance lui-même `wkm login` quand c'est nécessaire : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
+La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. L'agent lance lui-même `wikimasters login` quand c'est nécessaire : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
 
 ## User stories
 
@@ -12,7 +12,7 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
 
 ## Critères d'acceptation
 
-### `wkm login`
+### `wikimasters login`
 
 1. La commande ouvre Firefox sur la page de connexion, avec un profil temporaire distinct du Firefox habituel.
 2. Dès que la session apparaît, Firefox se ferme et la session est enregistrée localement, hors de tout fichier versionné.
@@ -28,5 +28,5 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
    - aucune session n'est enregistrée ;
    - la session enregistrée est expirée ou révoquée ;
    - l'API rejette la session (HTTP 401).
-6. Dans ces cas, le message d'erreur indique de lancer `wkm login`.
+6. Dans ces cas, le message d'erreur indique de lancer `wikimasters login`.
 7. Les autres erreurs (réseau, indisponibilité de l'API, argument invalide…) sortent avec le code 1.

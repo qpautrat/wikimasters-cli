@@ -1,16 +1,16 @@
 ---
 name: wikimasters
-description: Act on the user's WikiMasters account through the `wkm` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes"), collection or auctions ("enchères"), e.g. "enlève Half Dome de ma liste de souhaits".
+description: Act on the user's WikiMasters account through the `wikimasters` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes"), collection or auctions ("enchères"), e.g. "enlève Half Dome de ma liste de souhaits".
 ---
 
-# Using `wkm`
+# Using `wikimasters`
 
-Run every command from the repo root as `npm run -s wkm -- <command> --json`. If `dist/` is missing or older than `src/`, run `npm run -s build` first. `npm run -s wkm -- --help` lists the available commands.
+Run every command from the repo root as `npm run -s wikimasters -- <command> --json`. If `dist/` is missing or older than `src/`, run `npm run -s build` first. `npm run -s wikimasters -- --help` lists the available commands.
 
 ## Results and exit codes
 
 - `0`: success. Read the JSON on stdout.
-- `4`: the user must log in. Tell them a Firefox window is about to open for them to sign in, run `npm run -s wkm -- login --json`, then retry the original command once.
+- `4`: the user must log in. Tell them a Firefox window is about to open for them to sign in, run `npm run -s wikimasters -- login --json`, then retry the original command once.
 - Any other code: report the stderr message in one sentence. If it names an HTTP 5xx status, retry once before reporting, except for `auction bid`: never rerun it on your own.
 
 ## Cards named by the user

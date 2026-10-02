@@ -10,6 +10,6 @@ En tant que joueur, je consulte ma liste de souhaits avec, pour chaque carte, so
 
 ## Critères d'acceptation
 
-1. `wkm wishlist list` affiche une ligne par carte de ma liste de souhaits : identifiant, titre, rareté.
+1. `wikimasters wishlist list` affiche une ligne par carte de ma liste de souhaits : identifiant, titre, rareté.
 2. Les cartes sont triées par date d'ajout, la plus récente en premier.
 3. Une liste vide n'est pas une erreur : la commande le signale et sort avec le code 0.

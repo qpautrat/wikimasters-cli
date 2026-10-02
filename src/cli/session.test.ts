@@ -11,9 +11,9 @@ describe("reportFailure", () => {
   it("prints the message on stderr and exits with 1", () => {
     const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    reportFailure("wkm", new WikiMastersError("Listing failed"));
+    reportFailure("wikimasters", new WikiMastersError("Listing failed"));
 
-    expect(stderr).toHaveBeenCalledWith("wkm: Listing failed");
+    expect(stderr).toHaveBeenCalledWith("wikimasters: Listing failed");
     expect(process.exitCode).toBe(1);
   });
 

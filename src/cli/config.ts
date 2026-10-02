@@ -7,8 +7,8 @@ export const DEFAULT_ENV_FILE = fileURLToPath(
   new URL("../../.env", import.meta.url),
 );
 
-const ANON_KEY = "WKM_SUPABASE_ANON_KEY";
-const REFRESH_TOKEN = "WKM_REFRESH_TOKEN";
+const ANON_KEY = "WIKIMASTERS_SUPABASE_ANON_KEY";
+const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";
 
 type Env = Record<string, string | undefined>;
 

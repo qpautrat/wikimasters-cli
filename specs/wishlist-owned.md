@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Ma liste de souhaits peut contenir des cartes que j'ai obtenues depuis leur ajout. Elles y font du bruit et m'exposent à un doublon. `wkm wishlist list` ne dit pas si je possède déjà une carte.
+Ma liste de souhaits peut contenir des cartes que j'ai obtenues depuis leur ajout. Elles y font du bruit et m'exposent à un doublon. `wikimasters wishlist list` ne dit pas si je possède déjà une carte.
 
 Dépend de : [Lister la liste de souhaits](wishlist-list.md), [Sortie JSON des commandes](json-output.md).
 
@@ -12,7 +12,7 @@ En tant que joueur, je vois pour chaque carte de ma liste de souhaits si elle es
 
 ## Critères d'acceptation
 
-1. `wkm wishlist list` indique, sur la ligne de chaque carte, si elle est dans ma collection.
+1. `wikimasters wishlist list` indique, sur la ligne de chaque carte, si elle est dans ma collection.
 2. Une carte est dans ma collection dès que j'en possède au moins un exemplaire.
 3. Avec `--json`, chaque carte porte en plus le champ `owned`, à `true` ou `false`.
 

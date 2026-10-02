@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wkm collection discard-commons` défausse toutes mes cartes communes d'un coup. Je veux parfois n'en défausser qu'une partie, pour garder des communes ou ne gagner que les wikibidous dont j'ai besoin.
+`wikimasters collection discard-commons` défausse toutes mes cartes communes d'un coup. Je veux parfois n'en défausser qu'une partie, pour garder des communes ou ne gagner que les wikibidous dont j'ai besoin.
 
 Dépend de : [Défausser toutes mes cartes communes](../discard-commons.md).
 

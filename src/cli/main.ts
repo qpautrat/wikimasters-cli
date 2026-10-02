@@ -20,7 +20,7 @@ import {
 } from "./output.js";
 import { openSession, reportFailure } from "./session.js";
 
-const program = new Command("wkm")
+const program = new Command("wikimasters")
   .description("Interact with WikiMasters")
   .option("--json", "print the result as JSON on stdout")
   .configureHelp({ showGlobalOptions: true });
@@ -100,5 +100,5 @@ wishlist
 try {
   await program.parseAsync();
 } catch (error) {
-  reportFailure("wkm", error);
+  reportFailure("wikimasters", error);
 }

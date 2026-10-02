@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wkm auction bid <auction-id>` place toujours la mise minimale fixée par le jeu. Je veux parfois miser davantage, par exemple pour décourager les autres enchérisseurs d'un coup.
+`wikimasters auction bid <auction-id>` place toujours la mise minimale fixée par le jeu. Je veux parfois miser davantage, par exemple pour décourager les autres enchérisseurs d'un coup.
 
 Dépend de : [Miser sur une enchère](../auction-bid.md).
 
@@ -12,7 +12,7 @@ En tant que joueur, je donne l'identifiant d'une enchère et un montant, et la c
 
 ## Critères d'acceptation
 
-1. `wkm auction bid <auction-id>` accepte un montant en wikibidous, entier strictement positif.
+1. `wikimasters auction bid <auction-id>` accepte un montant en wikibidous, entier strictement positif.
 2. Avec ce montant, la commande place une mise de ce montant exact, ni arrondi ni ajusté.
 3. Sans montant, la commande place la mise minimale, comme aujourd'hui.
 4. Une valeur qui n'est pas un entier strictement positif est refusée sans rien miser.
