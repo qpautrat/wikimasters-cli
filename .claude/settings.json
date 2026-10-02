@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_response.filePath // .tool_input.file_path'); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/src/*.ts) cd \"$CLAUDE_PROJECT_DIR\" && npx biome format --write \"$f\" >/dev/null 2>&1 || true ;; esac",
+            "statusMessage": "Formatting with Biome"
+          }
+        ]
+      }
+    ]
+  }
+}
