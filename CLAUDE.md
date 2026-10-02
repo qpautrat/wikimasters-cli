@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `wikimasters-cli` lets an AI agent interact with [WikiMasters](https://www.wiki-masters.com), a collectible card game built from Wikipedia articles (packs, collection, duels, trades, auctions, guilds, messaging). The site has no public API: this project wraps the internal HTTP API used by its web front-end.
 
-That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Reads are discovered by querying the API read-only; writes, RPC functions and `/api/...` routes from HAR captures of the manual flows, stored sanitized in `capture-reseau-har/` (see `.claude/rules/api-discovery.md`). `docs/api.md` describes every table and route the core uses. `docs/game-rules.md` records the game rules the user states, which the API does not reveal.
+That front-end is a Next.js app whose data layer is Supabase: the browser calls PostgREST directly at `https://cyrxjeppjqsxxjayfrur.supabase.co/rest/v1/<table>` with the user's session JWT. A few routes go through the Next.js server instead (`https://www.wiki-masters.com/api/...`). Reads are discovered by querying the API read-only; writes, RPC functions and `/api/...` routes from HAR captures of the manual flows, kept sanitized and gitignored in `capture-reseau-har/` (see `.claude/rules/api-discovery.md`). `docs/api.md` describes every table and route the core uses. `docs/game-rules.md` records the game rules the user states, which the API does not reveal.
 
 ## Stack and commands
 
@@ -26,7 +26,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Run the CLI after a build | `npm run -s wikimasters -- login`, then `npm run -s wikimasters -- wishlist remove <card-uuid>` |
 | Query a table read-only with the stored session (builds first) | `npm run -s api:get -- 'user_cards?select=*&limit=1'` |
 
-The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any capture that `scripts/sanitize-har.sh --check` flags, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
+The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
 
 Edit `.claude/settings.json` directly, after reading the docs through Context7; never load the `update-config` skill.
 

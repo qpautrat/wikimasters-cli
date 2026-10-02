@@ -7,9 +7,12 @@ pre-commit:
         - ".env"
         - "**/.env"
       run: echo ".env holds the WikiMasters refresh token and must never be committed" >&2; exit 1
-    - name: refuse unsanitized captures
-      glob: "capture-reseau-har/*.har"
-      run: scripts/sanitize-har.sh --check {staged_files}
+    - name: refuse captures
+      files: git diff --cached --name-only --diff-filter=d
+      glob:
+        - "*.har"
+        - "**/*.har"
+      run: echo "HAR captures hold account data and stay local" >&2; exit 1
     - name: scan staged changes for secrets
       run: betterleaks git --staged --no-banner .
     - name: verify staged content

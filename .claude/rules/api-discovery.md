@@ -10,9 +10,9 @@ Record every table and route the core uses in `docs/api.md`, in the commit that 
 
 ## HAR captures
 
-Captures are versioned in `capture-reseau-har/`, one file per flow named after it (e.g. `withdraw-wishlist.har`), so endpoints can be re-derived without capturing again.
+Captures stay local in `capture-reseau-har/`, which git ignores, one file per flow named after it (e.g. `withdraw-wishlist.har`). `docs/api.md` is the reference for what the core uses.
 
-- A new capture holds session tokens, cookies and account data. Run `scripts/sanitize-har.sh <file>` on it before reading its content, and before staging it. The script rewrites the file in place, replacing credential headers, cookie values, `/auth/v1/` payloads, JWTs and email addresses with `REDACTED` markers.
-- The pre-commit hook refuses a capture that `scripts/sanitize-har.sh --check` reports as not sanitized; sanitize it and stage it again.
+- A new capture holds session tokens, cookies and account data. Run `scripts/sanitize-har.sh <file>` on it before reading its content. The script rewrites the file in place, replacing credential headers, cookie values, `/auth/v1/` payloads, JWTs and email addresses with `REDACTED` markers.
+- The pre-commit hook refuses any `.har` file.
 - Read every response of a capture, not only the write's, for the locks and filters the interface applies.
 - When a new kind of secret shows up in a capture, extend `scripts/sanitize-har.sh` rather than editing the capture by hand, then re-run it on every file in `capture-reseau-har/`.
