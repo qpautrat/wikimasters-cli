@@ -3,7 +3,9 @@ lefthook: mise exec -- lefthook
 pre-commit:
   jobs:
     - name: refuse .env
-      glob: ".env"
+      glob:
+        - ".env"
+        - "**/.env"
       run: echo ".env holds the WikiMasters refresh token and must never be committed" >&2; exit 1
     - name: refuse unsanitized captures
       glob: "capture-reseau-har/*.har"
