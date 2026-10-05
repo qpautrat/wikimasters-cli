@@ -58,6 +58,7 @@ Source: read-only query, 2026-10-02.
 - The owned rarity is `snapshot_rarity`: it can differ from `cards.rarity`, and the site's collection filter and counts follow it.
 
 - One row per owned card: no `card_id` appears twice.
+- Putting a card up for auction deletes its row; cancelling the auction creates a new one, with a new `id` and `obtained_at` set to the cancellation time (observed 2026-10-05).
 - Row-level security returns only the user's own rows.
 - `listCollection`: `GET` of `card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, paged by 1000.
 - `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` and `count=gt.0`, to find the entry of each card to discard.
@@ -96,12 +97,12 @@ Source: read-only query, 2026-10-05.
 
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 
-Source: capture `discard-cards.har`.
+Source: capture `discard-cards.har`, and a discard of an auctioned card's former entry (2026-10-05).
 
 - Body `{"card_ids": [<user_cards.id>, …]}`: collection entry ids, not `cards.id`.
-- Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [...]}`; the capture only shows an empty `failed`.
+- Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [{"card_id": <user_cards.id>, "error": <code>}, …]}`, HTTP 200 even when every card is refused. An entry that is no longer in the collection gets `card_not_owned`.
 - Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCards` reports the gain as `discarded_count`.
-- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCards` sends batches of 100, reports the last response's `balance`, names the cards whose `user_cards.id` or `cards.id` each `failed` entry holds, passing the entry on as the game's reason, and reports as refused the cards a batch neither counts in `discarded_count` nor lists in `failed`. `discardCards` reads the entries in batches of 100 card ids, all before the first discard.
+- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCards` sends batches of 100, reports the last response's `balance` and each `failed` entry as its card and `error` code, and fails on a response whose `discarded_count` and `failed` do not account for exactly the entries sent. `discardCards` reads the entries in batches of 100 card ids, all before the first discard.
 
 ## `auctions`: the auctions
 
