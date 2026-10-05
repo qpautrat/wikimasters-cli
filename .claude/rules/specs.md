@@ -2,6 +2,10 @@
 
 The user drives the project through specs in `specs/`, written in French. Implement from their acceptance criteria; when a spec is ambiguous or conflicts with existing code, ask instead of guessing.
 
+## Reading specs
+
+List the specs by title with `head -n1 specs/*.md specs/backlog/*.md`, then read only those related to the subject.
+
 ## One subject per spec
 
 - A spec covers one subject, functional or technical. Every acceptance criterion must belong to the subject named in the title. Split anything else out.
