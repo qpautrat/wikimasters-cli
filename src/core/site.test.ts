@@ -59,7 +59,12 @@ describe("sendSiteRequest", () => {
       siteRoute("DELETE", { status: 200, body: { ok: true } }),
     );
 
-    await expect(sent).resolves.toEqual({ status: 200, body: '{"ok":true}' });
+    await expect(sent).resolves.toEqual({
+      status: 200,
+      ok: true,
+      location: null,
+      body: '{"ok":true}',
+    });
     const [request] = siteRequests();
     expect(request?.headers.get("cookie")).toBe("auth-cookie");
     expect(request?.headers.get("origin")).toBe("https://www.wiki-masters.com");
@@ -90,17 +95,24 @@ describe("sendSiteRequest", () => {
 
     await expect(sent).resolves.toEqual({
       status: 400,
+      ok: false,
+      location: null,
       body: JSON.stringify(REFUSAL),
     });
   });
 
-  it("asks to log in again on HTTP 401", async () => {
-    const { sent } = await send(
+  it("returns a redirect without following it", async () => {
+    const { sent, siteRequests } = await send(
       { method: "GET" },
-      siteRoute("GET", { status: 401, body: {} }),
+      siteRoute("GET", { status: 307, headers: { location: "/login" } }),
     );
 
-    await expect(sent).rejects.toBeInstanceOf(AuthRequiredError);
+    await expect(sent).resolves.toMatchObject({
+      status: 307,
+      ok: false,
+      location: "/login",
+    });
+    expect(siteRequests()).toHaveLength(1);
   });
 
   it("retries a read after a transient error", async () => {
@@ -109,7 +121,7 @@ describe("sendSiteRequest", () => {
       failingFirst(2, 503, siteRoute("GET", { status: 200, body: [] })),
     );
 
-    await expect(sent).resolves.toEqual({ status: 200, body: "[]" });
+    await expect(sent).resolves.toMatchObject({ status: 200, body: "[]" });
     expect(siteRequests()).toHaveLength(3);
   });
 
@@ -144,5 +156,17 @@ describe("siteRequest", () => {
       `Cancelling the sale failed (HTTP 400): ${JSON.stringify(REFUSAL)}`,
     );
     await expect(failure).rejects.toBeInstanceOf(WikiMastersError);
+  });
+
+  it("asks to log in again on HTTP 401", async () => {
+    const { session } = await sessionWith(
+      siteRoute("GET", { status: 401, body: {} }),
+    );
+
+    await expect(
+      siteRequest(session, "auth-cookie", "Reading", "/", PATH, {
+        method: "GET",
+      }),
+    ).rejects.toBeInstanceOf(AuthRequiredError);
   });
 });

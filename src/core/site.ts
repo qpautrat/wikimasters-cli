@@ -17,10 +17,10 @@ export type SiteSendInit =
   | { method: "GET" }
   | { method: Exclude<SiteMethod, "GET">; body?: unknown };
 
-type SiteRequestInit = { method: "GET" } | { method: "POST"; body: unknown };
-
 export interface SiteResponse {
   status: number;
+  ok: boolean;
+  location: string | null;
   body: string;
 }
 
@@ -56,16 +56,22 @@ export async function sendSiteRequest(
         ...(hasBody ? { "Content-Type": "application/json" } : {}),
       },
       ...(hasBody ? { body: JSON.stringify(init.body) } : {}),
+      redirect: "manual",
     },
   );
   const text = await response.text();
   if (!isRead && isPossiblyDeliveredStatus(response.status)) {
     throw outcomeUnknown(action, response.status);
   }
-  if (response.status === 401 || isTransientStatus(response.status)) {
+  if (isTransientStatus(response.status)) {
     throw apiFailure(action, response.status, text);
   }
-  return { status: response.status, body: text };
+  return {
+    status: response.status,
+    ok: response.ok,
+    location: response.headers.get("location"),
+    body: text,
+  };
 }
 
 export async function siteRequest(
@@ -74,9 +80,9 @@ export async function siteRequest(
   action: string,
   fromPage: string,
   path: string,
-  init: SiteRequestInit,
+  init: SiteSendInit,
 ): Promise<unknown> {
-  const { status, body } = await sendSiteRequest(
+  const { status, ok, body } = await sendSiteRequest(
     session,
     cookie,
     action,
@@ -84,7 +90,7 @@ export async function siteRequest(
     path,
     init,
   );
-  if (status < 200 || status >= 300) throw apiFailure(action, status, body);
+  if (!ok) throw apiFailure(action, status, body);
   try {
     return JSON.parse(body);
   } catch {

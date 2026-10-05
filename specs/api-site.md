@@ -14,7 +14,7 @@ En tant que développeur, j'envoie une requête au serveur Next.js du site avec 
 
 1. `npm run -s api:site -- <méthode> <chemin> [corps JSON]` envoie une requête `<méthode>` à `https://www.wiki-masters.com<chemin>` avec la session stockée, par le code du core qui appelle le site : cookie d'authentification, en-têtes `Origin` et `Referer`, nouvelles tentatives sur une erreur passagère.
 2. La méthode est `GET`, `POST`, `PUT`, `PATCH` ou `DELETE`, le chemin commence par `/`, et le corps, facultatif, est du JSON valide, refusé avec `GET`. Sinon, la commande sort avec le code 1 sans rien envoyer.
-3. La commande écrit le statut HTTP sur la sortie d'erreur et le corps de la réponse, tel quel, sur la sortie standard, y compris quand le site refuse la requête. Elle sort avec le code 0 sur un statut 2xx, 1 sinon.
+3. La commande écrit le statut HTTP sur la sortie d'erreur et le corps de la réponse, tel quel, sur la sortie standard, y compris quand le site refuse la requête. Elle ne suit pas une redirection : elle écrit son statut et sa destination. Elle sort avec le code 0 sur un statut 2xx, 1 sinon.
 4. Le chemin d'une page du site donne son HTML, tel que le voit l'utilisateur connecté.
 5. Le jeton de rafraîchissement renouvelé est enregistré dans `.env` avant la requête. Ni le cookie ni aucun jeton n'est affiché.
 6. Sans session valide ou sur HTTP 401, la commande sort avec le code 4. Sur une erreur passagère qui persiste, ou qui peut avoir laissé passer une écriture, elle sort avec le code 75, comme `wikimasters`.

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { openSession, reportFailure } from "../src/cli/session.js";
+import { apiFailure } from "../src/core/errors.js";
 import { WikiMastersError } from "../src/core/index.js";
 import {
   SITE_METHODS,
@@ -39,17 +40,26 @@ function parseRequest(args: readonly string[]): {
 try {
   const { path, init } = parseRequest(process.argv.slice(2));
   const session = await openSession();
+  const action = `${init.method} ${path}`;
   const response = await sendSiteRequest(
     session,
     await siteCookie(session),
-    `${init.method} ${path}`,
+    action,
     "/",
     path,
     init,
   );
-  console.error(`HTTP ${response.status}`);
+  console.error(
+    response.location === null
+      ? `HTTP ${response.status}`
+      : `HTTP ${response.status}, redirected to ${response.location}`,
+  );
   process.stdout.write(response.body);
-  if (response.status < 200 || response.status >= 300) process.exitCode = 1;
+  if (response.status === 401) {
+    reportFailure(COMMAND, apiFailure(action, response.status, response.body));
+  } else if (!response.ok) {
+    process.exitCode = 1;
+  }
 } catch (error) {
   reportFailure(COMMAND, error);
 }
