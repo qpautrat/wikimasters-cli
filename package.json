@@ -20,7 +20,8 @@
     "format": "biome format --write src tools",
     "format:check": "biome format src tools",
     "wikimasters": "node dist/cli/main.js",
-    "api:get": "npm run -s build:tools && node dist-tools/tools/api-get.js"
+    "api:get": "npm run -s build:tools && node dist-tools/tools/api-get.js",
+    "api:site": "npm run -s build:tools && node dist-tools/tools/api-site.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
