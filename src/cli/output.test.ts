@@ -3,6 +3,7 @@ import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatAddition,
   formatBid,
+  formatCardSearch,
   formatCollection,
   formatDiscard,
   formatFavourite,
@@ -43,6 +44,23 @@ describe("JSON output", () => {
       id: bid.auctionId,
       amount: 359,
       balance: 7743,
+    });
+  });
+
+  it("lists the found cards with their id, title and rarity, and whether the list is truncated", () => {
+    expect(
+      JSON.parse(
+        formatCardSearch(
+          {
+            cards: [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }],
+            truncated: true,
+          },
+          "json",
+        ),
+      ),
+    ).toEqual({
+      cards: [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }],
+      truncated: true,
     });
   });
 
@@ -170,6 +188,39 @@ describe("text output", () => {
       "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
       `Card ${cardId} could not be discarded: card_not_owned`,
     ]);
+  });
+
+  it("prints one line per found card", () => {
+    expect(
+      formatCardSearch(
+        {
+          cards: [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }],
+          truncated: false,
+        },
+        "text",
+      ),
+    ).toBe(`${cardId}  Pointe de la Sambuy (PC)`);
+  });
+
+  it("says when more cards match than are shown", () => {
+    expect(
+      formatCardSearch(
+        {
+          cards: [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }],
+          truncated: true,
+        },
+        "text",
+      ).split("\n"),
+    ).toEqual([
+      `${cardId}  Pointe de la Sambuy (PC)`,
+      "Only the first 1 matches are shown; refine the name.",
+    ]);
+  });
+
+  it("says when no card matches", () => {
+    expect(formatCardSearch({ cards: [], truncated: false }, "text")).toBe(
+      "No card of the catalogue matches.",
+    );
   });
 
   it("prints one line per wishlist card", () => {

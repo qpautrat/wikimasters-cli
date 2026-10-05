@@ -10,6 +10,7 @@ import {
   parseCardId,
   placeMinimumBid,
   removeFromWishlist,
+  searchCards,
   starCard,
   tagCard,
   unstarCard,
@@ -20,6 +21,7 @@ import { loadConfig } from "./config.js";
 import {
   formatAddition,
   formatBid,
+  formatCardSearch,
   formatCollection,
   formatDiscard,
   formatFavourite,
@@ -62,6 +64,19 @@ auction
     const auctionId = parseAuctionId(rawAuctionId);
     const session = await openSession();
     console.log(formatBid(await placeMinimumBid(session, auctionId), format()));
+  });
+
+const cards = program.command("cards").description("Browse the card catalogue");
+
+cards
+  .command("search")
+  .description(
+    "Find the cards of the catalogue whose title contains the given text, regardless of case, exact title first, at most 50",
+  )
+  .argument("<name>", "all or part of the card title")
+  .action(async (name: string) => {
+    const result = await searchCards(await openSession(), name);
+    console.log(formatCardSearch(result, format()));
   });
 
 const collection = program

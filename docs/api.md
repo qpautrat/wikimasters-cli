@@ -36,7 +36,9 @@ Source: read-only query.
 | `wikipedia_title` | title of the Wikipedia article the card is built from |
 | `rarity` | current rarity code; seen: `C`, `PC`, `R`, `SR`, `UR` |
 
-- The whole catalogue is readable, owned or not.
+- The whole catalogue is readable, owned or not: more than 100,000 cards.
+- PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
+- `searchCards`: two `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, each filtered twice on `wikipedia_title`: `ilike` with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch` with the regex metacharacters escaped. The exact read anchors both (`ilike.<text>`, `imatch.^<text>$`), limited to 50; the containing read wraps the `ilike` in `%` and leaves the `imatch` unanchored, limited to 51 to tell whether more than 50 cards match.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection

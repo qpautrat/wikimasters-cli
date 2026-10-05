@@ -4,7 +4,7 @@
 
 Les commandes qui agissent sur une carte, comme `wikimasters wishlist add`, prennent son identifiant unique, que je ne connais pas. Je connais le nom de la carte, c'est-à-dire le titre de l'article Wikipédia dont elle est tirée. Le catalogue compte plus de 100 000 cartes : la recherche doit se faire côté API.
 
-Dépend de : [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Sortie JSON des commandes](json-output.md).
 
 ## User story
 

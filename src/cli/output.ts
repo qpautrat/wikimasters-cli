@@ -1,4 +1,5 @@
 import type {
+  CardSearch,
   CollectionCard,
   Discard,
   FavouriteChange,
@@ -58,6 +59,20 @@ export function formatRemoval(
   return removed
     ? `Card ${cardId} removed from the wishlist.`
     : `Card ${cardId} was not in the wishlist.`;
+}
+
+export function formatCardSearch(
+  { cards, truncated }: CardSearch,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ cards, truncated });
+  if (cards.length === 0) return "No card of the catalogue matches.";
+  return [
+    ...cards.map(({ id, title, rarity }) => `${id}  ${title} (${rarity})`),
+    ...(truncated
+      ? [`Only the first ${cards.length} matches are shown; refine the name.`]
+      : []),
+  ].join("\n");
 }
 
 export function formatCollection(

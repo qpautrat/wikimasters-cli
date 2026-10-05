@@ -17,6 +17,11 @@ export {
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
 export {
+  searchCards,
+  type CardSearch,
+  type CatalogueCard,
+} from "./card-search.js";
+export {
   listCollection,
   type CollectionCard,
   type CollectionFilter,
