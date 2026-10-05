@@ -104,7 +104,12 @@ export function formatTag(
   if (format === "json")
     return JSON.stringify({ id: cardId, label, tagged, changed });
   const name = JSON.stringify(label);
+  if (tagged) {
+    return changed
+      ? `Card ${cardId} labelled ${name}.`
+      : `Card ${cardId} already had the label ${name}.`;
+  }
   return changed
-    ? `Card ${cardId} labelled ${name}.`
-    : `Card ${cardId} already had the label ${name}.`;
+    ? `Label ${name} removed from card ${cardId}.`
+    : `Card ${cardId} did not have the label ${name}.`;
 }

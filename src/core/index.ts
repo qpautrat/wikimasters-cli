@@ -28,7 +28,7 @@ export {
   type ResumeSessionOptions,
   type Session,
 } from "./session.js";
-export { tagCard, type TagChange } from "./tag.js";
+export { tagCard, untagCard, type TagChange } from "./tag.js";
 export {
   listWishlist,
   removeFromWishlist,

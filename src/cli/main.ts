@@ -11,6 +11,7 @@ import {
   starCard,
   tagCard,
   unstarCard,
+  untagCard,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
@@ -96,18 +97,29 @@ for (const [name, description, change] of [
     });
 }
 
-collection
-  .command("tag")
-  .description(
+for (const [name, description, change] of [
+  [
+    "tag",
     "Put one of your labels on a card of your collection, which protects it from discard-commons; succeeds if the card already has it",
-  )
-  .argument("<card-id>", "card UUID")
-  .argument("<label>", "name of one of your labels")
-  .action(async (rawCardId: string, label: string) => {
-    const cardId = parseCardId(rawCardId);
-    const session = await openSession();
-    console.log(formatTag(await tagCard(session, cardId, label), format()));
-  });
+    tagCard,
+  ],
+  [
+    "untag",
+    "Remove one of your labels from a card of your collection, which lifts its protection from discard-commons once no label is left; succeeds if the card does not have it",
+    untagCard,
+  ],
+] as const) {
+  collection
+    .command(name)
+    .description(description)
+    .argument("<card-id>", "card UUID")
+    .argument("<label>", "name of one of your labels")
+    .action(async (rawCardId: string, label: string) => {
+      const cardId = parseCardId(rawCardId);
+      const session = await openSession();
+      console.log(formatTag(await change(session, cardId, label), format()));
+    });
+}
 
 const wishlist = program
   .command("wishlist")

@@ -171,4 +171,22 @@ describe("text output", () => {
       ),
     ).toBe(`Card ${cardId} already had the label "Histoire".`);
   });
+
+  it("says when a label is removed from a card", () => {
+    expect(
+      formatTag(
+        { cardId, label: "Histoire", tagged: false, changed: true },
+        "text",
+      ),
+    ).toBe(`Label "Histoire" removed from card ${cardId}.`);
+  });
+
+  it("says when a card did not have the label", () => {
+    expect(
+      formatTag(
+        { cardId, label: "Histoire", tagged: false, changed: false },
+        "text",
+      ),
+    ).toBe(`Card ${cardId} did not have the label "Histoire".`);
+  });
 });

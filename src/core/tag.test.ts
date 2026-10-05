@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseCardId } from "./card-id.js";
 import { AuthRequiredError } from "./errors.js";
 import { resumeSession } from "./session.js";
-import { tagCard } from "./tag.js";
+import { tagCard, untagCard } from "./tag.js";
 import {
   ACCESS_TOKEN,
   USER_ID,
@@ -162,5 +162,81 @@ describe("tagCard", () => {
     await expect(tagCard(session, cardId, "Histoire")).rejects.toThrow(
       AuthRequiredError,
     );
+  });
+});
+
+function tagDeletion(deletedRows: number): Route {
+  return ({ method, url }) =>
+    method === "DELETE" && url.pathname === "/rest/v1/user_card_tags"
+      ? { status: 204, headers: { "content-range": `*/${deletedRows}` } }
+      : undefined;
+}
+
+describe("untagCard", () => {
+  it("unlinks the label of the signed-in user from their collection entry for that card", async () => {
+    const { session, requests } = await sessionWith(
+      collectionEntry([history.id]),
+      labels(films, history),
+      tagDeletion(1),
+    );
+
+    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
+      cardId,
+      label: "Histoire",
+      tagged: false,
+      changed: true,
+    });
+    const labelRead = requests.find(
+      ({ url }) => url.pathname === "/rest/v1/tags",
+    );
+    expect(labelRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
+    const deletion = requests.find(({ method }) => method === "DELETE");
+    expect(deletion?.url.searchParams.get("user_card_id")).toBe(
+      `eq.${entryId}`,
+    );
+    expect(deletion?.url.searchParams.get("tag_id")).toBe(`eq.${history.id}`);
+    expect(deletion?.headers.get("prefer")).toContain("count=exact");
+    expect(deletion?.headers.get("authorization")).toBe(
+      `Bearer ${ACCESS_TOKEN}`,
+    );
+  });
+
+  it("succeeds without change when the card does not have the label", async () => {
+    const { session } = await sessionWith(
+      collectionEntry([films.id]),
+      labels(films, history),
+      tagDeletion(0),
+    );
+
+    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
+      cardId,
+      label: "Histoire",
+      tagged: false,
+      changed: false,
+    });
+  });
+
+  it("refuses a card absent from the collection without change", async () => {
+    const { session, requests } = await sessionWith(
+      collectionEntry(null),
+      labels(history),
+    );
+
+    await expect(untagCard(session, cardId, "Histoire")).rejects.toThrow(
+      /not in your collection; nothing was changed/,
+    );
+    expect(writes(requests)).toEqual([]);
+  });
+
+  it("refuses an unknown label without change, listing the user's labels", async () => {
+    const { session, requests } = await sessionWith(
+      collectionEntry([history.id]),
+      labels(films, history),
+    );
+
+    await expect(untagCard(session, cardId, "Sport")).rejects.toThrow(
+      'No label named "Sport"; your labels: "Films & Séries", "Histoire"; nothing was changed',
+    );
+    expect(writes(requests)).toEqual([]);
   });
 });

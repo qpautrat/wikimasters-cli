@@ -87,3 +87,26 @@ export async function tagCard(
   }
   return { cardId, label, tagged: true, changed: true };
 }
+
+export async function untagCard(
+  session: Session,
+  cardId: CardId,
+  label: string,
+): Promise<TagChange> {
+  const entry = await readEntry(session, cardId);
+  const tag = await findTag(session, label);
+
+  const action = `Removing label ${JSON.stringify(label)} from card ${cardId}`;
+  const { error, status, count } = await session.client
+    .from("user_card_tags")
+    .delete({ count: "exact" })
+    .eq("user_card_id", entry.id)
+    .eq("tag_id", tag.id);
+  if (error) throw apiFailure(action, status, error.message);
+  if (count === null) {
+    throw new WikiMastersError(
+      `${action} returned no row count (HTTP ${status})`,
+    );
+  }
+  return { cardId, label, tagged: false, changed: count > 0 };
+}
