@@ -4,9 +4,7 @@
 
 L'interface permet de marquer une carte de ma collection en favori (`user_cards.starred`). Une carte en favori est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux marquer un favori depuis le terminal.
 
-L'écriture n'est pas encore connue : elle demande une capture HAR du parcours dans l'interface.
-
-Dépend de : [Défausser toutes mes cartes communes](../discard-commons.md).
+Dépend de : [Défausser toutes mes cartes communes](discard-commons.md).
 
 ## User story
 
