@@ -9,6 +9,7 @@ import {
   placeMinimumBid,
   removeFromWishlist,
   starCard,
+  tagCard,
   unstarCard,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
@@ -18,6 +19,7 @@ import {
   formatFavourite,
   formatLogin,
   formatRemoval,
+  formatTag,
   formatWishlist,
   type Format,
 } from "./output.js";
@@ -93,6 +95,19 @@ for (const [name, description, change] of [
       console.log(formatFavourite(await change(session, cardId), format()));
     });
 }
+
+collection
+  .command("tag")
+  .description(
+    "Put one of your labels on a card of your collection, which protects it from discard-commons; succeeds if the card already has it",
+  )
+  .argument("<card-id>", "card UUID")
+  .argument("<label>", "name of one of your labels")
+  .action(async (rawCardId: string, label: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatTag(await tagCard(session, cardId, label), format()));
+  });
 
 const wishlist = program
   .command("wishlist")

@@ -67,7 +67,9 @@ Source: read-only query, 2026-10-02.
 | `user_card_id` | labelled collection entry, relation to `user_cards.id` |
 | `tag_id` | the label, relation to `tags.id` (`name`, `color`, one row per label the user created) |
 
+- Row-level security returns only the user's own rows.
 - `discardCommons` embeds it in `user_cards` to keep labelled entries out of the discard.
+- `tagCard`: `GET user_cards` of `id, user_card_tags(tag_id)`, filtered on `user_id`, `card_id` and `count=gt.0`, then `GET tags` of `id, name` filtered on `user_id`, then, when the entry lacks the label, `POST user_card_tags` with `{"user_card_id":"<entry id>","tag_id":"<label id>"}`; PostgREST answers `201` with no body. Source: capture `tag-card.har`.
 
 ## `rpc/get_my_profile`: the signed-in user's profile
 

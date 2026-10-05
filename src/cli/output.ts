@@ -2,6 +2,7 @@ import type {
   CommonsDiscard,
   FavouriteChange,
   PlacedBid,
+  TagChange,
   WishlistCard,
   WishlistRemoval,
 } from "../core/index.js";
@@ -94,4 +95,16 @@ export function formatFavourite(
   return changed
     ? `Card ${cardId} removed from the favourites.`
     : `Card ${cardId} was not a favourite.`;
+}
+
+export function formatTag(
+  { cardId, label, tagged, changed }: TagChange,
+  format: Format,
+): string {
+  if (format === "json")
+    return JSON.stringify({ id: cardId, label, tagged, changed });
+  const name = JSON.stringify(label);
+  return changed
+    ? `Card ${cardId} labelled ${name}.`
+    : `Card ${cardId} already had the label ${name}.`;
 }

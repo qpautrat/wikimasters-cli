@@ -6,6 +6,7 @@ import {
   formatFavourite,
   formatLogin,
   formatRemoval,
+  formatTag,
   formatWishlist,
 } from "./output.js";
 
@@ -58,6 +59,17 @@ describe("JSON output", () => {
         formatFavourite({ cardId, starred: true, changed: false }, "json"),
       ),
     ).toEqual({ id: cardId, starred: true, changed: false });
+  });
+
+  it("reports a label change with the card id, the label, the state and whether it changed", () => {
+    expect(
+      JSON.parse(
+        formatTag(
+          { cardId, label: "Histoire", tagged: true, changed: false },
+          "json",
+        ),
+      ),
+    ).toEqual({ id: cardId, label: "Histoire", tagged: true, changed: false });
   });
 
   it("reports a discard with its count, gain, balance and failures", () => {
@@ -140,5 +152,23 @@ describe("text output", () => {
     expect(
       formatFavourite({ cardId, starred: false, changed: false }, "text"),
     ).toBe(`Card ${cardId} was not a favourite.`);
+  });
+
+  it("says when a card is labelled", () => {
+    expect(
+      formatTag(
+        { cardId, label: "Histoire", tagged: true, changed: true },
+        "text",
+      ),
+    ).toBe(`Card ${cardId} labelled "Histoire".`);
+  });
+
+  it("says when a card already had the label", () => {
+    expect(
+      formatTag(
+        { cardId, label: "Histoire", tagged: true, changed: false },
+        "text",
+      ),
+    ).toBe(`Card ${cardId} already had the label "Histoire".`);
   });
 });
