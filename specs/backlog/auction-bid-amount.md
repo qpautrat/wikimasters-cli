@@ -4,7 +4,7 @@
 
 `wikimasters auction bid <auction-id>` place toujours la mise minimale fixée par le jeu. Je veux parfois miser davantage.
 
-Dépend de : [Miser sur une enchère](../auction-bid.md).
+Dépend de : [Miser sur une enchère](../auction-bid.md), [Laisser le jeu refuser une mise](auction-bid-game-refusals.md).
 
 ## User story
 
