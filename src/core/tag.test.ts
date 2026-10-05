@@ -120,6 +120,31 @@ describe("tagCard", () => {
     expect(writes(requests)).toEqual([]);
   });
 
+  it("succeeds without change when the label was put on the card meanwhile", async () => {
+    const { session } = await sessionWith(
+      collectionEntry([]),
+      labels(history),
+      ({ method }) =>
+        method === "POST"
+          ? {
+              status: 409,
+              body: {
+                code: "23505",
+                message:
+                  'duplicate key value violates unique constraint "user_card_tags_pkey"',
+              },
+            }
+          : undefined,
+    );
+
+    await expect(tagCard(session, cardId, "Histoire")).resolves.toEqual({
+      cardId,
+      label: "Histoire",
+      tagged: true,
+      changed: false,
+    });
+  });
+
   it("refuses a card absent from the collection without change", async () => {
     const { session, requests } = await sessionWith(
       collectionEntry(null),

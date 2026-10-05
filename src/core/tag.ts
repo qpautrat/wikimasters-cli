@@ -20,6 +20,8 @@ interface TaggedEntry {
   user_card_tags: { tag_id: string }[];
 }
 
+const UNIQUE_VIOLATION = "23505";
+
 async function findTag(session: Session, label: string): Promise<Tag> {
   const { data, error, status } = await session.client
     .from("tags")
@@ -57,6 +59,9 @@ export async function tagCard(
   const { error, status } = await session.client
     .from("user_card_tags")
     .insert({ user_card_id: entry.id, tag_id: tag.id });
+  if (error?.code === UNIQUE_VIOLATION) {
+    return { cardId, label, tagged: true, changed: false };
+  }
   if (error) {
     throw apiFailure(
       `Labelling card ${cardId} ${JSON.stringify(label)}`,
