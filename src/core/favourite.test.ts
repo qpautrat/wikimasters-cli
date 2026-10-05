@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseCardId } from "./card-id.js";
-import { AuthRequiredError, WikiMastersError } from "./errors.js";
+import { AuthRequiredError } from "./errors.js";
 import { starCard, unstarCard } from "./favourite.js";
 import { resumeSession } from "./session.js";
 import {
@@ -41,16 +41,19 @@ async function sessionWith(...routes: Route[]) {
   return { session, requests };
 }
 
-describe("starCard", () => {
-  it("stars the collection entry of the signed-in user for that card", async () => {
+describe.each([
+  { name: "starCard", change: starCard, starred: true },
+  { name: "unstarCard", change: unstarCard, starred: false },
+])("$name", ({ change, starred }) => {
+  it("updates the collection entry of the signed-in user for that card", async () => {
     const { session, requests } = await sessionWith(
-      collectionEntry(false),
+      collectionEntry(!starred),
       entryUpdate(1),
     );
 
-    await expect(starCard(session, cardId)).resolves.toEqual({
+    await expect(change(session, cardId)).resolves.toEqual({
       cardId,
-      starred: true,
+      starred,
       changed: true,
     });
     const read = requests.find(({ method }) => method === "GET");
@@ -59,17 +62,18 @@ describe("starCard", () => {
     expect(read?.url.searchParams.get("count")).toBe("gt.0");
     const update = requests.find(({ method }) => method === "PATCH");
     expect(update?.url.searchParams.get("id")).toBe(`eq.${entryId}`);
-    expect(JSON.parse(update?.body ?? "null")).toEqual({ starred: true });
+    expect(update?.url.searchParams.get("starred")).toBe(`eq.${!starred}`);
+    expect(JSON.parse(update?.body ?? "null")).toEqual({ starred });
     expect(update?.headers.get("prefer")).toContain("count=exact");
     expect(update?.headers.get("authorization")).toBe(`Bearer ${ACCESS_TOKEN}`);
   });
 
-  it("succeeds without change when the card is already starred", async () => {
-    const { session, requests } = await sessionWith(collectionEntry(true));
+  it("succeeds without change when the card already is in that state", async () => {
+    const { session, requests } = await sessionWith(collectionEntry(starred));
 
-    await expect(starCard(session, cardId)).resolves.toEqual({
+    await expect(change(session, cardId)).resolves.toEqual({
       cardId,
-      starred: true,
+      starred,
       changed: false,
     });
     expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
@@ -78,19 +82,21 @@ describe("starCard", () => {
   it("refuses a card absent from the collection without change", async () => {
     const { session, requests } = await sessionWith(collectionEntry(null));
 
-    await expect(starCard(session, cardId)).rejects.toThrow(
+    await expect(change(session, cardId)).rejects.toThrow(
       /not in your collection/,
     );
     expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
   });
 
-  it("fails when the update changes no entry", async () => {
+  it("fails without change when the entry changed meanwhile", async () => {
     const { session } = await sessionWith(
-      collectionEntry(false),
+      collectionEntry(!starred),
       entryUpdate(0),
     );
 
-    await expect(starCard(session, cardId)).rejects.toThrow(WikiMastersError);
+    await expect(change(session, cardId)).rejects.toThrow(
+      /changed meanwhile; nothing was changed/,
+    );
   });
 
   it("requires a new login when the API rejects the session", async () => {
@@ -100,44 +106,6 @@ describe("starCard", () => {
         : undefined,
     );
 
-    await expect(starCard(session, cardId)).rejects.toThrow(AuthRequiredError);
-  });
-});
-
-describe("unstarCard", () => {
-  it("unstars the collection entry of the signed-in user for that card", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry(true),
-      entryUpdate(1),
-    );
-
-    await expect(unstarCard(session, cardId)).resolves.toEqual({
-      cardId,
-      starred: false,
-      changed: true,
-    });
-    const update = requests.find(({ method }) => method === "PATCH");
-    expect(update?.url.searchParams.get("id")).toBe(`eq.${entryId}`);
-    expect(JSON.parse(update?.body ?? "null")).toEqual({ starred: false });
-  });
-
-  it("succeeds without change when the card is not starred", async () => {
-    const { session, requests } = await sessionWith(collectionEntry(false));
-
-    await expect(unstarCard(session, cardId)).resolves.toEqual({
-      cardId,
-      starred: false,
-      changed: false,
-    });
-    expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
-  });
-
-  it("refuses a card absent from the collection without change", async () => {
-    const { session, requests } = await sessionWith(collectionEntry(null));
-
-    await expect(unstarCard(session, cardId)).rejects.toThrow(
-      /not in your collection/,
-    );
-    expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
+    await expect(change(session, cardId)).rejects.toThrow(AuthRequiredError);
   });
 });

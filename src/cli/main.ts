@@ -71,29 +71,28 @@ collection
     if (result.failed.length > 0) process.exitCode = 1;
   });
 
-collection
-  .command("star")
-  .description(
+for (const [name, description, change] of [
+  [
+    "star",
     "Mark a card of your collection as favourite, which protects it from discard-commons; succeeds if it already is",
-  )
-  .argument("<card-id>", "card UUID")
-  .action(async (rawCardId: string) => {
-    const cardId = parseCardId(rawCardId);
-    const session = await openSession();
-    console.log(formatFavourite(await starCard(session, cardId), format()));
-  });
-
-collection
-  .command("unstar")
-  .description(
+    starCard,
+  ],
+  [
+    "unstar",
     "Remove a card of your collection from the favourites, which lifts its protection from discard-commons; succeeds if it is not a favourite",
-  )
-  .argument("<card-id>", "card UUID")
-  .action(async (rawCardId: string) => {
-    const cardId = parseCardId(rawCardId);
-    const session = await openSession();
-    console.log(formatFavourite(await unstarCard(session, cardId), format()));
-  });
+    unstarCard,
+  ],
+] as const) {
+  collection
+    .command(name)
+    .description(description)
+    .argument("<card-id>", "card UUID")
+    .action(async (rawCardId: string) => {
+      const cardId = parseCardId(rawCardId);
+      const session = await openSession();
+      console.log(formatFavourite(await change(session, cardId), format()));
+    });
+}
 
 const wishlist = program
   .command("wishlist")

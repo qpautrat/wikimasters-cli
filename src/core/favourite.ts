@@ -18,10 +18,6 @@ async function setStarred(
   cardId: CardId,
   starred: boolean,
 ): Promise<FavouriteChange> {
-  const action = starred
-    ? `Marking card ${cardId} as favourite`
-    : `Removing card ${cardId} from the favourites`;
-
   const { data, error, status } = await session.client
     .from("user_cards")
     .select("id, starred")
@@ -43,16 +39,25 @@ async function setStarred(
   }
   if (data.starred === starred) return { cardId, starred, changed: false };
 
+  const action = starred
+    ? `Marking card ${cardId} as favourite`
+    : `Removing card ${cardId} from the favourites`;
   const update = await session.client
     .from("user_cards")
     .update({ starred }, { count: "exact" })
-    .eq("id", data.id);
+    .eq("id", data.id)
+    .eq("starred", !starred);
   if (update.error) {
     throw apiFailure(action, update.status, update.error.message);
   }
-  if (update.count !== 1) {
+  if (update.count === null) {
     throw new WikiMastersError(
-      `${action} changed ${update.count ?? "an unknown number of"} collection entries instead of 1 (HTTP ${update.status})`,
+      `${action} returned no row count (HTTP ${update.status})`,
+    );
+  }
+  if (update.count === 0) {
+    throw new WikiMastersError(
+      `${action} found no entry to change: the collection entry changed meanwhile; nothing was changed`,
     );
   }
   return { cardId, starred, changed: true };
