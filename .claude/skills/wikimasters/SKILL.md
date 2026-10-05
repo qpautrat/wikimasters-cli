@@ -17,13 +17,11 @@ Run every command from the repo root as `npm run -s wikimasters -- <command> --j
 
 ## Cards named by the user
 
-The user names cards in natural language. Resolve each name to its id with the list command that matches the request, e.g. `wishlist list` for a card to remove from the wishlist, `collection list` for a card of the collection. Match without regard to case, accents or minor typos:
+The user names cards in natural language. Resolve each name to its id with the list command that matches the request, e.g. `wishlist list` for a card to remove from the wishlist, `collection list` for a card of the collection, `cards search <name>` for any card of the catalogue. Match without regard to case, accents or minor typos:
 
 - exactly one match: act on it;
 - several matches: show their titles and rarities, and act only after the user picks one;
 - no match: say so and change nothing.
-
-To add a card to the wishlist, ask the user for its id.
 
 Report results by card title, never by id alone.
 
