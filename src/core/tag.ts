@@ -1,6 +1,6 @@
 import type { CardId } from "./card-id.js";
 import { readCollectionEntry } from "./collection-entry.js";
-import { WikiMastersError, apiFailure } from "./errors.js";
+import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
 import type { Session } from "./session.js";
 
 export interface TagChange {
@@ -23,8 +23,6 @@ interface TaggedEntry {
 function hasTag(entry: TaggedEntry, tag: Tag): boolean {
   return entry.user_card_tags.some(({ tag_id }) => tag_id === tag.id);
 }
-
-const UNIQUE_VIOLATION = "23505";
 
 async function findTag(session: Session, label: string): Promise<Tag> {
   const { data, error, status } = await session.client
@@ -63,7 +61,7 @@ export async function tagCard(
   const { error, status } = await session.client
     .from("user_card_tags")
     .insert({ user_card_id: entry.id, tag_id: tag.id });
-  if (error?.code === UNIQUE_VIOLATION) {
+  if (isUniqueViolation(error)) {
     return { cardId, label, tagged: true, changed: false };
   }
   if (error) {

@@ -10,6 +10,10 @@ export class AuthRequiredError extends WikiMastersError {
   }
 }
 
+export function isUniqueViolation(error: { code?: string } | null): boolean {
+  return error?.code === "23505";
+}
+
 export function apiFailure(
   action: string,
   status: number,
