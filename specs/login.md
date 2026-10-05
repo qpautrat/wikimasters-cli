@@ -27,6 +27,7 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
 5. Une commande qui a besoin d'une session sort avec le code **4** quand :
    - aucune session n'est enregistrée ;
    - la session enregistrée est expirée ou révoquée ;
-   - l'API rejette la session (HTTP 401).
+   - l'API rejette la session (HTTP 401) ;
+   - le site redirige la requête vers sa page de connexion (`/login`).
 6. Dans ces cas, le message d'erreur indique de lancer `wikimasters login`.
 7. Les autres erreurs (réseau, indisponibilité de l'API, argument invalide…) sortent avec le code 1.

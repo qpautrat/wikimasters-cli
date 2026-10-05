@@ -17,6 +17,6 @@ En tant que développeur, j'envoie une requête au serveur Next.js du site avec 
 3. La commande écrit le statut HTTP sur la sortie d'erreur et le corps de la réponse, tel quel, sur la sortie standard, y compris quand le site refuse la requête. Elle ne suit pas une redirection : elle écrit son statut et sa destination. Elle sort avec le code 0 sur un statut 2xx, 1 sinon.
 4. Le chemin d'une page du site donne son HTML, tel que le voit l'utilisateur connecté.
 5. Le jeton de rafraîchissement renouvelé est enregistré dans `.env` avant la requête. Ni le cookie ni aucun jeton n'est affiché.
-6. Sans session valide ou sur HTTP 401, la commande sort avec le code 4. Sur une erreur passagère qui persiste, ou qui peut avoir laissé passer une écriture, elle sort avec le code 75, comme `wikimasters`.
+6. Sans session valide, sur HTTP 401 ou sur une redirection vers la page de connexion (`/login`), la commande sort avec le code 4. Sur une erreur passagère qui persiste, ou qui peut avoir laissé passer une écriture, elle sort avec le code 75, comme `wikimasters`.
 7. Les commandes `wikimasters` qui appellent le site gardent leur comportement.
 8. La règle `.claude/rules/api-discovery.md` indique cette commande pour les requêtes directes au site.

@@ -5,7 +5,12 @@ import {
   WikiMastersError,
 } from "./errors.js";
 import { resumeSession } from "./session.js";
-import { type SiteSendInit, sendSiteRequest, siteRequest } from "./site.js";
+import {
+  type SiteSendInit,
+  sendSiteRequest,
+  siteFailure,
+  siteRequest,
+} from "./site.js";
 import {
   type FakeResponse,
   type Route,
@@ -168,5 +173,47 @@ describe("siteRequest", () => {
         method: "GET",
       }),
     ).rejects.toBeInstanceOf(AuthRequiredError);
+  });
+
+  it("asks to log in again when redirected to the login page", async () => {
+    const { session } = await sessionWith(
+      siteRoute("GET", {
+        status: 307,
+        headers: { location: "https://www.wiki-masters.com/login" },
+      }),
+    );
+
+    await expect(
+      siteRequest(session, "auth-cookie", "Reading", "/", PATH, {
+        method: "GET",
+      }),
+    ).rejects.toBeInstanceOf(AuthRequiredError);
+  });
+});
+
+describe("siteFailure", () => {
+  const redirect = (location: string) => ({
+    status: 307,
+    ok: false,
+    location,
+    body: "",
+  });
+
+  it.each([
+    "/login",
+    "/login?next=%2Fmarketplace",
+    "https://www.wiki-masters.com/login",
+  ])("asks to log in again on a redirect to %s", (location) => {
+    const failure = siteFailure("Reading", redirect(location));
+
+    expect(failure).toBeInstanceOf(AuthRequiredError);
+    expect(failure.message).toMatch(/run `wikimasters login`/);
+  });
+
+  it("keeps a redirect elsewhere a plain failure", () => {
+    const failure = siteFailure("Reading", redirect("/pulls"));
+
+    expect(failure).not.toBeInstanceOf(AuthRequiredError);
+    expect(failure.message).toBe("Reading failed (HTTP 307): ");
   });
 });

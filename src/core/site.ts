@@ -1,5 +1,10 @@
 import { authCookieHeader } from "./auth-cookie.js";
-import { WikiMastersError, apiFailure, outcomeUnknown } from "./errors.js";
+import {
+  AuthRequiredError,
+  WikiMastersError,
+  apiFailure,
+  outcomeUnknown,
+} from "./errors.js";
 import type { Session } from "./session.js";
 import { SITE_URL } from "./supabase.js";
 import {
@@ -22,6 +27,27 @@ export interface SiteResponse {
   ok: boolean;
   location: string | null;
   body: string;
+}
+
+function redirectsToLogin({ status, location }: SiteResponse): boolean {
+  return (
+    status >= 300 &&
+    status < 400 &&
+    location !== null &&
+    new URL(location, SITE_URL).pathname === "/login"
+  );
+}
+
+export function siteFailure(
+  action: string,
+  response: SiteResponse,
+): WikiMastersError {
+  if (redirectsToLogin(response)) {
+    return new AuthRequiredError(
+      `${action} was redirected to the login page: the session is no longer valid`,
+    );
+  }
+  return apiFailure(action, response.status, response.body);
 }
 
 export async function siteCookie(session: Session): Promise<string> {
@@ -82,7 +108,7 @@ export async function siteRequest(
   path: string,
   init: SiteSendInit,
 ): Promise<unknown> {
-  const { status, ok, body } = await sendSiteRequest(
+  const response = await sendSiteRequest(
     session,
     cookie,
     action,
@@ -90,10 +116,10 @@ export async function siteRequest(
     path,
     init,
   );
-  if (!ok) throw apiFailure(action, status, body);
+  if (!response.ok) throw siteFailure(action, response);
   try {
-    return JSON.parse(body);
+    return JSON.parse(response.body);
   } catch {
-    throw new WikiMastersError(`${action} returned no JSON: ${body}`);
+    throw new WikiMastersError(`${action} returned no JSON: ${response.body}`);
   }
 }
