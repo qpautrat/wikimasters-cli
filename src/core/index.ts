@@ -30,8 +30,10 @@ export {
 } from "./session.js";
 export { tagCard, untagCard, type TagChange } from "./tag.js";
 export {
+  addToWishlist,
   listWishlist,
   removeFromWishlist,
+  type WishlistAddition,
   type WishlistCard,
   type WishlistRemoval,
 } from "./wishlist.js";

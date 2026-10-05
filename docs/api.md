@@ -14,7 +14,7 @@ Next.js routes live at `https://www.wiki-masters.com/api/...` and read the sessi
 
 ## `wishlist_items`: the wishlist
 
-Source: capture `withdraw-wishlist.har` (`DELETE`), read-only query (columns).
+Source: captures `withdraw-wishlist.har` (`DELETE`) and `add-wishlist.har` (`POST`), read-only query (columns).
 
 | Column | Meaning |
 |---|---|
@@ -23,6 +23,7 @@ Source: capture `withdraw-wishlist.har` (`DELETE`), read-only query (columns).
 | `created_at` | when the card was added |
 
 - `listWishlist`: `GET`, filtered on `user_id`, ordered by `created_at.desc`, embeds `cards`.
+- `addToWishlist`: `POST` with `{"user_id":"<user id>","card_id":"<card id>"}`; PostgREST answers with an empty body and `Content-Range: */*` (capture). The core treats a unique violation (`23505`) as the card being already there.
 - `removeFromWishlist`: `DELETE` filtered on `user_id` and `card_id` (capture). The core adds `Prefer: count=exact`, PostgREST's standard header, to get the number of deleted rows in `Content-Range`, `0` when the card was absent.
 
 ## `cards`: the card catalogue
@@ -34,6 +35,9 @@ Source: read-only query.
 | `id` | card UUID |
 | `wikipedia_title` | title of the Wikipedia article the card is built from |
 | `rarity` | current rarity code; seen: `C`, `PC`, `R`, `SR`, `UR` |
+
+- The whole catalogue is readable, owned or not.
+- `addToWishlist`: `GET` of `id, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection
 

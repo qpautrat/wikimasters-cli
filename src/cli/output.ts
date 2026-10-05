@@ -3,6 +3,7 @@ import type {
   FavouriteChange,
   PlacedBid,
   TagChange,
+  WishlistAddition,
   WishlistCard,
   WishlistRemoval,
 } from "../core/index.js";
@@ -36,6 +37,16 @@ export function formatWishlist(
         `${id}  ${title} (${rarity})${owned ? "  [owned]" : ""}`,
     )
     .join("\n");
+}
+
+export function formatAddition(
+  { cardId, added }: WishlistAddition,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ id: cardId, added });
+  return added
+    ? `Card ${cardId} added to the wishlist.`
+    : `Card ${cardId} was already in the wishlist.`;
 }
 
 export function formatRemoval(

@@ -7,6 +7,11 @@ export interface WishlistRemoval {
   removed: boolean;
 }
 
+export interface WishlistAddition {
+  cardId: CardId;
+  added: boolean;
+}
+
 export interface WishlistCard {
   id: CardId;
   title: string;
@@ -51,6 +56,51 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
       owned: cards.user_cards.length > 0,
     };
   });
+}
+
+interface CatalogueCard {
+  id: string;
+  wishlist_items: { card_id: string }[];
+}
+
+const UNIQUE_VIOLATION = "23505";
+
+export async function addToWishlist(
+  session: Session,
+  cardId: CardId,
+): Promise<WishlistAddition> {
+  const { data, error, status } = await session.client
+    .from("cards")
+    .select("id, wishlist_items(card_id)")
+    .eq("id", cardId)
+    .eq("wishlist_items.user_id", session.userId)
+    .maybeSingle<CatalogueCard>();
+  if (error) {
+    throw apiFailure(
+      `Reading card ${cardId} in the catalogue`,
+      status,
+      error.message,
+    );
+  }
+  if (!data) {
+    throw new WikiMastersError(
+      `Card ${cardId} is not in the card catalogue; nothing was changed`,
+    );
+  }
+  if (data.wishlist_items.length > 0) return { cardId, added: false };
+
+  const insert = await session.client
+    .from("wishlist_items")
+    .insert({ user_id: session.userId, card_id: cardId });
+  if (insert.error?.code === UNIQUE_VIOLATION) return { cardId, added: false };
+  if (insert.error) {
+    throw apiFailure(
+      `Adding card ${cardId} to the wishlist`,
+      insert.status,
+      insert.error.message,
+    );
+  }
+  return { cardId, added: true };
 }
 
 export async function removeFromWishlist(

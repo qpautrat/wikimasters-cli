@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
+  formatAddition,
   formatBid,
   formatDiscard,
   formatFavourite,
@@ -42,6 +43,15 @@ describe("JSON output", () => {
 
   it("gives an empty array for an empty wishlist", () => {
     expect(formatWishlist([], "json")).toBe("[]");
+  });
+
+  it("reports an addition with the card id and whether it was added", () => {
+    expect(JSON.parse(formatAddition({ cardId, added: true }, "json"))).toEqual(
+      { id: cardId, added: true },
+    );
+    expect(
+      JSON.parse(formatAddition({ cardId, added: false }, "json")),
+    ).toEqual({ id: cardId, added: false });
   });
 
   it("reports a removal with the card id and whether it was removed", () => {
@@ -134,6 +144,18 @@ describe("text output", () => {
     expect(
       formatFavourite({ cardId, starred: true, changed: true }, "text"),
     ).toBe(`Card ${cardId} marked as favourite.`);
+  });
+
+  it("says when a card is added to the wishlist", () => {
+    expect(formatAddition({ cardId, added: true }, "text")).toBe(
+      `Card ${cardId} added to the wishlist.`,
+    );
+  });
+
+  it("says when a card was already in the wishlist", () => {
+    expect(formatAddition({ cardId, added: false }, "text")).toBe(
+      `Card ${cardId} was already in the wishlist.`,
+    );
   });
 
   it("says when a card already was a favourite", () => {

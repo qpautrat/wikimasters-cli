@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import {
+  addToWishlist,
   discardCommons,
   listWishlist,
   loginInBrowser,
@@ -15,6 +16,7 @@ import {
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
+  formatAddition,
   formatBid,
   formatDiscard,
   formatFavourite,
@@ -134,6 +136,18 @@ wishlist
     console.log(
       formatWishlist(await listWishlist(await openSession()), format()),
     );
+  });
+
+wishlist
+  .command("add")
+  .description(
+    "Add a card of the catalogue to your wishlist; succeeds if the card is already there",
+  )
+  .argument("<card-id>", "card UUID")
+  .action(async (rawCardId: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatAddition(await addToWishlist(session, cardId), format()));
   });
 
 wishlist

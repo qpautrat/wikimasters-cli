@@ -7,9 +7,11 @@ import {
   USER_ID,
   fakeFetch,
   tokenRefresh,
+  type FakeResponse,
+  type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
-import { listWishlist, removeFromWishlist } from "./wishlist.js";
+import { addToWishlist, listWishlist, removeFromWishlist } from "./wishlist.js";
 
 const cardId = parseCardId("3fc9a132-31db-4b14-832c-04823e02113d");
 
@@ -29,6 +31,98 @@ async function sessionWith(...routes: Route[]) {
   });
   return { session, requests };
 }
+
+function catalogueCard(rows: unknown[]): Route {
+  return ({ method, url }) =>
+    method === "GET" && url.pathname === "/rest/v1/cards"
+      ? { status: 200, body: rows }
+      : undefined;
+}
+
+function isWishlistInsert({ method, url }: RecordedRequest): boolean {
+  return method === "POST" && url.pathname === "/rest/v1/wishlist_items";
+}
+
+function wishlistInsert(response: FakeResponse): Route {
+  return (request) => (isWishlistInsert(request) ? response : undefined);
+}
+
+describe("addToWishlist", () => {
+  it("adds a card of the catalogue for the signed-in user", async () => {
+    const { session, requests } = await sessionWith(
+      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      wishlistInsert({ status: 201 }),
+    );
+
+    await expect(addToWishlist(session, cardId)).resolves.toEqual({
+      cardId,
+      added: true,
+    });
+    const read = requests.find(({ method }) => method === "GET");
+    expect(read?.url.searchParams.get("id")).toBe(`eq.${cardId}`);
+    expect(read?.url.searchParams.get("select")).toBe(
+      "id,wishlist_items(card_id)",
+    );
+    expect(read?.url.searchParams.get("wishlist_items.user_id")).toBe(
+      `eq.${USER_ID}`,
+    );
+    const insert = requests.find(isWishlistInsert);
+    expect(JSON.parse(insert?.body ?? "null")).toEqual({
+      user_id: USER_ID,
+      card_id: cardId,
+    });
+  });
+
+  it("refuses a card absent from the catalogue without changing anything", async () => {
+    const { session, requests } = await sessionWith(catalogueCard([]));
+
+    await expect(addToWishlist(session, cardId)).rejects.toThrow(
+      /not in the card catalogue; nothing was changed/,
+    );
+    expect(requests.some(isWishlistInsert)).toBe(false);
+  });
+
+  it("succeeds without change when the card is already in the wishlist", async () => {
+    const { session, requests } = await sessionWith(
+      catalogueCard([{ id: cardId, wishlist_items: [{ card_id: cardId }] }]),
+    );
+
+    await expect(addToWishlist(session, cardId)).resolves.toEqual({
+      cardId,
+      added: false,
+    });
+    expect(requests.some(isWishlistInsert)).toBe(false);
+  });
+
+  it("succeeds without change when the card was added meanwhile", async () => {
+    const { session } = await sessionWith(
+      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      wishlistInsert({
+        status: 409,
+        body: { code: "23505", message: "duplicate key value" },
+      }),
+    );
+
+    await expect(addToWishlist(session, cardId)).resolves.toEqual({
+      cardId,
+      added: false,
+    });
+  });
+
+  it("requires a new login when the API rejects the session", async () => {
+    const { session } = await sessionWith(
+      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      wishlistInsert({
+        status: 401,
+        body: { code: "PGRST303", message: "JWT expired" },
+      }),
+    );
+
+    await expect(addToWishlist(session, cardId)).rejects.toThrow(
+      AuthRequiredError,
+    );
+  });
+});
 
 describe("removeFromWishlist", () => {
   it("deletes the wishlist item of the signed-in user for that card", async () => {
