@@ -4,7 +4,7 @@
 
 `wikimasters collection discard-commons` choisit lui-même les cartes à défausser : la rareté commune, et des cartes épargnées (favori, brillante, étiquetée). Ces choix sont ceux du joueur, pas de l'API : la défausse du jeu prend une liste de cartes. Cette commande la remplace et laisse l'agent choisir les cartes, par exemple à partir de `wikimasters collection list`.
 
-Dépend de : [Défausser toutes mes cartes communes](discard-commons.md), [Revoir les contrats des commandes au regard du rôle de la CLI](cli-contract-review.md).
+Dépend de : [Revoir les contrats des commandes au regard du rôle de la CLI](cli-contract-review.md).
 
 ## User story
 

@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Une carte en favori (`user_cards.starred`) est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux pouvoir lever cette protection depuis le terminal, par exemple pour un favori marqué par erreur.
+Je veux pouvoir retirer une carte de ma collection de mes favoris (`user_cards.starred`) depuis le terminal, par exemple pour un favori marqué par erreur.
 
 Dépend de : [Marquer une carte de ma collection en favori](collection-favourite.md).
 

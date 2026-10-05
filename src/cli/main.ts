@@ -2,7 +2,7 @@
 import { Command } from "commander";
 import {
   addToWishlist,
-  discardCommons,
+  discardCards,
   listCollection,
   listWishlist,
   loginInBrowser,
@@ -83,12 +83,14 @@ collection
   });
 
 collection
-  .command("discard-commons")
+  .command("discard")
   .description(
-    "Discard every common card of your collection, except favourite, shiny, labelled and pending-trade ones, for 1 wikibidou each; exits 1 if the site failed to discard some",
+    "Discard the given cards of your collection for 1 wikibidou each; refuses them all if one is not in your collection, exits 1 if the game refused some",
   )
-  .action(async () => {
-    const result = await discardCommons(await openSession());
+  .argument("<card-id...>", "card UUIDs")
+  .action(async (rawCardIds: string[]) => {
+    const cardIds = rawCardIds.map(parseCardId);
+    const result = await discardCards(await openSession(), cardIds);
     console.log(formatDiscard(result, format()));
     if (result.failed.length > 0) process.exitCode = 1;
   });
@@ -96,12 +98,12 @@ collection
 for (const [name, description, change] of [
   [
     "star",
-    "Mark a card of your collection as favourite, which protects it from discard-commons; succeeds if it already is",
+    "Mark a card of your collection as favourite; succeeds if it already is",
     starCard,
   ],
   [
     "unstar",
-    "Remove a card of your collection from the favourites, which lifts its protection from discard-commons; succeeds if it is not a favourite",
+    "Remove a card of your collection from the favourites; succeeds if it is not a favourite",
     unstarCard,
   ],
 ] as const) {
@@ -119,12 +121,12 @@ for (const [name, description, change] of [
 for (const [name, description, change] of [
   [
     "tag",
-    "Put one of your labels on a card of your collection, which protects it from discard-commons; succeeds if the card already has it",
+    "Put one of your labels on a card of your collection; succeeds if the card already has it",
     tagCard,
   ],
   [
     "untag",
-    "Remove one of your labels from a card of your collection, which lifts its protection from discard-commons once no label is left; succeeds if the card does not have it",
+    "Remove one of your labels from a card of your collection; succeeds if the card does not have it",
     untagCard,
   ],
 ] as const) {

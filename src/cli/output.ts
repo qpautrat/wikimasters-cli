@@ -1,6 +1,6 @@
 import type {
   CollectionCard,
-  CommonsDiscard,
+  Discard,
   FavouriteChange,
   PlacedBid,
   TagChange,
@@ -96,19 +96,28 @@ function wikibidous(count: number): string {
 }
 
 export function formatDiscard(
-  { discarded, gained, balance, failed }: CommonsDiscard,
+  { discarded, gained, balance, failed }: Discard,
   format: Format,
 ): string {
   if (format === "json") {
-    return JSON.stringify({ discarded, gained, balance, failed });
+    return JSON.stringify({
+      discarded,
+      gained,
+      balance,
+      failed: failed.map(({ cardId, reason }) => ({ id: cardId, reason })),
+    });
   }
   const summary =
     discarded === 0
-      ? `No common card discarded; balance ${wikibidous(balance)}.`
-      : `Discarded ${cards(discarded, "common card")} for ${wikibidous(gained)}; balance ${wikibidous(balance)}.`;
-  return failed.length === 0
-    ? summary
-    : `${summary}\n${cards(failed.length, "card")} could not be discarded: ${JSON.stringify(failed)}`;
+      ? `No card discarded; balance ${wikibidous(balance)}.`
+      : `Discarded ${cards(discarded, "card")} for ${wikibidous(gained)}; balance ${wikibidous(balance)}.`;
+  return [
+    summary,
+    ...failed.map(
+      ({ cardId, reason }) =>
+        `${cardId === null ? "A card" : `Card ${cardId}`} could not be discarded: ${JSON.stringify(reason)}`,
+    ),
+  ].join("\n");
 }
 
 export function formatBid(

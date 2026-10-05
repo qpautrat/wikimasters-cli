@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
-import { discardCommons } from "./collection.js";
+import { parseCardId, type CardId } from "./card-id.js";
+import { discardCards } from "./collection.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -8,7 +9,6 @@ import {
   USER_ID,
   fakeFetch,
   restRequest,
-  restRoute,
   tokenRefresh,
   type RecordedRequest,
   type Route,
@@ -16,55 +16,57 @@ import {
 
 const INITIAL_BALANCE = 7000;
 
-function common(index: number) {
+interface Entry {
+  id: string;
+  card_id: CardId;
+}
+
+function entry(index: number): Entry {
   const suffix = String(index).padStart(12, "0");
   return {
     id: `00000000-0000-4000-8000-${suffix}`,
-    card_id: `11111111-1111-4111-8111-${suffix}`,
-    snapshot_rarity: "C",
-    starred: false,
-    is_shiny: false,
-    user_card_tags: [],
+    card_id: parseCardId(`11111111-1111-4111-8111-${suffix}`),
   };
 }
 
-function commons(count: number) {
-  return Array.from({ length: count }, (_, index) => common(index));
+function entries(count: number): Entry[] {
+  return Array.from({ length: count }, (_, index) => entry(index));
 }
 
-function collectionSelect(rows: unknown[]): Route {
+function pair(): [Entry, Entry] {
+  return [entry(0), entry(1)];
+}
+
+function cardIds(rows: readonly Entry[]): CardId[] {
+  return rows.map(({ card_id }) => card_id);
+}
+
+function collectionSelect(rows: readonly Entry[]): Route {
   const isCollectionRead = restRequest("GET", "user_cards");
   return (request) => {
     if (!isCollectionRead(request)) return undefined;
-    const { url } = request;
-    const offset = Number(url.searchParams.get("offset") ?? 0);
-    const limit = Number(url.searchParams.get("limit") ?? rows.length);
-    return { status: 200, body: rows.slice(offset, offset + limit) };
+    const wanted = (request.url.searchParams.get("card_id") ?? "")
+      .replace(/^in\.\(|\)$/g, "")
+      .split(",");
+    return {
+      status: 200,
+      body: rows.filter(({ card_id }) => wanted.includes(card_id)),
+    };
   };
 }
 
-function myCollection(pendingTradeCardIds: string[] = []): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/api/my-collection"
-      ? { status: 200, body: { collection: [], pendingTradeCardIds } }
-      : undefined;
-}
-
-const profile = restRoute("POST", "rpc/get_my_profile", {
-  status: 200,
-  body: { wikibidous_balance: INITIAL_BALANCE },
-});
-
-function bulkDiscard(): Route {
+function bulkDiscard(failed: (ids: string[]) => unknown[] = () => []): Route {
   let balance = INITIAL_BALANCE;
   return ({ method, url, body }) => {
     if (method !== "POST" || url.pathname !== "/api/user-cards/bulk-discard")
       return undefined;
     const { card_ids } = JSON.parse(body ?? "{}") as { card_ids: string[] };
-    balance += card_ids.length;
+    const refused = failed(card_ids);
+    const count = card_ids.length - refused.length;
+    balance += count;
     return {
       status: 200,
-      body: { balance, discarded_count: card_ids.length, failed: [] },
+      body: { balance, discarded_count: count, failed: refused },
     };
   };
 }
@@ -79,13 +81,8 @@ async function sessionWith(...routes: Route[]) {
   return { session, requests };
 }
 
-function collectionWith(rows: unknown[], pendingTradeCardIds: string[] = []) {
-  return sessionWith(
-    collectionSelect(rows),
-    myCollection(pendingTradeCardIds),
-    profile,
-    bulkDiscard(),
-  );
+function collectionWith(rows: readonly Entry[]) {
+  return sessionWith(collectionSelect(rows), bulkDiscard());
 }
 
 function discardRequests(requests: RecordedRequest[]) {
@@ -98,131 +95,132 @@ function discardedIds(requests: RecordedRequest[]) {
   );
 }
 
-describe("discardCommons", () => {
-  it("selects only the plain common cards of the signed-in user", async () => {
-    const { session, requests } = await collectionWith(commons(1));
+describe("discardCards", () => {
+  it("reads the given cards among the signed-in user's owned ones", async () => {
+    const rows = entries(2);
+    const { session, requests } = await collectionWith(rows);
 
-    await discardCommons(session);
+    await discardCards(session, cardIds(rows));
 
-    const select = requests.find(restRequest("GET", "user_cards"));
-    const params = select?.url.searchParams;
+    const params = requests.find(restRequest("GET", "user_cards"))?.url
+      .searchParams;
     expect(params?.get("user_id")).toBe(`eq.${USER_ID}`);
-    expect(params?.get("snapshot_rarity")).toBe("eq.C");
-    expect(params?.get("starred")).toBe("is.false");
-    expect(params?.get("is_shiny")).toBe("is.false");
-    expect(params?.get("select")).toContain("user_card_tags(tag_id)");
-    expect(params?.get("user_card_tags")).toBe("is.null");
+    expect(params?.get("card_id")).toBe(`in.(${cardIds(rows).join(",")})`);
     expect(params?.get("count")).toBe("gt.0");
   });
 
-  it("discards every common across pages, 100 at a time, for 1 wikibidou each", async () => {
-    const rows = commons(1003);
+  it("discards exactly the given cards by their collection entry", async () => {
+    const [first, second] = pair();
+    const { session, requests } = await collectionWith([
+      first,
+      second,
+      entry(2),
+    ]);
+
+    const result = await discardCards(session, cardIds([second, first]));
+
+    expect(discardedIds(requests).flat().sort()).toEqual([first.id, second.id]);
+    expect(result).toEqual({
+      discarded: 2,
+      gained: 2,
+      balance: INITIAL_BALANCE + 2,
+      failed: [],
+    });
+  });
+
+  it("discards any number of cards, 100 at a time, for 1 wikibidou each", async () => {
+    const rows = entries(250);
     const { session, requests } = await collectionWith(rows);
 
-    const result = await discardCommons(session);
+    const result = await discardCards(session, cardIds(rows));
 
     const batches = discardedIds(requests);
-    expect(batches.every((batch) => batch.length <= 100)).toBe(true);
+    expect(batches.map((batch) => batch.length)).toEqual([100, 100, 50]);
     expect(batches.flat()).toEqual(rows.map(({ id }) => id));
-    expect(result).toEqual({
-      discarded: 1003,
-      gained: 1003,
-      balance: INITIAL_BALANCE + 1003,
-      failed: [],
-    });
+    expect(result.discarded).toBe(250);
+    expect(result.gained).toBe(250);
+    expect(result.balance).toBe(INITIAL_BALANCE + 250);
   });
 
-  it("keeps the cards engaged in a pending trade", async () => {
-    const [byEntry, byCard, free] = commons(3);
-    const { session, requests } = await collectionWith(
-      [byEntry, byCard, free],
-      [byEntry?.id ?? "", byCard?.card_id ?? ""],
-    );
+  it("discards a card given twice only once", async () => {
+    const row = entry(0);
+    const { session, requests } = await collectionWith([row]);
 
-    await discardCommons(session);
+    await discardCards(session, cardIds([row, row]));
 
-    expect(discardedIds(requests).flat()).toEqual([free?.id]);
+    expect(discardedIds(requests)).toEqual([[row.id]]);
   });
 
-  it("authenticates site requests with the session cookie the site reads", async () => {
-    const { session, requests } = await collectionWith(commons(1));
+  it("refuses cards absent from the collection, naming them, and discards nothing", async () => {
+    const [owned, absent] = pair();
+    const { session, requests } = await collectionWith([owned]);
 
-    await discardCommons(session);
+    const discard = discardCards(session, cardIds([owned, absent]));
 
-    const siteRequests = requests.filter(({ url }) =>
-      url.pathname.startsWith("/api/"),
+    await expect(discard).rejects.toThrow(WikiMastersError);
+    await expect(discard).rejects.toThrow(
+      `Not in your collection: ${absent.card_id}; nothing was discarded`,
     );
-    expect(siteRequests).toHaveLength(2);
+    expect(discardRequests(requests)).toEqual([]);
+  });
+
+  it("names each card the game refused with the game's reason", async () => {
+    const [refused, accepted] = pair();
+    const reason = { id: refused.id, error: "Carte engagée dans un échange" };
+    const { session } = await sessionWith(
+      collectionSelect([refused, accepted]),
+      bulkDiscard(() => [reason, "unknown failure"]),
+    );
+
+    const result = await discardCards(session, cardIds([refused, accepted]));
+
+    expect(result.failed).toEqual([
+      { cardId: refused.card_id, reason },
+      { cardId: null, reason: "unknown failure" },
+    ]);
+  });
+
+  it("authenticates the discard with the session cookie the site reads", async () => {
+    const { session, requests } = await collectionWith(entries(1));
+
+    await discardCards(session, cardIds(entries(1)));
+
+    const [discard] = discardRequests(requests);
     const prefix = `${AUTH_COOKIE_NAME}=base64-`;
-    for (const { headers } of siteRequests) {
-      const cookie = headers.get("cookie") ?? "";
-      expect(cookie.startsWith(prefix)).toBe(true);
-      const stored = JSON.parse(
-        Buffer.from(cookie.slice(prefix.length), "base64url").toString("utf8"),
-      );
-      expect(stored.access_token).toBe(ACCESS_TOKEN);
-    }
-  });
-
-  it("succeeds without discarding when there is no common card", async () => {
-    const { session, requests } = await collectionWith([]);
-
-    await expect(discardCommons(session)).resolves.toEqual({
-      discarded: 0,
-      gained: 0,
-      balance: INITIAL_BALANCE,
-      failed: [],
-    });
-    expect(discardRequests(requests)).toEqual([]);
-  });
-
-  it("discards nothing when a selected card is not a plain common", async () => {
-    const { session, requests } = await collectionWith([
-      common(0),
-      { ...common(1), snapshot_rarity: "PC" },
-    ]);
-
-    await expect(discardCommons(session)).rejects.toThrow(WikiMastersError);
-    expect(discardRequests(requests)).toEqual([]);
-  });
-
-  it("discards nothing when a selected card has a label", async () => {
-    const { session, requests } = await collectionWith([
-      common(0),
-      { ...common(1), user_card_tags: [{ tag_id: "label" }] },
-    ]);
-
-    await expect(discardCommons(session)).rejects.toThrow(WikiMastersError);
-    expect(discardRequests(requests)).toEqual([]);
+    const cookie = discard?.headers.get("cookie") ?? "";
+    expect(cookie.startsWith(prefix)).toBe(true);
+    const stored = JSON.parse(
+      Buffer.from(cookie.slice(prefix.length), "base64url").toString("utf8"),
+    );
+    expect(stored.access_token).toBe(ACCESS_TOKEN);
   });
 
   it("tells how many cards were discarded before a batch failed", async () => {
     const discard = bulkDiscard();
     let calls = 0;
-    const { session } = await sessionWith(
-      collectionSelect(commons(250)),
-      myCollection(),
-      (request) =>
-        request.url.pathname.endsWith("/bulk-discard") && ++calls === 3
-          ? { status: 500, body: { error: "boom" } }
-          : discard(request),
+    const rows = entries(250);
+    const { session } = await sessionWith(collectionSelect(rows), (request) =>
+      request.url.pathname.endsWith("/bulk-discard") && ++calls === 3
+        ? { status: 500, body: { error: "boom" } }
+        : discard(request),
     );
 
-    await expect(discardCommons(session)).rejects.toThrow(
+    await expect(discardCards(session, cardIds(rows))).rejects.toThrow(
       /HTTP 500.*200 cards were discarded before the failure/,
     );
   });
 
   it("requires a new login when the site rejects the session", async () => {
     const { session } = await sessionWith(
-      collectionSelect(commons(1)),
-      myCollection(),
+      collectionSelect(entries(1)),
       ({ url }) =>
         url.pathname.endsWith("/bulk-discard")
           ? { status: 401, body: { error: "Unauthorized" } }
           : undefined,
     );
 
-    await expect(discardCommons(session)).rejects.toThrow(AuthRequiredError);
+    await expect(discardCards(session, cardIds(entries(1)))).rejects.toThrow(
+      AuthRequiredError,
+    );
   });
 });

@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Une carte étiquetée (`user_card_tags`) est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux pouvoir retirer une étiquette depuis le terminal, pour reclasser une carte ou lever sa protection.
+Je veux pouvoir retirer une étiquette (`user_card_tags`) d'une carte de ma collection depuis le terminal, pour reclasser la carte.
 
 Dépend de : [Étiqueter une carte de ma collection](collection-tag.md).
 

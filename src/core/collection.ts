@@ -1,28 +1,28 @@
+import type { CardId } from "./card-id.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
-import { readAllPages } from "./paged-read.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
 const COLLECTION_PAGE = "/collection";
 
-const COMMON = "C";
 const WIKIBIDOUS_PER_DISCARD = 1;
 const DISCARD_BATCH_SIZE = 100;
 
-export interface CommonsDiscard {
+export interface DiscardFailure {
+  cardId: CardId | null;
+  reason: unknown;
+}
+
+export interface Discard {
   discarded: number;
   gained: number;
   balance: number;
-  failed: unknown[];
+  failed: DiscardFailure[];
 }
 
-interface CollectionRow {
+interface CollectionEntry {
   id: string;
-  card_id: string;
-  snapshot_rarity: string;
-  starred: boolean;
-  is_shiny: boolean;
-  user_card_tags: unknown[];
+  card_id: CardId;
 }
 
 interface BulkDiscardResponse {
@@ -31,73 +31,45 @@ interface BulkDiscardResponse {
   failed: unknown[];
 }
 
-async function pendingTradeIds(
-  session: Session,
-  cookie: string,
-): Promise<Set<string>> {
-  const action = "Listing the cards in pending trades";
-  const body = await siteRequest(
-    session,
-    cookie,
-    action,
-    COLLECTION_PAGE,
-    `/api/my-collection?sort=rarity&rarity=${COMMON}&page=0&stats=0`,
-    { method: "GET" },
-  );
-  const ids =
-    typeof body === "object" && body !== null && "pendingTradeCardIds" in body
-      ? body.pendingTradeCardIds
-      : undefined;
-  if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
-    throw new WikiMastersError(`${action} returned no pendingTradeCardIds`);
+function batches<Item>(items: readonly Item[]): Item[][] {
+  const result: Item[][] = [];
+  for (let from = 0; from < items.length; from += DISCARD_BATCH_SIZE) {
+    result.push(items.slice(from, from + DISCARD_BATCH_SIZE));
   }
-  return new Set(ids);
+  return result;
 }
 
-async function listPlainCommons(session: Session): Promise<CollectionRow[]> {
-  const rows = await readAllPages("Listing the common cards", (from, to) =>
-    session.client
+async function collectionEntries(
+  session: Session,
+  cardIds: readonly CardId[],
+): Promise<CollectionEntry[]> {
+  const entries: CollectionEntry[] = [];
+  for (const batch of batches(cardIds)) {
+    const { data, error, status } = await session.client
       .from("user_cards")
-      .select(
-        "id, card_id, snapshot_rarity, starred, is_shiny, user_card_tags(tag_id)",
-      )
+      .select("id, card_id")
       .eq("user_id", session.userId)
-      .eq("snapshot_rarity", COMMON)
-      .is("starred", false)
-      .is("is_shiny", false)
-      .is("user_card_tags", null)
+      .in("card_id", batch)
       .gt("count", 0)
-      .order("id")
-      .range(from, to)
-      .overrideTypes<CollectionRow[], { merge: false }>(),
-  );
+      .overrideTypes<CollectionEntry[], { merge: false }>();
+    if (error) {
+      throw apiFailure(
+        "Reading the cards to discard in the collection",
+        status,
+        error.message,
+      );
+    }
+    entries.push(...data);
+  }
 
-  const unsafe = rows.find(
-    (row) =>
-      row.snapshot_rarity !== COMMON ||
-      row.starred ||
-      row.is_shiny ||
-      row.user_card_tags.length > 0,
-  );
-  if (unsafe) {
+  const owned = new Set(entries.map(({ card_id }) => card_id));
+  const missing = cardIds.filter((cardId) => !owned.has(cardId));
+  if (missing.length > 0) {
     throw new WikiMastersError(
-      `Collection entry ${unsafe.id} is not a plain common card; nothing was discarded`,
+      `Not in your collection: ${missing.join(", ")}; nothing was discarded`,
     );
   }
-  return rows;
-}
-
-async function wikibidousBalance(session: Session): Promise<number> {
-  const { data, error, status } = await session.client.rpc("get_my_profile");
-  if (error) {
-    throw apiFailure("Reading the profile", status, error.message);
-  }
-  const balance = (data as { wikibidous_balance?: unknown } | null)
-    ?.wikibidous_balance;
-  if (typeof balance !== "number") {
-    throw new WikiMastersError("The profile holds no wikibidous balance");
-  }
-  return balance;
+  return entries;
 }
 
 function isBulkDiscardResponse(body: unknown): body is BulkDiscardResponse {
@@ -116,7 +88,7 @@ function isBulkDiscardResponse(body: unknown): body is BulkDiscardResponse {
 async function bulkDiscard(
   session: Session,
   cookie: string,
-  userCardIds: readonly string[],
+  entryIds: readonly string[],
 ): Promise<BulkDiscardResponse> {
   const action = "Discarding cards";
   const body = await siteRequest(
@@ -125,7 +97,7 @@ async function bulkDiscard(
     action,
     COLLECTION_PAGE,
     "/api/user-cards/bulk-discard",
-    { method: "POST", body: { card_ids: userCardIds } },
+    { method: "POST", body: { card_ids: entryIds } },
   );
   if (!isBulkDiscardResponse(body)) {
     throw new WikiMastersError(
@@ -135,37 +107,52 @@ async function bulkDiscard(
   return body;
 }
 
-export async function discardCommons(
-  session: Session,
-): Promise<CommonsDiscard> {
-  const cookie = await siteCookie(session);
-  const inTrade = await pendingTradeIds(session, cookie);
-  const userCardIds = (await listPlainCommons(session))
-    .filter(({ id, card_id }) => !inTrade.has(id) && !inTrade.has(card_id))
-    .map(({ id }) => id);
+function mentionedStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (typeof value !== "object" || value === null) return [];
+  return Object.values(value).flatMap(mentionedStrings);
+}
 
-  if (userCardIds.length === 0) {
-    return {
-      discarded: 0,
-      gained: 0,
-      balance: await wikibidousBalance(session),
-      failed: [],
-    };
+function failedCard(
+  entries: readonly CollectionEntry[],
+  failure: unknown,
+): CardId | null {
+  const mentioned = new Set(mentionedStrings(failure));
+  return (
+    entries.find(
+      ({ id, card_id }) => mentioned.has(id) || mentioned.has(card_id),
+    )?.card_id ?? null
+  );
+}
+
+export async function discardCards(
+  session: Session,
+  cardIds: readonly CardId[],
+): Promise<Discard> {
+  if (cardIds.length === 0) {
+    throw new WikiMastersError("No card to discard was given");
   }
+  const entries = await collectionEntries(session, [...new Set(cardIds)]);
+  const cookie = await siteCookie(session);
 
   let discarded = 0;
   let balance = 0;
-  const failed: unknown[] = [];
-  for (let from = 0; from < userCardIds.length; from += DISCARD_BATCH_SIZE) {
+  const failed: DiscardFailure[] = [];
+  for (const batch of batches(entries)) {
     try {
-      const batch = await bulkDiscard(
+      const response = await bulkDiscard(
         session,
         cookie,
-        userCardIds.slice(from, from + DISCARD_BATCH_SIZE),
+        batch.map(({ id }) => id),
       );
-      discarded += batch.discarded_count;
-      balance = batch.balance;
-      failed.push(...batch.failed);
+      discarded += response.discarded_count;
+      balance = response.balance;
+      failed.push(
+        ...response.failed.map((reason) => ({
+          cardId: failedCard(batch, reason),
+          reason,
+        })),
+      );
     } catch (error) {
       if (error instanceof Error && discarded > 0) {
         error.message += ` (${discarded} cards were discarded before the failure)`;

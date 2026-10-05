@@ -21,7 +21,11 @@ export {
   type CollectionCard,
   type CollectionFilter,
 } from "./collection-list.js";
-export { discardCommons, type CommonsDiscard } from "./collection.js";
+export {
+  discardCards,
+  type Discard,
+  type DiscardFailure,
+} from "./collection.js";
 export {
   ApiUnavailableError,
   AuthRequiredError,

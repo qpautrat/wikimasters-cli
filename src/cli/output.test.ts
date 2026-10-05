@@ -116,8 +116,13 @@ describe("JSON output", () => {
     ).toEqual({ id: cardId, label: "Histoire", tagged: true, changed: false });
   });
 
-  it("reports a discard with its count, gain, balance and failures", () => {
-    expect(JSON.parse(formatDiscard(discard, "json"))).toEqual(discard);
+  it("reports a discard with its count, gain, balance and refused cards", () => {
+    const reason = { error: "Carte engagée" };
+    expect(
+      JSON.parse(
+        formatDiscard({ ...discard, failed: [{ cardId, reason }] }, "json"),
+      ),
+    ).toEqual({ ...discard, failed: [{ id: cardId, reason }] });
   });
 
   it("reports the logged-in user id", () => {
@@ -136,26 +141,39 @@ describe("text output", () => {
 
   it("prints the discard count, gain and balance", () => {
     expect(formatDiscard(discard, "text")).toBe(
-      "Discarded 3 common cards for 3 wikibidous; balance 7430 wikibidous.",
+      "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
     );
   });
 
   it("uses the singular for one card", () => {
     expect(formatDiscard({ ...discard, discarded: 1, gained: 1 }, "text")).toBe(
-      "Discarded 1 common card for 1 wikibidou; balance 7430 wikibidous.",
+      "Discarded 1 card for 1 wikibidou; balance 7430 wikibidous.",
     );
   });
 
-  it("says when no common card was discarded", () => {
+  it("says when no card was discarded", () => {
     expect(formatDiscard({ ...discard, discarded: 0, gained: 0 }, "text")).toBe(
-      "No common card discarded; balance 7430 wikibidous.",
+      "No card discarded; balance 7430 wikibidous.",
     );
   });
 
-  it("lists the cards the site failed to discard", () => {
+  it("names each card the game refused to discard with its reason", () => {
     expect(
-      formatDiscard({ ...discard, failed: ["entry-id"] }, "text"),
-    ).toContain('1 card could not be discarded: ["entry-id"]');
+      formatDiscard(
+        {
+          ...discard,
+          failed: [
+            { cardId, reason: { error: "Carte engagée" } },
+            { cardId: null, reason: "boom" },
+          ],
+        },
+        "text",
+      ).split("\n"),
+    ).toEqual([
+      "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
+      `Card ${cardId} could not be discarded: {"error":"Carte engagée"}`,
+      'A card could not be discarded: "boom"',
+    ]);
   });
 
   it("prints one line per wishlist card", () => {

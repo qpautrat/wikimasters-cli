@@ -60,7 +60,7 @@ Source: read-only query, 2026-10-02.
 - One row per owned card: no `card_id` appears twice.
 - Row-level security returns only the user's own rows.
 - `listCollection`: `GET` of `card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, paged by 1000.
-- `discardCommons`: `GET`, filtered on `user_id`, `snapshot_rarity=eq.C`, `starred=is.false`, `is_shiny=is.false`, `count=gt.0` and, embedding `user_card_tags(tag_id)`, `user_card_tags=is.null`, paged by 1000.
+- `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` with at most 100 card ids per request, and `count=gt.0`, to find the entry of each card to discard.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
 - `starCard` / `unstarCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when `starred` differs, `PATCH user_cards?id=eq.<entry id>&starred=eq.<previous state>` with `{"starred":true}` / `{"starred":false}` and `Prefer: count=exact`; PostgREST answers `204`. Source: captures `star-card.har` and `unstar-card.har`, the interface filters the same `PATCH` on `id` only.
 
@@ -74,7 +74,6 @@ Source: read-only query, 2026-10-02.
 | `tag_id` | the label, relation to `tags.id` |
 
 - Row-level security returns only the user's own rows.
-- `discardCommons` embeds it in `user_cards` to keep labelled entries out of the discard.
 - `listCollection` embeds it in `user_cards` as `user_card_tags(tags(name))` to give each entry's label names.
 - `tagCard`: `GET user_cards` of `id, user_card_tags(tag_id)`, filtered on `user_id`, `card_id` and `count=gt.0`, then `GET tags` of `id, name` filtered on `user_id`, then, when the entry lacks the label, `POST user_card_tags` with `{"user_card_id":"<entry id>","tag_id":"<label id>"}`; PostgREST answers `201` with no body. Source: capture `tag-card.har`.
 - `untagCard`: the same two `GET`, then, when the entry has the label, `DELETE user_card_tags?user_card_id=eq.<entry id>&tag_id=eq.<label id>` with `Prefer: count=exact`; PostgREST answers `204`, and a count of `0` means the label was removed meanwhile. Source: capture `untag-card.har`.
@@ -95,28 +94,14 @@ Source: read-only query, 2026-10-05.
 - `listCollection`: reads `name` through the `user_card_tags(tags(name))` embed in `user_cards`.
 - `tagCard` / `untagCard`: `GET` of `id, name` filtered on `user_id` and ordered by `name`, to find the label by its exact name or list the user's labels.
 
-## `rpc/get_my_profile`: the signed-in user's profile
-
-Source: capture `discard-cards.har`.
-
-- `POST` with an empty JSON body; returns one object holding, among others, `username` and `wikibidous_balance`.
-- `discardCommons`: reads `wikibidous_balance` only when there is nothing to discard; otherwise the last `bulk-discard` response gives the balance.
-
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 
 Source: capture `discard-cards.har`.
 
 - Body `{"card_ids": [<user_cards.id>, …]}`: collection entry ids, not `cards.id`.
 - Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [...]}`; the capture only shows an empty `failed`.
-- Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCommons` reports the gain as `discarded_count`.
-- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCommons` sends batches of 100.
-
-## `GET /api/my-collection`: the collection page
-
-Source: capture `discard-cards.har`.
-
-- Query `sort=rarity&rarity=<code>&page=<n>&stats=0`; returns `collection` (one page of entries with their card) and `pendingTradeCardIds`, the cards engaged in a pending trade, empty in the capture.
-- `discardCommons`: reads `pendingTradeCardIds` and keeps every entry whose `id` or `card_id` it lists, the capture not telling which of the two it holds.
+- Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCards` reports the gain as `discarded_count`.
+- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCards` sends batches of 100, reports the last response's `balance`, and names the card of each `failed` entry that holds its `user_cards.id` or `cards.id`, passing the entry on as the game's reason.
 
 ## `auctions`: the auctions
 

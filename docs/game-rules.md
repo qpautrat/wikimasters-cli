@@ -4,7 +4,7 @@ Rules the API enforces without revealing them, as the user states them. Record e
 
 | Rule | Used by |
 |---|---|
-| Discarding a card yields exactly 1 wikibidou, whatever its rarity. | `discardCommons` |
+| Discarding a card yields exactly 1 wikibidou, whatever its rarity. | `discardCards` |
 | Wikibidous are the currency bid in auctions, the way to buy a specific card. | — |
 | A card engaged in an auction or a trade is temporarily removed from the collection, so it cannot be discarded. | — |
 | An auction that has ended, or one's own auction, refuses every bid. | — |
