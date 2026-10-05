@@ -26,7 +26,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Run the CLI after a build | `npm run -s wikimasters -- login`, then `npm run -s wikimasters -- wishlist remove <card-uuid>` |
 | Query a table read-only with the stored session (builds first) | `npm run -s api:get -- 'user_cards?select=*&limit=1'` |
 
-The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit.
+The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests and build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit. Never pass `--no-verify`, including with `--amend`.
 
 Edit `.claude/settings.json` directly, after reading the docs through Context7; never load the `update-config` skill.
 
