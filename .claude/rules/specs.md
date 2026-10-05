@@ -6,6 +6,8 @@ The user drives the project through specs in `specs/`, written in French. Implem
 
 List the specs by title with `head -n1 specs/*.md specs/backlog/*.md`, then read only those related to the subject.
 
+Present a backlog listing in two tables, functional and technical, sorted by each spec's user story (player vs agent or developer).
+
 ## One subject per spec
 
 - A spec covers one subject, functional or technical. Every acceptance criterion must belong to the subject named in the title. Split anything else out.
