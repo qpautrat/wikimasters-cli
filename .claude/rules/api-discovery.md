@@ -6,6 +6,7 @@ Discover what a feature needs from the API in this order:
 2. **Writes, RPC functions and Next.js `/api/...` routes**: establish their contract yourself on the account. Chain the existing `wikimasters` commands, and send a direct request for a step no command covers, e.g. put a card up for auction, then try to discard it to see how the discard refuses it. Take a request's name and body from the site's JavaScript or an existing capture.
    - Before running the sequence, present each write and its effect on the account, and run it once the user agrees.
    - Ask the user for a HAR capture of the manual flow only when neither the site's JavaScript nor an existing capture reveals the request.
+   - Once a sequence establishes a contract, align the core, its tests and `docs/api.md` on it in the same increment, without asking.
 
 Record every table and route the core uses in `docs/api.md`, in the commit that makes the core use it.
 
