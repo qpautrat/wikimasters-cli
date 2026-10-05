@@ -23,6 +23,8 @@ The user names cards in natural language. Resolve each name to its id with the l
 - several matches: show their titles and rarities, and act only after the user picks one;
 - no match: say so and change nothing.
 
+When `cards search` finds nothing, search again with a shorter part of the name, free of accented letters, before concluding there is no match.
+
 Report results by card title, never by id alone.
 
 ## Auctions named by the user
