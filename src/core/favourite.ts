@@ -64,3 +64,10 @@ export function starCard(
 ): Promise<FavouriteChange> {
   return setStarred(session, cardId, true);
 }
+
+export function unstarCard(
+  session: Session,
+  cardId: CardId,
+): Promise<FavouriteChange> {
+  return setStarred(session, cardId, false);
+}

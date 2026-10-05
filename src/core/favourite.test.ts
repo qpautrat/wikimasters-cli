@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseCardId } from "./card-id.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
-import { starCard } from "./favourite.js";
+import { starCard, unstarCard } from "./favourite.js";
 import { resumeSession } from "./session.js";
 import {
   ACCESS_TOKEN,
@@ -101,5 +101,43 @@ describe("starCard", () => {
     );
 
     await expect(starCard(session, cardId)).rejects.toThrow(AuthRequiredError);
+  });
+});
+
+describe("unstarCard", () => {
+  it("unstars the collection entry of the signed-in user for that card", async () => {
+    const { session, requests } = await sessionWith(
+      collectionEntry(true),
+      entryUpdate(1),
+    );
+
+    await expect(unstarCard(session, cardId)).resolves.toEqual({
+      cardId,
+      starred: false,
+      changed: true,
+    });
+    const update = requests.find(({ method }) => method === "PATCH");
+    expect(update?.url.searchParams.get("id")).toBe(`eq.${entryId}`);
+    expect(JSON.parse(update?.body ?? "null")).toEqual({ starred: false });
+  });
+
+  it("succeeds without change when the card is not starred", async () => {
+    const { session, requests } = await sessionWith(collectionEntry(false));
+
+    await expect(unstarCard(session, cardId)).resolves.toEqual({
+      cardId,
+      starred: false,
+      changed: false,
+    });
+    expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
+  });
+
+  it("refuses a card absent from the collection without change", async () => {
+    const { session, requests } = await sessionWith(collectionEntry(null));
+
+    await expect(unstarCard(session, cardId)).rejects.toThrow(
+      /not in your collection/,
+    );
+    expect(requests.some(({ method }) => method === "PATCH")).toBe(false);
   });
 });

@@ -9,6 +9,7 @@ import {
   placeMinimumBid,
   removeFromWishlist,
   starCard,
+  unstarCard,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
@@ -80,6 +81,18 @@ collection
     const cardId = parseCardId(rawCardId);
     const session = await openSession();
     console.log(formatFavourite(await starCard(session, cardId), format()));
+  });
+
+collection
+  .command("unstar")
+  .description(
+    "Remove a card of your collection from the favourites, which lifts its protection from discard-commons; succeeds if it is not a favourite",
+  )
+  .argument("<card-id>", "card UUID")
+  .action(async (rawCardId: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatFavourite(await unstarCard(session, cardId), format()));
   });
 
 const wishlist = program

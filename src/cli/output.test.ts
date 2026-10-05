@@ -129,4 +129,16 @@ describe("text output", () => {
       formatFavourite({ cardId, starred: true, changed: false }, "text"),
     ).toBe(`Card ${cardId} was already a favourite.`);
   });
+
+  it("says when a card is removed from the favourites", () => {
+    expect(
+      formatFavourite({ cardId, starred: false, changed: true }, "text"),
+    ).toBe(`Card ${cardId} removed from the favourites.`);
+  });
+
+  it("says when a card was not a favourite", () => {
+    expect(
+      formatFavourite({ cardId, starred: false, changed: false }, "text"),
+    ).toBe(`Card ${cardId} was not a favourite.`);
+  });
 });

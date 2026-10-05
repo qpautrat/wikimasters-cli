@@ -56,7 +56,7 @@ Source: read-only query, 2026-10-02.
 - Row-level security returns only the user's own rows.
 - `discardCommons`: `GET`, filtered on `user_id`, `snapshot_rarity=eq.C`, `starred=is.false`, `is_shiny=is.false`, `count=gt.0` and, embedding `user_card_tags(tag_id)`, `user_card_tags=is.null`, paged by 1000.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
-- `starCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when not starred yet, `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` and `Prefer: count=exact`; PostgREST answers `204`. Source: capture `star-card.har`, the interface sends the same `PATCH` filtered on `id` only.
+- `starCard` / `unstarCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when `starred` differs, `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` / `{"starred":false}` and `Prefer: count=exact`; PostgREST answers `204`. Source: captures `star-card.har` and `unstar-card.har`, the interface sends the same `PATCH` filtered on `id` only.
 
 ## `user_card_tags`: the labels put on collection entries
 
