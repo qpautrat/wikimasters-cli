@@ -1,5 +1,6 @@
 import type {
   CommonsDiscard,
+  FavouriteChange,
   PlacedBid,
   WishlistCard,
   WishlistRemoval,
@@ -77,4 +78,15 @@ export function formatBid(
   if (format === "json")
     return JSON.stringify({ id: auctionId, amount, balance });
   return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
+}
+
+export function formatFavourite(
+  { cardId, starred, changed }: FavouriteChange,
+  format: Format,
+): string {
+  if (format === "json")
+    return JSON.stringify({ id: cardId, starred, changed });
+  return changed
+    ? `Card ${cardId} marked as favourite.`
+    : `Card ${cardId} was already a favourite.`;
 }

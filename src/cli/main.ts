@@ -8,11 +8,13 @@ import {
   parseCardId,
   placeMinimumBid,
   removeFromWishlist,
+  starCard,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
   formatBid,
   formatDiscard,
+  formatFavourite,
   formatLogin,
   formatRemoval,
   formatWishlist,
@@ -66,6 +68,18 @@ collection
     const result = await discardCommons(await openSession());
     console.log(formatDiscard(result, format()));
     if (result.failed.length > 0) process.exitCode = 1;
+  });
+
+collection
+  .command("star")
+  .description(
+    "Mark a card of your collection as favourite, which protects it from discard-commons; succeeds if it already is",
+  )
+  .argument("<card-id>", "card UUID")
+  .action(async (rawCardId: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatFavourite(await starCard(session, cardId), format()));
   });
 
 const wishlist = program

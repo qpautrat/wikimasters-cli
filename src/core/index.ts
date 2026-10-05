@@ -18,6 +18,7 @@ export {
 export { parseCardId, type CardId } from "./card-id.js";
 export { discardCommons, type CommonsDiscard } from "./collection.js";
 export { AuthRequiredError, WikiMastersError } from "./errors.js";
+export { starCard, type FavouriteChange } from "./favourite.js";
 export {
   resumeSession,
   type ResumeSessionOptions,

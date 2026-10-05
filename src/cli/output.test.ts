@@ -3,6 +3,7 @@ import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatBid,
   formatDiscard,
+  formatFavourite,
   formatLogin,
   formatRemoval,
   formatWishlist,
@@ -49,6 +50,14 @@ describe("JSON output", () => {
     expect(
       JSON.parse(formatRemoval({ cardId, removed: false }, "json")),
     ).toEqual({ id: cardId, removed: false });
+  });
+
+  it("reports a favourite change with the card id, the state and whether it changed", () => {
+    expect(
+      JSON.parse(
+        formatFavourite({ cardId, starred: true, changed: false }, "json"),
+      ),
+    ).toEqual({ id: cardId, starred: true, changed: false });
   });
 
   it("reports a discard with its count, gain, balance and failures", () => {
@@ -107,5 +116,17 @@ describe("text output", () => {
 
   it("says when the wishlist is empty", () => {
     expect(formatWishlist([], "text")).toBe("The wishlist is empty.");
+  });
+
+  it("says when a card is marked as favourite", () => {
+    expect(
+      formatFavourite({ cardId, starred: true, changed: true }, "text"),
+    ).toBe(`Card ${cardId} marked as favourite.`);
+  });
+
+  it("says when a card already was a favourite", () => {
+    expect(
+      formatFavourite({ cardId, starred: true, changed: false }, "text"),
+    ).toBe(`Card ${cardId} was already a favourite.`);
   });
 });
