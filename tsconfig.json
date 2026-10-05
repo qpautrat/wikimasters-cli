@@ -10,7 +10,8 @@
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmit": true
   },
   "include": ["src", "tools"]
 }

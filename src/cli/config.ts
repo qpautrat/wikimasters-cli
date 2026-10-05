@@ -16,7 +16,9 @@ function packageRoot(): string {
   return dir;
 }
 
-export const DEFAULT_ENV_FILE = join(packageRoot(), ".env");
+function defaultEnvFile(): string {
+  return join(packageRoot(), ".env");
+}
 
 const ANON_KEY = "WIKIMASTERS_SUPABASE_ANON_KEY";
 const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";
@@ -29,7 +31,7 @@ export interface Config {
 }
 
 export function loadConfig(
-  envFile = DEFAULT_ENV_FILE,
+  envFile = defaultEnvFile(),
   env: Env = process.env,
 ): Config {
   const fileEnv: Env = existsSync(envFile)
@@ -53,7 +55,7 @@ export function requireRefreshToken(config: Config): string {
 
 export function saveRefreshToken(
   refreshToken: string,
-  envFile = DEFAULT_ENV_FILE,
+  envFile = defaultEnvFile(),
 ): void {
   const line = `${REFRESH_TOKEN}=${refreshToken}`;
   const lines = existsSync(envFile)
