@@ -7,6 +7,7 @@ Discover what a feature needs from the API in this order:
    - Before running the sequence, present each write and its effect on the account, and run it once the user agrees.
    - Ask the user for a HAR capture of the manual flow only when neither the site's JavaScript nor an existing capture reveals the request.
    - Once a sequence establishes a contract, align the core, its tests and `docs/api.md` on it in the same increment, without asking.
+   - Before proposing a change based on how the site answers, observe that answer on the route the core calls, with `npm run -s api:site`; a page's answer does not stand for an `/api/...` route's.
 
 Record every table and route the core uses in `docs/api.md`, in the commit that makes the core use it.
 
