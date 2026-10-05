@@ -14,3 +14,4 @@ npm run -s lint
 npm run -s format:check
 npm test --silent
 npm run -s build
+npm run -s build:tools

@@ -12,14 +12,15 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "build:tools": "tsc -p tsconfig.tools.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "biome lint src",
-    "lint:fix": "biome lint --write src",
-    "format": "biome format --write src",
-    "format:check": "biome format src",
+    "lint": "biome lint src tools",
+    "lint:fix": "biome lint --write src tools",
+    "format": "biome format --write src tools",
+    "format:check": "biome format src tools",
     "wikimasters": "node dist/cli/main.js",
-    "api:get": "npm run -s build && node dist/dev/api-get.js"
+    "api:get": "npm run -s build:tools && node dist-tools/tools/api-get.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

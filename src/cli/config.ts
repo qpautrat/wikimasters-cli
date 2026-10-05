@@ -1,11 +1,22 @@
 import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 import { AuthRequiredError, WikiMastersError } from "../core/index.js";
 
-export const DEFAULT_ENV_FILE = fileURLToPath(
-  new URL("../../.env", import.meta.url),
-);
+function packageRoot(): string {
+  let dir = dirname(fileURLToPath(import.meta.url));
+  while (!existsSync(join(dir, "package.json"))) {
+    const parent = dirname(dir);
+    if (parent === dir) {
+      throw new WikiMastersError("No package.json above the CLI");
+    }
+    dir = parent;
+  }
+  return dir;
+}
+
+export const DEFAULT_ENV_FILE = join(packageRoot(), ".env");
 
 const ANON_KEY = "WIKIMASTERS_SUPABASE_ANON_KEY";
 const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";
