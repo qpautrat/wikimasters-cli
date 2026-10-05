@@ -14,11 +14,11 @@ En tant que joueur, je donne tout ou partie du nom d'une carte et j'obtiens les 
 
 1. `wikimasters cards search <nom>` cherche dans le catalogue de toutes les cartes du jeu, que je les possède ou non.
 2. Une carte correspond quand son nom contient le texte donné, sans tenir compte de la casse.
-3. Chaque résultat affiche l'identifiant unique de la carte (UUID `cards.id`), son nom et sa rareté.
+3. Chaque résultat affiche l'identifiant unique de la carte (UUID `cards.id`), son titre et sa rareté.
 4. Une carte dont le nom est exactement le texte donné, à la casse près, apparaît en premier.
 5. La commande affiche au plus 50 résultats et signale quand d'autres cartes correspondent.
 6. Une recherche sans résultat réussit et le dit.
-7. Avec `--json`, stdout porte la liste des cartes trouvées, chacune avec ses champs `id`, `name` et `rarity`, et un champ indiquant si la liste est tronquée.
+7. Avec `--json`, stdout porte la liste des cartes trouvées, chacune avec ses champs `id`, `title` et `rarity`, et un champ indiquant si la liste est tronquée.
 
 ## Hors périmètre
 
