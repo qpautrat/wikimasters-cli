@@ -7,6 +7,7 @@ transcript=$(ls ~/.claude/projects/*/"$session_id".jsonl)
 plugin_root=$(mise -C "$repo_root" exec -- jq -r --arg project "$repo_root" '
   .plugins["session-report@claude-plugins-official"][] | select(.projectPath == $project) | .installPath
 ' ~/.claude/plugins/installed_plugins.json)
+[ -n "$plugin_root" ] || { echo "session-report is not installed for $repo_root" >&2; exit 1; }
 
 copy=$(mktemp -d)
 trap 'rm -rf "$copy"' EXIT
