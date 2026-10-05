@@ -88,3 +88,17 @@ export function fakeFetch(...routes: Route[]) {
 
   return { fetch, requests };
 }
+
+export function failingFirst(
+  times: number,
+  status: number,
+  route: Route,
+): Route {
+  let failures = 0;
+  return (request) => {
+    const response = route(request);
+    if (!response || failures >= times) return response;
+    failures += 1;
+    return { status, body: "<!DOCTYPE html><html>Cloudflare error</html>" };
+  };
+}

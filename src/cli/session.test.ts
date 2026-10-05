@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AuthRequiredError, WikiMastersError } from "../core/index.js";
+import {
+  ApiUnavailableError,
+  AuthRequiredError,
+  WikiMastersError,
+} from "../core/index.js";
 import { reportFailure } from "./session.js";
 
 describe("reportFailure", () => {
@@ -23,5 +27,13 @@ describe("reportFailure", () => {
     reportFailure("api:get", new AuthRequiredError("Not logged in"));
 
     expect(process.exitCode).toBe(4);
+  });
+
+  it("exits with 75 when the API stays unavailable", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    reportFailure("wikimasters", new ApiUnavailableError("Unavailable"));
+
+    expect(process.exitCode).toBe(75);
   });
 });

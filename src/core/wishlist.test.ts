@@ -193,13 +193,13 @@ describe("removeFromWishlist", () => {
   it("reports the HTTP status when the API fails", async () => {
     const { session } = await sessionWith(({ method }) =>
       method === "DELETE"
-        ? { status: 525, body: { message: "SSL handshake failed" } }
+        ? { status: 500, body: { message: "Internal server error" } }
         : undefined,
     );
 
     const failure = removeFromWishlist(session, cardId);
 
-    await expect(failure).rejects.toThrow(/HTTP 525/);
+    await expect(failure).rejects.toThrow(/HTTP 500/);
     await expect(failure).rejects.not.toThrow(AuthRequiredError);
   });
 

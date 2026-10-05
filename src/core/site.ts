@@ -1,7 +1,12 @@
 import { authCookieHeader } from "./auth-cookie.js";
-import { WikiMastersError, apiFailure } from "./errors.js";
+import { WikiMastersError, apiFailure, outcomeUnknown } from "./errors.js";
 import type { Session } from "./session.js";
 import { SITE_URL } from "./supabase.js";
+import {
+  fetchRetrying,
+  isTransientStatus,
+  isUndeliveredStatus,
+} from "./transient.js";
 
 type SiteRequestInit = { method: "GET" } | { method: "POST"; body: unknown };
 
@@ -21,17 +26,31 @@ export async function siteRequest(
   path: string,
   init: SiteRequestInit,
 ): Promise<unknown> {
-  const response = await session.fetch(`${SITE_URL}${path}`, {
-    method: init.method,
-    headers: {
-      Cookie: cookie,
-      Origin: SITE_URL,
-      Referer: `${SITE_URL}${fromPage}`,
-      ...(init.method === "POST" ? { "Content-Type": "application/json" } : {}),
+  const isPost = init.method === "POST";
+  const response = await fetchRetrying(
+    session.fetch,
+    session.retryDelaysMs,
+    isPost ? isUndeliveredStatus : isTransientStatus,
+    `${SITE_URL}${path}`,
+    {
+      method: init.method,
+      headers: {
+        Cookie: cookie,
+        Origin: SITE_URL,
+        Referer: `${SITE_URL}${fromPage}`,
+        ...(isPost ? { "Content-Type": "application/json" } : {}),
+      },
+      ...(isPost ? { body: JSON.stringify(init.body) } : {}),
     },
-    ...(init.method === "POST" ? { body: JSON.stringify(init.body) } : {}),
-  });
+  );
   const text = await response.text();
+  if (
+    isPost &&
+    isTransientStatus(response.status) &&
+    !isUndeliveredStatus(response.status)
+  ) {
+    throw outcomeUnknown(action, response.status);
+  }
   if (!response.ok) throw apiFailure(action, response.status, text);
   try {
     return JSON.parse(text);

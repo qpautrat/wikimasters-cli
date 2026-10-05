@@ -22,7 +22,11 @@ export {
   type CollectionFilter,
 } from "./collection-list.js";
 export { discardCommons, type CommonsDiscard } from "./collection.js";
-export { AuthRequiredError, WikiMastersError } from "./errors.js";
+export {
+  ApiUnavailableError,
+  AuthRequiredError,
+  WikiMastersError,
+} from "./errors.js";
 export {
   starCard,
   unstarCard,

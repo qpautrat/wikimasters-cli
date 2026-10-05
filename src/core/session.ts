@@ -1,17 +1,29 @@
 import {
   createClient,
   isAuthApiError,
+  isAuthRetryableFetchError,
   type SupabaseClient,
 } from "@supabase/supabase-js";
-import { AuthRequiredError, WikiMastersError } from "./errors.js";
+import {
+  AuthRequiredError,
+  WikiMastersError,
+  apiUnavailable,
+} from "./errors.js";
 import { SUPABASE_URL } from "./supabase.js";
+import {
+  RETRY_DELAYS_MS,
+  fetchRetrying,
+  isTransientStatus,
+} from "./transient.js";
 
 const SESSION_REJECTED_STATUSES = new Set([400, 401, 403]);
+const AUTH_PATH = "/auth/v1/";
 
 export interface ResumeSessionOptions {
   anonKey: string;
   refreshToken: string;
   fetch?: typeof fetch;
+  retryDelaysMs?: readonly number[];
 }
 
 export interface Session {
@@ -19,26 +31,41 @@ export interface Session {
   userId: string;
   refreshToken: string;
   fetch: typeof fetch;
+  retryDelaysMs: readonly number[];
+}
+
+function requestUrl(input: string | URL | Request): URL {
+  return new URL(input instanceof Request ? input.url : input);
 }
 
 export async function resumeSession({
   anonKey,
   refreshToken,
-  fetch,
+  fetch = globalThis.fetch,
+  retryDelaysMs = RETRY_DELAYS_MS,
 }: ResumeSessionOptions): Promise<Session> {
+  const supabaseFetch: typeof globalThis.fetch = (input, init) =>
+    requestUrl(input).pathname.startsWith(AUTH_PATH)
+      ? fetch(input, init)
+      : fetchRetrying(fetch, retryDelaysMs, isTransientStatus, input, init);
+
   const client = createClient(SUPABASE_URL, anonKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,
     },
-    ...(fetch ? { global: { fetch } } : {}),
+    db: { retry: false },
+    global: { fetch: supabaseFetch },
   });
 
   const { data, error } = await client.auth.refreshSession({
     refresh_token: refreshToken,
   });
   if (error) {
+    if (isAuthRetryableFetchError(error) && isTransientStatus(error.status)) {
+      throw apiUnavailable(error.status);
+    }
     throw isAuthApiError(error) && SESSION_REJECTED_STATUSES.has(error.status)
       ? new AuthRequiredError(
           `The stored session is expired or revoked (${error.message})`,
@@ -53,6 +80,7 @@ export async function resumeSession({
     client,
     userId: data.user.id,
     refreshToken: data.session.refresh_token,
-    fetch: fetch ?? globalThis.fetch,
+    fetch,
+    retryDelaysMs,
   };
 }

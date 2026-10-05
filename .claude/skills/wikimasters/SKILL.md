@@ -11,7 +11,8 @@ Run every command from the repo root as `npm run -s wikimasters -- <command> --j
 
 - `0`: success. Read the JSON on stdout.
 - `4`: the user must log in. Tell them a Firefox window is about to open for them to sign in, run `npm run -s wikimasters -- login --json`, then retry the original command once.
-- Any other code: report the stderr message in one sentence. If it names an HTTP 5xx status, retry once before reporting, except for `auction bid`: never rerun it on your own.
+- `75`: the API stayed unavailable after the CLI's own retries. Report the stderr message in one sentence and tell the user to retry later; do not rerun the command on your own. If the message says the request may have taken effect, tell the user to check its outcome first.
+- Any other code: report the stderr message in one sentence.
 
 ## Cards named by the user
 
