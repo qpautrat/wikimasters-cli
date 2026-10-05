@@ -17,7 +17,7 @@ En tant que joueur, je donne l'identifiant d'une enchère et un montant, et la c
 3. Sans montant, la commande place la mise minimale, comme aujourd'hui.
 4. Une valeur qui n'est pas un entier strictement positif est refusée sans rien miser.
 5. Un montant inférieur à la mise minimale que le jeu accepte est refusé sans rien miser, avec un message qui donne cette mise minimale.
-6. Les autres refus et l'affichage restent ceux de la mise minimale : enchère terminée, enchère dont je suis le vendeur, motif donné par le jeu, montant misé et nouveau solde affichés.
+6. Les autres refus et l'affichage restent ceux de la mise minimale : motif donné par le jeu, montant misé et nouveau solde affichés.
 7. La commande mise le montant choisi même quand je suis déjà le meilleur enchérisseur.
 
 ## Hors périmètre
