@@ -1,4 +1,5 @@
 import type { CardId } from "./card-id.js";
+import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 
@@ -17,32 +18,6 @@ interface Tag {
 interface TaggedEntry {
   id: string;
   user_card_tags: { tag_id: string }[];
-}
-
-async function readEntry(
-  session: Session,
-  cardId: CardId,
-): Promise<TaggedEntry> {
-  const { data, error, status } = await session.client
-    .from("user_cards")
-    .select("id, user_card_tags(tag_id)")
-    .eq("user_id", session.userId)
-    .eq("card_id", cardId)
-    .gt("count", 0)
-    .maybeSingle<TaggedEntry>();
-  if (error) {
-    throw apiFailure(
-      `Reading card ${cardId} in the collection`,
-      status,
-      error.message,
-    );
-  }
-  if (!data) {
-    throw new WikiMastersError(
-      `Card ${cardId} is not in your collection; nothing was changed`,
-    );
-  }
-  return data;
 }
 
 async function findTag(session: Session, label: string): Promise<Tag> {
@@ -69,7 +44,11 @@ export async function tagCard(
   cardId: CardId,
   label: string,
 ): Promise<TagChange> {
-  const entry = await readEntry(session, cardId);
+  const entry = await readCollectionEntry<TaggedEntry>(
+    session,
+    cardId,
+    "id, user_card_tags(tag_id)",
+  );
   const tag = await findTag(session, label);
   if (entry.user_card_tags.some(({ tag_id }) => tag_id === tag.id)) {
     return { cardId, label, tagged: true, changed: false };
@@ -93,7 +72,11 @@ export async function untagCard(
   cardId: CardId,
   label: string,
 ): Promise<TagChange> {
-  const entry = await readEntry(session, cardId);
+  const entry = await readCollectionEntry<TaggedEntry>(
+    session,
+    cardId,
+    "id, user_card_tags(tag_id)",
+  );
   const tag = await findTag(session, label);
 
   const action = `Removing label ${JSON.stringify(label)} from card ${cardId}`;

@@ -1,4 +1,5 @@
 import type { CardId } from "./card-id.js";
+import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 
@@ -18,26 +19,12 @@ async function setStarred(
   cardId: CardId,
   starred: boolean,
 ): Promise<FavouriteChange> {
-  const { data, error, status } = await session.client
-    .from("user_cards")
-    .select("id, starred")
-    .eq("user_id", session.userId)
-    .eq("card_id", cardId)
-    .gt("count", 0)
-    .maybeSingle<CollectionEntry>();
-  if (error) {
-    throw apiFailure(
-      `Reading card ${cardId} in the collection`,
-      status,
-      error.message,
-    );
-  }
-  if (!data) {
-    throw new WikiMastersError(
-      `Card ${cardId} is not in your collection; nothing was changed`,
-    );
-  }
-  if (data.starred === starred) return { cardId, starred, changed: false };
+  const entry = await readCollectionEntry<CollectionEntry>(
+    session,
+    cardId,
+    "id, starred",
+  );
+  if (entry.starred === starred) return { cardId, starred, changed: false };
 
   const action = starred
     ? `Marking card ${cardId} as favourite`
@@ -45,7 +32,7 @@ async function setStarred(
   const update = await session.client
     .from("user_cards")
     .update({ starred }, { count: "exact" })
-    .eq("id", data.id)
+    .eq("id", entry.id)
     .eq("starred", !starred);
   if (update.error) {
     throw apiFailure(action, update.status, update.error.message);
