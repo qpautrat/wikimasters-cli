@@ -95,6 +95,11 @@ function wikibidous(count: number): string {
   return `${count} wikibidou${count === 1 ? "" : "s"}`;
 }
 
+function refusedCards(cardIds: readonly string[]): string {
+  if (cardIds.length === 0) return "Some cards";
+  return `${cardIds.length === 1 ? "Card" : "Cards"} ${cardIds.join(", ")}`;
+}
+
 export function formatDiscard(
   { discarded, gained, balance, failed }: Discard,
   format: Format,
@@ -104,7 +109,7 @@ export function formatDiscard(
       discarded,
       gained,
       balance,
-      failed: failed.map(({ cardId, reason }) => ({ id: cardId, reason })),
+      failed: failed.map(({ cardIds, reason }) => ({ ids: cardIds, reason })),
     });
   }
   const summary =
@@ -114,8 +119,8 @@ export function formatDiscard(
   return [
     summary,
     ...failed.map(
-      ({ cardId, reason }) =>
-        `${cardId === null ? "A card" : `Card ${cardId}`} could not be discarded: ${JSON.stringify(reason)}`,
+      ({ cardIds, reason }) =>
+        `${refusedCards(cardIds)} could not be discarded: ${JSON.stringify(reason)}`,
     ),
   ].join("\n");
 }

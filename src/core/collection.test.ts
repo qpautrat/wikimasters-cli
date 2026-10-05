@@ -164,9 +164,23 @@ describe("discardCards", () => {
     expect(discardRequests(requests)).toEqual([]);
   });
 
+  it("refuses a card absent from a later read batch before any discard", async () => {
+    const rows = entries(150);
+    const absent = entry(150);
+    const { session, requests } = await collectionWith(rows);
+
+    await expect(
+      discardCards(session, [...cardIds(rows), absent.card_id]),
+    ).rejects.toThrow(`Not in your collection: ${absent.card_id}`);
+    expect(discardRequests(requests)).toEqual([]);
+  });
+
   it("names each card the game refused with the game's reason", async () => {
     const [refused, accepted] = pair();
-    const reason = { id: refused.id, error: "Carte engagée dans un échange" };
+    const reason = {
+      ids: [refused.id, accepted.card_id],
+      error: "Carte engagée dans un échange",
+    };
     const { session } = await sessionWith(
       collectionSelect([refused, accepted]),
       bulkDiscard(() => [reason, "unknown failure"]),
@@ -175,15 +189,34 @@ describe("discardCards", () => {
     const result = await discardCards(session, cardIds([refused, accepted]));
 
     expect(result.failed).toEqual([
-      { cardId: refused.card_id, reason },
-      { cardId: null, reason: "unknown failure" },
+      { cardIds: [refused.card_id, accepted.card_id], reason },
+      { cardIds: [], reason: "unknown failure" },
+    ]);
+  });
+
+  it("reports the cards the game neither discarded nor refused", async () => {
+    const rows = entries(3);
+    const { session } = await sessionWith(collectionSelect(rows), () => ({
+      status: 200,
+      body: { balance: INITIAL_BALANCE + 2, discarded_count: 2, failed: [] },
+    }));
+
+    const result = await discardCards(session, cardIds(rows));
+
+    expect(result.failed).toEqual([
+      {
+        cardIds: [],
+        reason:
+          "1 of 3 cards sent were neither discarded nor reported as refused",
+      },
     ]);
   });
 
   it("authenticates the discard with the session cookie the site reads", async () => {
-    const { session, requests } = await collectionWith(entries(1));
+    const rows = entries(1);
+    const { session, requests } = await collectionWith(rows);
 
-    await discardCards(session, cardIds(entries(1)));
+    await discardCards(session, cardIds(rows));
 
     const [discard] = discardRequests(requests);
     const prefix = `${AUTH_COOKIE_NAME}=base64-`;
@@ -207,6 +240,26 @@ describe("discardCards", () => {
 
     await expect(discardCards(session, cardIds(rows))).rejects.toThrow(
       /HTTP 500.*200 cards were discarded before the failure/,
+    );
+  });
+
+  it("keeps the refusals of earlier batches when a later batch fails", async () => {
+    const rows = entries(150);
+    const refusal = { id: rows[0]?.id, error: "Carte engagée" };
+    let calls = 0;
+    const { session } = await sessionWith(collectionSelect(rows), (request) => {
+      if (!request.url.pathname.endsWith("/bulk-discard")) return undefined;
+      calls += 1;
+      return calls === 1
+        ? {
+            status: 200,
+            body: { balance: 7099, discarded_count: 99, failed: [refusal] },
+          }
+        : { status: 500, body: { error: "boom" } };
+    });
+
+    await expect(discardCards(session, cardIds(rows))).rejects.toThrow(
+      `refused before the failure: ${JSON.stringify([{ cardIds: [rows[0]?.card_id], reason: refusal }])}`,
     );
   });
 

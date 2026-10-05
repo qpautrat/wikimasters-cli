@@ -120,9 +120,12 @@ describe("JSON output", () => {
     const reason = { error: "Carte engagée" };
     expect(
       JSON.parse(
-        formatDiscard({ ...discard, failed: [{ cardId, reason }] }, "json"),
+        formatDiscard(
+          { ...discard, failed: [{ cardIds: [cardId], reason }] },
+          "json",
+        ),
       ),
-    ).toEqual({ ...discard, failed: [{ id: cardId, reason }] });
+    ).toEqual({ ...discard, failed: [{ ids: [cardId], reason }] });
   });
 
   it("reports the logged-in user id", () => {
@@ -163,8 +166,9 @@ describe("text output", () => {
         {
           ...discard,
           failed: [
-            { cardId, reason: { error: "Carte engagée" } },
-            { cardId: null, reason: "boom" },
+            { cardIds: [cardId], reason: { error: "Carte engagée" } },
+            { cardIds: [cardId, cardId], reason: "pair" },
+            { cardIds: [], reason: "boom" },
           ],
         },
         "text",
@@ -172,7 +176,8 @@ describe("text output", () => {
     ).toEqual([
       "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
       `Card ${cardId} could not be discarded: {"error":"Carte engagée"}`,
-      'A card could not be discarded: "boom"',
+      `Cards ${cardId}, ${cardId} could not be discarded: "pair"`,
+      'Some cards could not be discarded: "boom"',
     ]);
   });
 

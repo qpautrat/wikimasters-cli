@@ -7,9 +7,10 @@ const COLLECTION_PAGE = "/collection";
 
 const WIKIBIDOUS_PER_DISCARD = 1;
 const DISCARD_BATCH_SIZE = 100;
+const ENTRY_READ_BATCH_SIZE = 100;
 
 export interface DiscardFailure {
-  cardId: CardId | null;
+  cardIds: CardId[];
   reason: unknown;
 }
 
@@ -31,36 +32,46 @@ interface BulkDiscardResponse {
   failed: unknown[];
 }
 
-function batches<Item>(items: readonly Item[]): Item[][] {
+function batches<Item>(items: readonly Item[], size: number): Item[][] {
   const result: Item[][] = [];
-  for (let from = 0; from < items.length; from += DISCARD_BATCH_SIZE) {
-    result.push(items.slice(from, from + DISCARD_BATCH_SIZE));
+  for (let from = 0; from < items.length; from += size) {
+    result.push(items.slice(from, from + size));
   }
   return result;
+}
+
+async function readEntries(
+  session: Session,
+  cardIds: readonly CardId[],
+): Promise<CollectionEntry[]> {
+  const { data, error, status } = await session.client
+    .from("user_cards")
+    .select("id, card_id")
+    .eq("user_id", session.userId)
+    .in("card_id", cardIds)
+    .gt("count", 0)
+    .overrideTypes<CollectionEntry[], { merge: false }>();
+  if (error) {
+    throw apiFailure(
+      "Reading the cards to discard in the collection",
+      status,
+      error.message,
+    );
+  }
+  return data;
 }
 
 async function collectionEntries(
   session: Session,
   cardIds: readonly CardId[],
 ): Promise<CollectionEntry[]> {
-  const entries: CollectionEntry[] = [];
-  for (const batch of batches(cardIds)) {
-    const { data, error, status } = await session.client
-      .from("user_cards")
-      .select("id, card_id")
-      .eq("user_id", session.userId)
-      .in("card_id", batch)
-      .gt("count", 0)
-      .overrideTypes<CollectionEntry[], { merge: false }>();
-    if (error) {
-      throw apiFailure(
-        "Reading the cards to discard in the collection",
-        status,
-        error.message,
-      );
-    }
-    entries.push(...data);
-  }
+  const entries = (
+    await Promise.all(
+      batches(cardIds, ENTRY_READ_BATCH_SIZE).map((batch) =>
+        readEntries(session, batch),
+      ),
+    )
+  ).flat();
 
   const owned = new Set(entries.map(({ card_id }) => card_id));
   const missing = cardIds.filter((cardId) => !owned.has(cardId));
@@ -113,16 +124,35 @@ function mentionedStrings(value: unknown): string[] {
   return Object.values(value).flatMap(mentionedStrings);
 }
 
-function failedCard(
+function failedCards(
   entries: readonly CollectionEntry[],
   failure: unknown,
-): CardId | null {
+): CardId[] {
   const mentioned = new Set(mentionedStrings(failure));
-  return (
-    entries.find(
-      ({ id, card_id }) => mentioned.has(id) || mentioned.has(card_id),
-    )?.card_id ?? null
-  );
+  return entries
+    .filter(({ id, card_id }) => mentioned.has(id) || mentioned.has(card_id))
+    .map(({ card_id }) => card_id);
+}
+
+function batchFailures(
+  batch: readonly CollectionEntry[],
+  response: BulkDiscardResponse,
+): DiscardFailure[] {
+  const failures = response.failed.map((reason) => ({
+    cardIds: failedCards(batch, reason),
+    reason,
+  }));
+  const unreported =
+    batch.length - response.discarded_count - response.failed.length;
+  return unreported > 0
+    ? [
+        ...failures,
+        {
+          cardIds: [],
+          reason: `${unreported} of ${batch.length} cards sent were neither discarded nor reported as refused`,
+        },
+      ]
+    : failures;
 }
 
 export async function discardCards(
@@ -138,7 +168,7 @@ export async function discardCards(
   let discarded = 0;
   let balance = 0;
   const failed: DiscardFailure[] = [];
-  for (const batch of batches(entries)) {
+  for (const batch of batches(entries, DISCARD_BATCH_SIZE)) {
     try {
       const response = await bulkDiscard(
         session,
@@ -147,15 +177,13 @@ export async function discardCards(
       );
       discarded += response.discarded_count;
       balance = response.balance;
-      failed.push(
-        ...response.failed.map((reason) => ({
-          cardId: failedCard(batch, reason),
-          reason,
-        })),
-      );
+      failed.push(...batchFailures(batch, response));
     } catch (error) {
       if (error instanceof Error && discarded > 0) {
         error.message += ` (${discarded} cards were discarded before the failure)`;
+      }
+      if (error instanceof Error && failed.length > 0) {
+        error.message += `; refused before the failure: ${JSON.stringify(failed)}`;
       }
       throw error;
     }
