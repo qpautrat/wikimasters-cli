@@ -227,9 +227,24 @@ describe("untagCard", () => {
   });
 
   it("succeeds without change when the card does not have the label", async () => {
-    const { session } = await sessionWith(
+    const { session, requests } = await sessionWith(
       collectionEntry([films.id]),
       labels(films, history),
+    );
+
+    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
+      cardId,
+      label: "Histoire",
+      tagged: false,
+      changed: false,
+    });
+    expect(writes(requests)).toEqual([]);
+  });
+
+  it("succeeds without change when the label was removed meanwhile", async () => {
+    const { session } = await sessionWith(
+      collectionEntry([history.id]),
+      labels(history),
       tagDeletion(0),
     );
 

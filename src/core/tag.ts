@@ -20,6 +20,10 @@ interface TaggedEntry {
   user_card_tags: { tag_id: string }[];
 }
 
+function hasTag(entry: TaggedEntry, tag: Tag): boolean {
+  return entry.user_card_tags.some(({ tag_id }) => tag_id === tag.id);
+}
+
 const UNIQUE_VIOLATION = "23505";
 
 async function findTag(session: Session, label: string): Promise<Tag> {
@@ -52,7 +56,7 @@ export async function tagCard(
     "id, user_card_tags(tag_id)",
   );
   const tag = await findTag(session, label);
-  if (entry.user_card_tags.some(({ tag_id }) => tag_id === tag.id)) {
+  if (hasTag(entry, tag)) {
     return { cardId, label, tagged: true, changed: false };
   }
 
@@ -83,6 +87,9 @@ export async function untagCard(
     "id, user_card_tags(tag_id)",
   );
   const tag = await findTag(session, label);
+  if (!hasTag(entry, tag)) {
+    return { cardId, label, tagged: false, changed: false };
+  }
 
   const action = `Removing label ${JSON.stringify(label)} from card ${cardId}`;
   const { error, status, count } = await session.client

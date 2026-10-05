@@ -70,7 +70,7 @@ Source: read-only query, 2026-10-02.
 - Row-level security returns only the user's own rows.
 - `discardCommons` embeds it in `user_cards` to keep labelled entries out of the discard.
 - `tagCard`: `GET user_cards` of `id, user_card_tags(tag_id)`, filtered on `user_id`, `card_id` and `count=gt.0`, then `GET tags` of `id, name` filtered on `user_id`, then, when the entry lacks the label, `POST user_card_tags` with `{"user_card_id":"<entry id>","tag_id":"<label id>"}`; PostgREST answers `201` with no body. Source: capture `tag-card.har`.
-- `untagCard`: the same two `GET`, then `DELETE user_card_tags?user_card_id=eq.<entry id>&tag_id=eq.<label id>` with `Prefer: count=exact`; PostgREST answers `204`, and a count of `0` means the entry did not have the label. Source: capture `untag-card.har`.
+- `untagCard`: the same two `GET`, then, when the entry has the label, `DELETE user_card_tags?user_card_id=eq.<entry id>&tag_id=eq.<label id>` with `Prefer: count=exact`; PostgREST answers `204`, and a count of `0` means the label was removed meanwhile. Source: capture `untag-card.har`.
 
 ## `rpc/get_my_profile`: the signed-in user's profile
 
