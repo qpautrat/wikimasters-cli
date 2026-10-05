@@ -16,6 +16,10 @@ Present a backlog listing in two tables, functional and technical, sorted by eac
 - A cross-cutting capability (an option on every command, an exit-code contract) gets its own spec, never a section inside the first feature that needs it.
 - Never spec an agent workflow that only chains existing commands (e.g. "remove by name" = `list` + `remove`). The agent composes commands itself.
 
+## Command scope
+
+A command exposes an API call and nothing more. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands.
+
 ## Spec before code
 
 - Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first.
