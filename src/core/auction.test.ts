@@ -20,6 +20,7 @@ import {
 
 const auctionId = parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f");
 const SELLER_ID = "4e795adc-61ec-4927-9a71-22a0ca69d08a";
+const BIDDER_ID = "8b2f61c4-0d7e-4a3b-9c55-1f6e2a9d7b30";
 const BALANCE_AFTER_BID = 7743;
 
 function auction(overrides: Record<string, unknown> = {}) {
@@ -29,7 +30,7 @@ function auction(overrides: Record<string, unknown> = {}) {
     seller_id: SELLER_ID,
     base_amount: 200,
     current_bid: 326,
-    current_bidder_id: SELLER_ID,
+    current_bidder_id: BIDDER_ID,
     snapshot_rarity: "R",
     is_shiny: true,
     cards: { wikipedia_title: "Musique celtique" },
@@ -240,6 +241,9 @@ describe("showAuction", () => {
     });
     const select = requests.find(restRequest("GET", "auctions"));
     expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
+    expect(select?.url.searchParams.get("select")).toBe(
+      "status,end_at,seller_id,base_amount,current_bid,current_bidder_id,snapshot_rarity,is_shiny,cards(wikipedia_title)",
+    );
   });
 
   it("tells when the user leads the auction", async () => {
@@ -272,6 +276,16 @@ describe("showAuction", () => {
       leading: false,
       minimumBid: 200,
     });
+  });
+
+  it("fails when the auctioned card cannot be read", async () => {
+    const { session } = await sessionWith(
+      auctionSelect([auction({ cards: null })]),
+    );
+
+    await expect(showAuction(session, auctionId)).rejects.toThrow(
+      new WikiMastersError(`Auction ${auctionId} has no readable card details`),
+    );
   });
 
   it("fails on an unknown auction", async () => {
