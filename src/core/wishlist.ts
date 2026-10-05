@@ -1,4 +1,5 @@
 import type { CardId } from "./card-id.js";
+import type { CatalogueCard } from "./card-search.js";
 import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
 import type { Session } from "./session.js";
 
@@ -13,10 +14,7 @@ export interface WishlistAddition {
   added: boolean;
 }
 
-export interface WishlistCard {
-  id: CardId;
-  title: string;
-  rarity: string;
+export interface WishlistCard extends CatalogueCard {
   owned: boolean;
 }
 
@@ -59,7 +57,7 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
   });
 }
 
-interface CatalogueCard {
+interface WishlistedCatalogueRow {
   wikipedia_title: string;
   wishlist_items: { card_id: string }[];
 }
@@ -73,7 +71,7 @@ export async function addToWishlist(
     .select("wikipedia_title, wishlist_items(card_id)")
     .eq("id", cardId)
     .eq("wishlist_items.user_id", session.userId)
-    .maybeSingle<CatalogueCard>();
+    .maybeSingle<WishlistedCatalogueRow>();
   if (error) {
     throw apiFailure(
       `Reading card ${cardId} in the catalogue`,

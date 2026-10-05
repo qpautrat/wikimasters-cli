@@ -1,5 +1,6 @@
 import type {
   CardSearch,
+  CatalogueCard,
   CollectionCard,
   Discard,
   FavouriteChange,
@@ -18,6 +19,10 @@ export function formatLogin(userId: string, format: Format): string {
     : `Logged in as user ${userId}.`;
 }
 
+function cardLine({ id, title, rarity }: CatalogueCard): string {
+  return `${id}  ${title} (${rarity})`;
+}
+
 export function formatWishlist(
   cards: readonly WishlistCard[],
   format: Format,
@@ -34,10 +39,7 @@ export function formatWishlist(
   }
   if (cards.length === 0) return "The wishlist is empty.";
   return cards
-    .map(
-      ({ id, title, rarity, owned }) =>
-        `${id}  ${title} (${rarity})${owned ? "  [owned]" : ""}`,
-    )
+    .map((card) => `${cardLine(card)}${card.owned ? "  [owned]" : ""}`)
     .join("\n");
 }
 
@@ -68,7 +70,7 @@ export function formatCardSearch(
   if (format === "json") return JSON.stringify({ cards, truncated });
   if (cards.length === 0) return "No card of the catalogue matches.";
   return [
-    ...cards.map(({ id, title, rarity }) => `${id}  ${title} (${rarity})`),
+    ...cards.map(cardLine),
     ...(truncated
       ? [`Only the first ${cards.length} matches are shown; refine the name.`]
       : []),
