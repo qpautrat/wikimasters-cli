@@ -50,18 +50,21 @@ function wishlistInsert(response: FakeResponse): Route {
 describe("addToWishlist", () => {
   it("adds a card of the catalogue for the signed-in user", async () => {
     const { session, requests } = await sessionWith(
-      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      catalogueCard([
+        { wikipedia_title: "Caliste (esport)", wishlist_items: [] },
+      ]),
       wishlistInsert({ status: 201 }),
     );
 
     await expect(addToWishlist(session, cardId)).resolves.toEqual({
       cardId,
+      title: "Caliste (esport)",
       added: true,
     });
     const read = requests.find(({ method }) => method === "GET");
     expect(read?.url.searchParams.get("id")).toBe(`eq.${cardId}`);
     expect(read?.url.searchParams.get("select")).toBe(
-      "id,wishlist_items(card_id)",
+      "wikipedia_title,wishlist_items(card_id)",
     );
     expect(read?.url.searchParams.get("wishlist_items.user_id")).toBe(
       `eq.${USER_ID}`,
@@ -84,11 +87,17 @@ describe("addToWishlist", () => {
 
   it("succeeds without change when the card is already in the wishlist", async () => {
     const { session, requests } = await sessionWith(
-      catalogueCard([{ id: cardId, wishlist_items: [{ card_id: cardId }] }]),
+      catalogueCard([
+        {
+          wikipedia_title: "Caliste (esport)",
+          wishlist_items: [{ card_id: cardId }],
+        },
+      ]),
     );
 
     await expect(addToWishlist(session, cardId)).resolves.toEqual({
       cardId,
+      title: "Caliste (esport)",
       added: false,
     });
     expect(requests.some(isWishlistInsert)).toBe(false);
@@ -96,7 +105,9 @@ describe("addToWishlist", () => {
 
   it("succeeds without change when the card was added meanwhile", async () => {
     const { session } = await sessionWith(
-      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      catalogueCard([
+        { wikipedia_title: "Caliste (esport)", wishlist_items: [] },
+      ]),
       wishlistInsert({
         status: 409,
         body: { code: "23505", message: "duplicate key value" },
@@ -105,13 +116,46 @@ describe("addToWishlist", () => {
 
     await expect(addToWishlist(session, cardId)).resolves.toEqual({
       cardId,
+      title: "Caliste (esport)",
       added: false,
     });
   });
 
-  it("requires a new login when the API rejects the session", async () => {
+  it("requires a new login when the catalogue read rejects the session", async () => {
+    const { session, requests } = await sessionWith(({ method, url }) =>
+      method === "GET" && url.pathname === "/rest/v1/cards"
+        ? { status: 401, body: { code: "PGRST303", message: "JWT expired" } }
+        : undefined,
+    );
+
+    await expect(addToWishlist(session, cardId)).rejects.toThrow(
+      AuthRequiredError,
+    );
+    expect(requests.some(isWishlistInsert)).toBe(false);
+  });
+
+  it("reports the HTTP status when the insert fails", async () => {
     const { session } = await sessionWith(
-      catalogueCard([{ id: cardId, wishlist_items: [] }]),
+      catalogueCard([
+        { wikipedia_title: "Caliste (esport)", wishlist_items: [] },
+      ]),
+      wishlistInsert({
+        status: 403,
+        body: { code: "42501", message: "row-level security policy" },
+      }),
+    );
+
+    const failure = addToWishlist(session, cardId);
+
+    await expect(failure).rejects.toThrow(/HTTP 403/);
+    await expect(failure).rejects.not.toThrow(AuthRequiredError);
+  });
+
+  it("requires a new login when the insert rejects the session", async () => {
+    const { session } = await sessionWith(
+      catalogueCard([
+        { wikipedia_title: "Caliste (esport)", wishlist_items: [] },
+      ]),
       wishlistInsert({
         status: 401,
         body: { code: "PGRST303", message: "JWT expired" },

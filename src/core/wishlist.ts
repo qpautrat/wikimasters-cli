@@ -1,5 +1,5 @@
 import type { CardId } from "./card-id.js";
-import { WikiMastersError, apiFailure } from "./errors.js";
+import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
 import type { Session } from "./session.js";
 
 export interface WishlistRemoval {
@@ -9,6 +9,7 @@ export interface WishlistRemoval {
 
 export interface WishlistAddition {
   cardId: CardId;
+  title: string;
   added: boolean;
 }
 
@@ -59,11 +60,9 @@ export async function listWishlist(session: Session): Promise<WishlistCard[]> {
 }
 
 interface CatalogueCard {
-  id: string;
+  wikipedia_title: string;
   wishlist_items: { card_id: string }[];
 }
-
-const UNIQUE_VIOLATION = "23505";
 
 export async function addToWishlist(
   session: Session,
@@ -71,7 +70,7 @@ export async function addToWishlist(
 ): Promise<WishlistAddition> {
   const { data, error, status } = await session.client
     .from("cards")
-    .select("id, wishlist_items(card_id)")
+    .select("wikipedia_title, wishlist_items(card_id)")
     .eq("id", cardId)
     .eq("wishlist_items.user_id", session.userId)
     .maybeSingle<CatalogueCard>();
@@ -87,12 +86,13 @@ export async function addToWishlist(
       `Card ${cardId} is not in the card catalogue; nothing was changed`,
     );
   }
-  if (data.wishlist_items.length > 0) return { cardId, added: false };
+  const title = data.wikipedia_title;
+  if (data.wishlist_items.length > 0) return { cardId, title, added: false };
 
   const insert = await session.client
     .from("wishlist_items")
     .insert({ user_id: session.userId, card_id: cardId });
-  if (insert.error?.code === UNIQUE_VIOLATION) return { cardId, added: false };
+  if (isUniqueViolation(insert.error)) return { cardId, title, added: false };
   if (insert.error) {
     throw apiFailure(
       `Adding card ${cardId} to the wishlist`,
@@ -100,7 +100,7 @@ export async function addToWishlist(
       insert.error.message,
     );
   }
-  return { cardId, added: true };
+  return { cardId, title, added: true };
 }
 
 export async function removeFromWishlist(

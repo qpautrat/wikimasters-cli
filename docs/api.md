@@ -23,7 +23,7 @@ Source: captures `withdraw-wishlist.har` (`DELETE`) and `add-wishlist.har` (`POS
 | `created_at` | when the card was added |
 
 - `listWishlist`: `GET`, filtered on `user_id`, ordered by `created_at.desc`, embeds `cards`.
-- `addToWishlist`: `POST` with `{"user_id":"<user id>","card_id":"<card id>"}`; PostgREST answers with an empty body and `Content-Range: */*` (capture). The core treats a unique violation (`23505`) as the card being already there.
+- `addToWishlist`: `POST` with `{"user_id":"<user id>","card_id":"<card id>"}`; PostgREST answers with an empty body and `Content-Range: */*`; Firefox recorded the status as `0`. The core treats a unique violation (`23505`) as the card being already there.
 - `removeFromWishlist`: `DELETE` filtered on `user_id` and `card_id` (capture). The core adds `Prefer: count=exact`, PostgREST's standard header, to get the number of deleted rows in `Content-Range`, `0` when the card was absent.
 
 ## `cards`: the card catalogue
@@ -37,7 +37,7 @@ Source: read-only query.
 | `rarity` | current rarity code; seen: `C`, `PC`, `R`, `SR`, `UR` |
 
 - The whole catalogue is readable, owned or not.
-- `addToWishlist`: `GET` of `id, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
+- `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection
 

@@ -45,13 +45,17 @@ describe("JSON output", () => {
     expect(formatWishlist([], "json")).toBe("[]");
   });
 
-  it("reports an addition with the card id and whether it was added", () => {
-    expect(JSON.parse(formatAddition({ cardId, added: true }, "json"))).toEqual(
-      { id: cardId, added: true },
-    );
+  it("reports an addition with the card id, its title and whether it was added", () => {
     expect(
-      JSON.parse(formatAddition({ cardId, added: false }, "json")),
-    ).toEqual({ id: cardId, added: false });
+      JSON.parse(
+        formatAddition({ cardId, title: card.title, added: true }, "json"),
+      ),
+    ).toEqual({ id: cardId, title: "Pointe de la Sambuy", added: true });
+    expect(
+      JSON.parse(
+        formatAddition({ cardId, title: card.title, added: false }, "json"),
+      ),
+    ).toEqual({ id: cardId, title: "Pointe de la Sambuy", added: false });
   });
 
   it("reports a removal with the card id and whether it was removed", () => {
@@ -147,15 +151,15 @@ describe("text output", () => {
   });
 
   it("says when a card is added to the wishlist", () => {
-    expect(formatAddition({ cardId, added: true }, "text")).toBe(
-      `Card ${cardId} added to the wishlist.`,
-    );
+    expect(
+      formatAddition({ cardId, title: card.title, added: true }, "text"),
+    ).toBe(`Card ${cardId} (Pointe de la Sambuy) added to the wishlist.`);
   });
 
   it("says when a card was already in the wishlist", () => {
-    expect(formatAddition({ cardId, added: false }, "text")).toBe(
-      `Card ${cardId} was already in the wishlist.`,
-    );
+    expect(
+      formatAddition({ cardId, title: card.title, added: false }, "text"),
+    ).toBe(`Card ${cardId} (Pointe de la Sambuy) was already in the wishlist.`);
   });
 
   it("says when a card already was a favourite", () => {

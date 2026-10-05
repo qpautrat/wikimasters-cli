@@ -40,13 +40,13 @@ export function formatWishlist(
 }
 
 export function formatAddition(
-  { cardId, added }: WishlistAddition,
+  { cardId, title, added }: WishlistAddition,
   format: Format,
 ): string {
-  if (format === "json") return JSON.stringify({ id: cardId, added });
+  if (format === "json") return JSON.stringify({ id: cardId, title, added });
   return added
-    ? `Card ${cardId} added to the wishlist.`
-    : `Card ${cardId} was already in the wishlist.`;
+    ? `Card ${cardId} (${title}) added to the wishlist.`
+    : `Card ${cardId} (${title}) was already in the wishlist.`;
 }
 
 export function formatRemoval(
