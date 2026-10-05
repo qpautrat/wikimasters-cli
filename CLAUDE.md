@@ -33,6 +33,8 @@ Edit `.claude/settings.json` directly, after reading the docs through Context7; 
 
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. `tsconfig.json` covers every file and serves the typecheck and the editor; `tsconfig.build.json` builds `src/` to `dist/`, without test files and `testing/`.
 
+Before committing a command, run it on the account against data in the state its spec targets, read just before the run (e.g. an auction with `status=eq.active` and `end_at` a few minutes ahead), and check its output against each acceptance criterion.
+
 Dev tools such as `api:get` and `api:site` live in `tools/`, outside `src/`, and never reach `dist/`. They import the core and `src/cli/session.ts`. The npm script running a tool first compiles it with `tsconfig.tools.json`, along with the code it imports, into the gitignored `dist-tools/`.
 
 Supabase auth on this project requires a captcha, so there is no password sign-in: `wikimasters login` starts the installed Firefox, unautomated, on a throwaway profile; the user signs in there, and the CLI reads the refresh token from the `sb-<ref>-auth-token` cookies in the profile's `cookies.sqlite` (through the `sqlite3` CLI), then closes Firefox and deletes the profile. A browser driven by Playwright/WebDriver fails the captcha. Every command then exchanges that refresh token for a session. Supabase rotates refresh tokens on each use, so the CLI writes the new one back to `.env` right after the exchange, before doing anything else. Never solve the captcha programmatically or hide browser automation from it.
