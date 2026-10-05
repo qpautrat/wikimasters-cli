@@ -16,7 +16,7 @@ En tant que joueur, je liste les enchères, au besoin d'un seul statut, pour obt
 
 1. `wikimasters auction list` affiche une ligne par enchère, dans l'ordre où l'API les renvoie.
 2. L'option `--limit <n>` fixe le nombre maximal d'enchères affichées, 50 par défaut comme dans l'interface ; une valeur qui n'est pas un entier strictement positif est refusée sans interroger le jeu.
-3. L'option `--status <statut>` ne liste que les enchères de ce statut, l'une des valeurs de `auctions.status` ; un statut inconnu est refusé sans interroger le jeu.
+3. L'option `--status <statut>` ne liste que les enchères de ce statut ; la commande transmet la valeur au jeu sans la vérifier, et rapporte ce que l'API répond, liste vide ou refus.
 4. Sans `--status`, la commande lit les enchères de tous les statuts ; quand l'API dépasse son délai, la commande échoue avec le motif donné par l'API.
 5. Chaque ligne donne l'identifiant unique de l'enchère (UUID `auctions.id`), le titre de la carte, la rareté et la brillance de l'exemplaire mis en vente, le statut, l'heure de fin, le prix de départ et la mise actuelle, ou l'absence de mise.
 6. Chaque ligne indique si je suis le meilleur enchérisseur et si j'en suis le vendeur.
