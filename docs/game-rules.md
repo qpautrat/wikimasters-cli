@@ -1,6 +1,6 @@
 # WikiMasters game rules
 
-Rules the user states and the API does not reveal. Record each one as soon as the user gives it.
+Rules the API enforces without revealing them, as the user states them. Record each one as soon as the user gives it.
 
 | Rule | Used by |
 |---|---|
