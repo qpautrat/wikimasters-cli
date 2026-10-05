@@ -4,7 +4,7 @@
 
 `wikimasters collection discard-commons` choisit lui-même les cartes à défausser : la rareté commune, et des cartes épargnées (favori, brillante, étiquetée). Ces choix sont ceux du joueur, pas de l'API : la défausse du jeu prend une liste de cartes. Cette commande la remplace et laisse l'agent choisir les cartes, par exemple à partir de `wikimasters collection list`.
 
-Dépend de : [Défausser toutes mes cartes communes](../discard-commons.md), [Revoir les contrats des commandes au regard du rôle de la CLI](../cli-contract-review.md).
+Dépend de : [Défausser toutes mes cartes communes](discard-commons.md), [Revoir les contrats des commandes au regard du rôle de la CLI](cli-contract-review.md).
 
 ## User story
 
@@ -18,7 +18,7 @@ En tant que joueur, je donne les cartes de ma collection à défausser, et la co
 4. Quand le jeu refuse de défausser certaines des cartes, la commande les nomme avec le motif donné par le jeu.
 5. La commande affiche le nombre de cartes défaussées, les wikibidous gagnés et mon nouveau solde de wikibidous.
 6. `wikimasters collection discard-commons` n'existe plus.
-7. Les specs [Marquer une carte de ma collection en favori](../collection-favourite.md) et [Étiqueter une carte de ma collection](../collection-tag.md) ne présentent plus `discard-commons` comme ce qui protège une carte de la défausse.
+7. Les specs [Marquer une carte de ma collection en favori](collection-favourite.md) et [Étiqueter une carte de ma collection](collection-tag.md) ne présentent plus `discard-commons` comme ce qui protège une carte de la défausse.
 
 ## Hors périmètre
 
