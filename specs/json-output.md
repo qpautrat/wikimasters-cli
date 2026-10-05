@@ -13,6 +13,7 @@ En tant qu'agent, j'obtiens le résultat de chaque commande sous forme de JSON, 
 1. Toute commande `wikimasters` accepte l'option `--json`.
 2. Avec `--json`, la sortie standard contient uniquement le résultat en JSON.
 3. `wikimasters wishlist list --json` écrit `[{ "id": "…", "title": "…", "rarity": "…", "owned": false }]`, et `[]` pour une liste vide.
-4. `wikimasters wishlist remove <card-id> --json` écrit `{ "id": "…", "removed": true }`, ou `false` si la carte était déjà absente.
-5. `wikimasters login --json` écrit `{ "userId": "…" }`.
-6. En cas d'erreur, la sortie standard reste vide, le message part sur la sortie d'erreur et le code de sortie est non nul, avec ou sans `--json`.
+4. `wikimasters wishlist add <card-id> --json` écrit `{ "id": "…", "title": "…", "added": true }`, ou `false` si la carte y était déjà.
+5. `wikimasters wishlist remove <card-id> --json` écrit `{ "id": "…", "removed": true }`, ou `false` si la carte était déjà absente.
+6. `wikimasters login --json` écrit `{ "userId": "…" }`.
+7. En cas d'erreur, la sortie standard reste vide, le message part sur la sortie d'erreur et le code de sortie est non nul, avec ou sans `--json`.
