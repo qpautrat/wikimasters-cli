@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { openSession, reportFailure } from "../src/cli/session.js";
-import { AuthRequiredError, WikiMastersError } from "../src/core/index.js";
+import { apiFailure } from "../src/core/errors.js";
+import { WikiMastersError } from "../src/core/index.js";
 import {
   SITE_METHODS,
   type SiteMethod,
   type SiteSendInit,
   sendSiteRequest,
   siteCookie,
-  siteFailure,
 } from "../src/core/site.js";
 
 const COMMAND = "api:site";
@@ -55,10 +55,10 @@ try {
       : `HTTP ${response.status}, redirected to ${response.location}`,
   );
   process.stdout.write(response.body);
-  if (!response.ok) {
-    const failure = siteFailure(action, response);
-    if (failure instanceof AuthRequiredError) reportFailure(COMMAND, failure);
-    else process.exitCode = 1;
+  if (response.status === 401) {
+    reportFailure(COMMAND, apiFailure(action, response.status, response.body));
+  } else if (!response.ok) {
+    process.exitCode = 1;
   }
 } catch (error) {
   reportFailure(COMMAND, error);
