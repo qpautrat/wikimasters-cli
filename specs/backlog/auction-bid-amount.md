@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wikimasters auction bid <auction-id>` place toujours la mise minimale fixée par le jeu. Je veux parfois miser davantage, par exemple pour décourager les autres enchérisseurs d'un coup.
+`wikimasters auction bid <auction-id>` place toujours la mise minimale fixée par le jeu. Je veux parfois miser davantage.
 
 Dépend de : [Miser sur une enchère](../auction-bid.md).
 
