@@ -4,9 +4,7 @@
 
 Dans l'interface, ajouter une carte à la liste de souhaits demande d'ouvrir « Toutes les cartes », de retrouver la carte parmi toutes les cartes du jeu, de l'ouvrir puis de l'ajouter. Je veux le faire depuis le terminal.
 
-L'écriture n'est pas encore connue : elle demande une capture HAR du parcours dans l'interface.
-
-Dépend de : [Lister la liste de souhaits](../wishlist-list.md).
+Dépend de : [Lister la liste de souhaits](wishlist-list.md).
 
 ## User story
 
