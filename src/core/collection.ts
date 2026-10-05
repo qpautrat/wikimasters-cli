@@ -1,4 +1,5 @@
 import { WikiMastersError, apiFailure } from "./errors.js";
+import { readAllPages } from "./paged-read.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -7,7 +8,6 @@ const COLLECTION_PAGE = "/collection";
 const COMMON = "C";
 const WIKIBIDOUS_PER_DISCARD = 1;
 const DISCARD_BATCH_SIZE = 100;
-const PAGE_SIZE = 1000;
 
 export interface CommonsDiscard {
   discarded: number;
@@ -55,9 +55,8 @@ async function pendingTradeIds(
 }
 
 async function listPlainCommons(session: Session): Promise<CollectionRow[]> {
-  const rows: CollectionRow[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error, status } = await session.client
+  const rows = await readAllPages("Listing the common cards", (from, to) =>
+    session.client
       .from("user_cards")
       .select(
         "id, card_id, snapshot_rarity, starred, is_shiny, user_card_tags(tag_id)",
@@ -69,14 +68,9 @@ async function listPlainCommons(session: Session): Promise<CollectionRow[]> {
       .is("user_card_tags", null)
       .gt("count", 0)
       .order("id")
-      .range(from, from + PAGE_SIZE - 1)
-      .overrideTypes<CollectionRow[], { merge: false }>();
-    if (error) {
-      throw apiFailure("Listing the common cards", status, error.message);
-    }
-    rows.push(...data);
-    if (data.length < PAGE_SIZE) break;
-  }
+      .range(from, to)
+      .overrideTypes<CollectionRow[], { merge: false }>(),
+  );
 
   const unsafe = rows.find(
     (row) =>

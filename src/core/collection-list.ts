@@ -1,8 +1,7 @@
 import type { CardId } from "./card-id.js";
-import { WikiMastersError, apiFailure } from "./errors.js";
+import { WikiMastersError } from "./errors.js";
+import { readAllPages } from "./paged-read.js";
 import type { Session } from "./session.js";
-
-const PAGE_SIZE = 1000;
 
 export interface CollectionCard {
   id: CardId;
@@ -47,8 +46,7 @@ export async function listCollection(
   session: Session,
   { rarity }: CollectionFilter = {},
 ): Promise<CollectionCard[]> {
-  const rows: OwnedCardRow[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
+  const rows = await readAllPages("Listing the collection", (from, to) => {
     let query = session.client
       .from("user_cards")
       .select(
@@ -57,17 +55,12 @@ export async function listCollection(
       .eq("user_id", session.userId)
       .gt("count", 0);
     if (rarity !== undefined) query = query.eq("snapshot_rarity", rarity);
-    const { data, error, status } = await query
+    return query
       .order("obtained_at")
       .order("id")
-      .range(from, from + PAGE_SIZE - 1)
+      .range(from, to)
       .overrideTypes<OwnedCardRow[], { merge: false }>();
-    if (error) {
-      throw apiFailure("Listing the collection", status, error.message);
-    }
-    rows.push(...data);
-    if (data.length < PAGE_SIZE) break;
-  }
+  });
 
   return rows.map((row) => ({
     id: row.card_id as CardId,
