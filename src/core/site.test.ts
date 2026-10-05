@@ -210,10 +210,13 @@ describe("siteFailure", () => {
     expect(failure.message).toMatch(/run `wikimasters login`/);
   });
 
-  it("keeps a redirect elsewhere a plain failure", () => {
-    const failure = siteFailure("Reading", redirect("/pulls"));
+  it.each(["/pulls", "http://[bad"])(
+    "keeps a redirect to %s a plain failure",
+    (location) => {
+      const failure = siteFailure("Reading", redirect(location));
 
-    expect(failure).not.toBeInstanceOf(AuthRequiredError);
-    expect(failure.message).toBe("Reading failed (HTTP 307): ");
-  });
+      expect(failure).not.toBeInstanceOf(AuthRequiredError);
+      expect(failure.message).toBe("Reading failed (HTTP 307): ");
+    },
+  );
 });

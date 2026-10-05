@@ -34,6 +34,7 @@ function redirectsToLogin({ status, location }: SiteResponse): boolean {
     status >= 300 &&
     status < 400 &&
     location !== null &&
+    URL.canParse(location, SITE_URL) &&
     new URL(location, SITE_URL).pathname === "/login"
   );
 }
