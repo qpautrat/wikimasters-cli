@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(npx prettier *)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
