@@ -6,7 +6,11 @@ The user drives the project through specs in `specs/`, written in French. Implem
 
 List the specs by title with `head -n1 specs/*.md specs/backlog/*.md`, then read only those related to the subject.
 
-Present a backlog listing in two tables, functional and technical, sorted by each spec's user story (player vs agent or developer).
+Present a backlog listing in three tables, an empty one included:
+
+1. **API features**: a CLI command that exposes a call of the WikiMasters API.
+2. **Player rules**: a choice of how the player plays, meant for `CLAUDE.local.md`.
+3. **Technical**: tooling, rules and infrastructure of the repo.
 
 ## One subject per spec
 
