@@ -82,21 +82,40 @@ describe("searchCards", () => {
     );
   });
 
-  it("puts the cards titled exactly as the text first", async () => {
+  it("puts the cards titled exactly as the text first, from a single read when it holds every match", async () => {
     const dome = row(1, "Dome");
     const halfDome = row(2, "Half Dome");
     const { session, requests } = await sessionWith(
-      catalogue([dome], [dome, halfDome].reverse()),
+      catalogue([], [halfDome, dome]),
     );
 
-    const { cards } = await searchCards(session, "dome");
+    const { cards } = await searchCards(session, "DOME");
 
     expect(cards.map(({ title }) => title)).toEqual(["Dome", "Half Dome"]);
+    expect(requests.filter(isCardRead)).toHaveLength(1);
+  });
+
+  it("reads the exact titles apart when more cards match, and puts them first", async () => {
+    const others = Array.from({ length: CARD_SEARCH_LIMIT + 1 }, (_, index) =>
+      row(index, `A dome ${index}`),
+    );
+    const dome = row(99, "Dome");
+    const { session, requests } = await sessionWith(catalogue([dome], others));
+
+    const { cards, truncated } = await searchCards(session, "dome");
+
+    expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
+    expect(cards[0]?.title).toBe("Dome");
+    expect(cards[1]?.title).toBe("A dome 0");
+    expect(truncated).toBe(true);
     const exact = requests.find(isExactRead);
     expect(exact?.url.searchParams.getAll("wikipedia_title")).toEqual([
       "ilike.dome",
       "imatch.^dome$",
     ]);
+    expect(exact?.url.searchParams.get("limit")).toBe(
+      String(CARD_SEARCH_LIMIT),
+    );
   });
 
   it("matches the text literally, wildcards and regex characters included", async () => {

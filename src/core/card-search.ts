@@ -21,8 +21,8 @@ interface CardRow {
   rarity: string;
 }
 
-// PostgREST turns every `*` of an ilike pattern into `%`, escaped or not: the
-// ilike `_` lets the trigram index find a `*`, the imatch keeps it literal.
+// PostgREST turns every `*` of a like pattern into `%`, escaped or not
+// (https://docs.postgrest.org/en/stable/references/api/tables_views.html#operators).
 function likePattern(text: string): string {
   return text.replace(/[\\%_]/g, "\\$&").replaceAll("*", "_");
 }
@@ -58,10 +58,19 @@ export async function searchCards(
 ): Promise<CardSearch> {
   const like = likePattern(name);
   const regex = regexLiteral(name);
-  const [exact, containing] = await Promise.all([
-    readTitles(session, like, `^${regex}$`, CARD_SEARCH_LIMIT),
-    readTitles(session, `%${like}%`, regex, CARD_SEARCH_LIMIT + 1),
-  ]);
+  const containing = await readTitles(
+    session,
+    `%${like}%`,
+    regex,
+    CARD_SEARCH_LIMIT + 1,
+  );
+  const truncated = containing.length > CARD_SEARCH_LIMIT;
+  const exact = truncated
+    ? await readTitles(session, like, `^${regex}$`, CARD_SEARCH_LIMIT)
+    : containing.filter(
+        ({ wikipedia_title }) =>
+          wikipedia_title.toLowerCase() === name.toLowerCase(),
+      );
 
   const exactIds = new Set(exact.map(({ id }) => id));
   const rows = [...exact, ...containing.filter(({ id }) => !exactIds.has(id))];
@@ -73,6 +82,6 @@ export async function searchCards(
         title: wikipedia_title,
         rarity,
       })),
-    truncated: rows.length > CARD_SEARCH_LIMIT,
+    truncated,
   };
 }
