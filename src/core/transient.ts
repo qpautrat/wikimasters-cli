@@ -29,6 +29,10 @@ export function isUndeliveredStatus(status: number): boolean {
   return UNDELIVERED_STATUSES.has(status);
 }
 
+export function isPossiblyDeliveredStatus(status: number): boolean {
+  return isTransientStatus(status) && !isUndeliveredStatus(status);
+}
+
 export function describeTransientStatus(status: number): string {
   return TRANSIENT_STATUSES.get(status) ?? "server error";
 }

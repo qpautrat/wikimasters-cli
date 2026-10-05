@@ -4,6 +4,7 @@ import type { Session } from "./session.js";
 import { SITE_URL } from "./supabase.js";
 import {
   fetchRetrying,
+  isPossiblyDeliveredStatus,
   isTransientStatus,
   isUndeliveredStatus,
 } from "./transient.js";
@@ -44,11 +45,7 @@ export async function siteRequest(
     },
   );
   const text = await response.text();
-  if (
-    isPost &&
-    isTransientStatus(response.status) &&
-    !isUndeliveredStatus(response.status)
-  ) {
+  if (isPost && isPossiblyDeliveredStatus(response.status)) {
     throw outcomeUnknown(action, response.status);
   }
   if (!response.ok) throw apiFailure(action, response.status, text);
