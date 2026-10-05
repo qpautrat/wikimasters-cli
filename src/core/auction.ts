@@ -11,12 +11,30 @@ export interface PlacedBid {
   balance: number;
 }
 
+export interface Auction {
+  auctionId: AuctionId;
+  title: string;
+  rarity: string;
+  shiny: boolean;
+  status: string;
+  endsAt: string;
+  startingPrice: number;
+  currentBid: number | null;
+  leading: boolean;
+  selling: boolean;
+  minimumBid: number;
+}
+
 interface AuctionRow {
   status: string;
   end_at: string;
   seller_id: string;
   base_amount: number;
   current_bid: number | null;
+  current_bidder_id: string | null;
+  snapshot_rarity: string;
+  is_shiny: boolean;
+  cards: { wikipedia_title: string } | null;
 }
 
 interface BidResponse {
@@ -44,7 +62,9 @@ async function readAuction(
 ): Promise<AuctionRow> {
   const { data, error, status } = await session.client
     .from("auctions")
-    .select("status, end_at, seller_id, base_amount, current_bid")
+    .select(
+      "status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)",
+    )
     .eq("id", auctionId)
     .maybeSingle()
     .overrideTypes<AuctionRow, { merge: false }>();
@@ -53,6 +73,31 @@ async function readAuction(
   }
   if (!data) throw new WikiMastersError(`Auction ${auctionId} not found`);
   return data;
+}
+
+export async function showAuction(
+  session: Session,
+  auctionId: AuctionId,
+): Promise<Auction> {
+  const auction = await readAuction(session, auctionId);
+  if (!auction.cards) {
+    throw new WikiMastersError(
+      `Auction ${auctionId} has no readable card details`,
+    );
+  }
+  return {
+    auctionId,
+    title: auction.cards.wikipedia_title,
+    rarity: auction.snapshot_rarity,
+    shiny: auction.is_shiny,
+    status: auction.status,
+    endsAt: auction.end_at,
+    startingPrice: auction.base_amount,
+    currentBid: auction.current_bid,
+    leading: auction.current_bidder_id === session.userId,
+    selling: auction.seller_id === session.userId,
+    minimumBid: minimumBid(auction),
+  };
 }
 
 function isBidResponse(body: unknown): body is BidResponse {

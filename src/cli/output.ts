@@ -1,4 +1,5 @@
 import type {
+  Auction,
   CardSearch,
   CatalogueCard,
   CollectionCard,
@@ -144,6 +145,37 @@ export function formatBid(
   if (format === "json")
     return JSON.stringify({ id: auctionId, amount, balance });
   return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
+}
+
+export function formatAuction(auction: Auction, format: Format): string {
+  if (format === "json") {
+    const { auctionId, ...state } = auction;
+    return JSON.stringify({ id: auctionId, ...state });
+  }
+  const {
+    auctionId,
+    title,
+    rarity,
+    shiny,
+    status,
+    endsAt,
+    startingPrice,
+    currentBid,
+    leading,
+    selling,
+    minimumBid,
+  } = auction;
+  return [
+    `Auction ${auctionId}: ${title} (${rarity})${shiny ? " [shiny]" : ""}`,
+    `Status ${status}, ends ${endsAt}`,
+    `Starting price ${wikibidous(startingPrice)}; ${
+      currentBid === null
+        ? "no bid yet"
+        : `current bid ${wikibidous(currentBid)} by ${leading ? "you" : "another player"}`
+    }`,
+    `Minimum bid ${wikibidous(minimumBid)}`,
+    `Sold by ${selling ? "you" : "another player"}`,
+  ].join("\n");
 }
 
 export function formatFavourite(

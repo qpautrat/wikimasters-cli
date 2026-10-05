@@ -1,6 +1,8 @@
 export {
   parseAuctionId,
   placeMinimumBid,
+  showAuction,
+  type Auction,
   type AuctionId,
   type PlacedBid,
 } from "./auction.js";

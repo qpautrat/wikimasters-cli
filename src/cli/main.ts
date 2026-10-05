@@ -11,6 +11,7 @@ import {
   placeMinimumBid,
   removeFromWishlist,
   searchCards,
+  showAuction,
   starCard,
   tagCard,
   unstarCard,
@@ -20,6 +21,7 @@ import {
 import { loadConfig } from "./config.js";
 import {
   formatAddition,
+  formatAuction,
   formatBid,
   formatCardSearch,
   formatCollection,
@@ -64,6 +66,18 @@ auction
     const auctionId = parseAuctionId(rawAuctionId);
     const session = await openSession();
     console.log(formatBid(await placeMinimumBid(session, auctionId), format()));
+  });
+
+auction
+  .command("show")
+  .description(
+    "Show an auction's card, status, end time, starting price, current bid, whether you lead or sell it, and the minimum bid the game accepts now",
+  )
+  .argument("<auction-id>", "auction UUID")
+  .action(async (rawAuctionId: string) => {
+    const auctionId = parseAuctionId(rawAuctionId);
+    const session = await openSession();
+    console.log(formatAuction(await showAuction(session, auctionId), format()));
   });
 
 const cards = program.command("cards").description("Browse the card catalogue");

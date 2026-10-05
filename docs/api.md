@@ -39,6 +39,7 @@ Source: read-only query.
 - The whole catalogue is readable, owned or not: more than 100,000 cards.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
 - `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first.
+- `placeMinimumBid` / `showAuction` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection
@@ -108,7 +109,7 @@ Source: capture `discard-cards.har`, and a discard of an auctioned card's former
 
 ## `auctions`: the auctions
 
-Source: read-only query, 2026-10-02.
+Source: read-only queries, 2026-10-02 and 2026-10-05.
 
 | Column | Meaning |
 |---|---|
@@ -119,8 +120,11 @@ Source: read-only query, 2026-10-02.
 | `base_amount` | starting price, which the seller can lower once |
 | `current_bid` | highest bid, `null` while nobody has bid |
 | `current_bidder_id` | author of `current_bid` |
+| `card_id` | auctioned card, relation to `cards.id` |
+| `snapshot_rarity` | rarity of the auctioned copy |
+| `is_shiny` | whether the auctioned copy is shiny |
 
-- `placeMinimumBid`: `GET` filtered on `id`, to check the auction is running and not the user's own, and to compute the minimum bid.
+- `placeMinimumBid` / `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`. `placeMinimumBid` checks the auction is running and not the user's own, and computes the minimum bid; `showAuction` reports it with the minimum bid.
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 

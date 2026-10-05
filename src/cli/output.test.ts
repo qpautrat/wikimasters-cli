@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatAddition,
+  formatAuction,
   formatBid,
   formatCardSearch,
   formatCollection,
@@ -26,6 +27,19 @@ const bid = {
   amount: 359,
   balance: 7743,
 };
+const shownAuction = {
+  auctionId: bid.auctionId,
+  title: "Musique celtique",
+  rarity: "R",
+  shiny: true,
+  status: "active",
+  endsAt: "2026-10-05T18:36:38.07319+00:00",
+  startingPrice: 200,
+  currentBid: 326,
+  leading: true,
+  selling: false,
+  minimumBid: 359,
+};
 const owned = {
   id: cardId,
   title: "Pointe de la Sambuy",
@@ -39,6 +53,14 @@ const owned = {
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
+  it("reports each piece of the auction state in its own field", () => {
+    const { auctionId, ...state } = shownAuction;
+    expect(JSON.parse(formatAuction(shownAuction, "json"))).toEqual({
+      id: auctionId,
+      ...state,
+    });
+  });
+
   it("reports the auction id, the amount bid and the balance", () => {
     expect(JSON.parse(formatBid(bid, "json"))).toEqual({
       id: bid.auctionId,
@@ -151,6 +173,25 @@ describe("JSON output", () => {
 });
 
 describe("text output", () => {
+  it("prints the auction state", () => {
+    expect(formatAuction(shownAuction, "text").split("\n")).toEqual([
+      `Auction ${bid.auctionId}: Musique celtique (R) [shiny]`,
+      "Status active, ends 2026-10-05T18:36:38.07319+00:00",
+      "Starting price 200 wikibidous; current bid 326 wikibidous by you",
+      "Minimum bid 359 wikibidous",
+      "Sold by another player",
+    ]);
+  });
+
+  it("says when nobody has bid on the auction", () => {
+    expect(
+      formatAuction(
+        { ...shownAuction, currentBid: null, leading: false, selling: true },
+        "text",
+      ).split("\n"),
+    ).toContain("Starting price 200 wikibidous; no bid yet");
+  });
+
   it("prints the amount bid and the balance", () => {
     expect(formatBid(bid, "text")).toBe(
       `Bid 359 wikibidous on auction ${bid.auctionId}; balance 7743 wikibidous.`,

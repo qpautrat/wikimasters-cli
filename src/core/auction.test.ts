@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
-import { minimumBid, parseAuctionId, placeMinimumBid } from "./auction.js";
+import {
+  minimumBid,
+  parseAuctionId,
+  placeMinimumBid,
+  showAuction,
+} from "./auction.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -24,6 +29,10 @@ function auction(overrides: Record<string, unknown> = {}) {
     seller_id: SELLER_ID,
     base_amount: 200,
     current_bid: 326,
+    current_bidder_id: SELLER_ID,
+    snapshot_rarity: "R",
+    is_shiny: true,
+    cards: { wikipedia_title: "Musique celtique" },
     ...overrides,
   };
 }
@@ -207,6 +216,69 @@ describe("placeMinimumBid", () => {
 
     await expect(placeMinimumBid(session, auctionId)).rejects.toThrow(
       AuthRequiredError,
+    );
+  });
+});
+
+describe("showAuction", () => {
+  it("returns the auctioned copy, the bids and the minimum bid", async () => {
+    const row = auction();
+    const { session, requests } = await sessionWith(auctionSelect([row]));
+
+    await expect(showAuction(session, auctionId)).resolves.toEqual({
+      auctionId,
+      title: "Musique celtique",
+      rarity: "R",
+      shiny: true,
+      status: "active",
+      endsAt: row.end_at,
+      startingPrice: 200,
+      currentBid: 326,
+      leading: false,
+      selling: false,
+      minimumBid: 359,
+    });
+    const select = requests.find(restRequest("GET", "auctions"));
+    expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
+  });
+
+  it("tells when the user leads the auction", async () => {
+    const { session } = await sessionWith(
+      auctionSelect([auction({ current_bidder_id: USER_ID })]),
+    );
+
+    const { leading, selling } = await showAuction(session, auctionId);
+
+    expect({ leading, selling }).toEqual({ leading: true, selling: false });
+  });
+
+  it("tells when the user sells the auctioned card", async () => {
+    const { session } = await sessionWith(
+      auctionSelect([auction({ seller_id: USER_ID })]),
+    );
+
+    await expect(showAuction(session, auctionId)).resolves.toMatchObject({
+      selling: true,
+    });
+  });
+
+  it("reports no bid and the starting price as minimum while nobody has bid", async () => {
+    const { session } = await sessionWith(
+      auctionSelect([auction({ current_bid: null, current_bidder_id: null })]),
+    );
+
+    await expect(showAuction(session, auctionId)).resolves.toMatchObject({
+      currentBid: null,
+      leading: false,
+      minimumBid: 200,
+    });
+  });
+
+  it("fails on an unknown auction", async () => {
+    const { session } = await sessionWith(auctionSelect([]));
+
+    await expect(showAuction(session, auctionId)).rejects.toThrow(
+      `Auction ${auctionId} not found`,
     );
   });
 });
