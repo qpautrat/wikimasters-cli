@@ -73,9 +73,9 @@ cards
   .description(
     "Find the cards of the catalogue whose title contains the given text, regardless of case, exact title first, at most 50",
   )
-  .argument("<name>", "all or part of the card title")
-  .action(async (name: string) => {
-    const result = await searchCards(await openSession(), name);
+  .argument("<name...>", "all or part of the card title")
+  .action(async (words: string[]) => {
+    const result = await searchCards(await openSession(), words.join(" "));
     console.log(formatCardSearch(result, format()));
   });
 
