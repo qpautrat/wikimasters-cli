@@ -3,6 +3,7 @@ import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatAddition,
   formatBid,
+  formatCollection,
   formatDiscard,
   formatFavourite,
   formatLogin,
@@ -24,6 +25,16 @@ const bid = {
   amount: 359,
   balance: 7743,
 };
+const owned = {
+  id: cardId,
+  title: "Pointe de la Sambuy",
+  rarity: "C",
+  copies: 1,
+  starred: false,
+  shiny: false,
+  labels: [],
+  obtainedAt: "2026-09-18T23:42:15.692426+00:00",
+};
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
@@ -39,6 +50,25 @@ describe("JSON output", () => {
     expect(JSON.parse(formatWishlist(cards, "json"))).toEqual([
       { id: cardId, title: "Pointe de la Sambuy", rarity: "PC", owned: false },
     ]);
+  });
+
+  it("lists the collection as an array of cards with each attribute in its own field", () => {
+    expect(JSON.parse(formatCollection([owned], "json"))).toEqual([
+      {
+        id: cardId,
+        title: "Pointe de la Sambuy",
+        rarity: "C",
+        copies: 1,
+        starred: false,
+        shiny: false,
+        labels: [],
+        obtainedAt: "2026-09-18T23:42:15.692426+00:00",
+      },
+    ]);
+  });
+
+  it("gives an empty array for an empty collection", () => {
+    expect(formatCollection([], "json", "UR")).toBe("[]");
   });
 
   it("gives an empty array for an empty wishlist", () => {
@@ -137,6 +167,41 @@ describe("text output", () => {
   it("marks the wishlist cards already in the collection", () => {
     expect(formatWishlist([{ ...card, owned: true }], "text")).toBe(
       `${cardId}  Pointe de la Sambuy (PC)  [owned]`,
+    );
+  });
+
+  it("prints one line per collection card", () => {
+    expect(formatCollection([owned], "text")).toBe(
+      `${cardId}  Pointe de la Sambuy (C)  x1  obtained 2026-09-18T23:42:15.692426+00:00`,
+    );
+  });
+
+  it("marks the favourite, shiny and labelled collection cards", () => {
+    expect(
+      formatCollection(
+        [
+          {
+            ...owned,
+            copies: 2,
+            starred: true,
+            shiny: true,
+            labels: ["Lieux", "Montagnes"],
+          },
+        ],
+        "text",
+      ),
+    ).toBe(
+      `${cardId}  Pointe de la Sambuy (C)  x2  obtained 2026-09-18T23:42:15.692426+00:00  [favourite]  [shiny]  [labels: "Lieux", "Montagnes"]`,
+    );
+  });
+
+  it("says when the collection is empty", () => {
+    expect(formatCollection([], "text")).toBe("The collection is empty.");
+  });
+
+  it("says when the collection holds no card of the requested rarity", () => {
+    expect(formatCollection([], "text", "UR")).toBe(
+      "The collection holds no card of rarity UR.",
     );
   });
 

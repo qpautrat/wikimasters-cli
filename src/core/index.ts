@@ -16,6 +16,11 @@ export {
   type BrowserLoginOptions,
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
+export {
+  listCollection,
+  type CollectionCard,
+  type CollectionFilter,
+} from "./collection-list.js";
 export { discardCommons, type CommonsDiscard } from "./collection.js";
 export { AuthRequiredError, WikiMastersError } from "./errors.js";
 export {

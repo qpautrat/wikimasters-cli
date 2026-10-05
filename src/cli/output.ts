@@ -1,4 +1,5 @@
 import type {
+  CollectionCard,
   CommonsDiscard,
   FavouriteChange,
   PlacedBid,
@@ -57,6 +58,57 @@ export function formatRemoval(
   return removed
     ? `Card ${cardId} removed from the wishlist.`
     : `Card ${cardId} was not in the wishlist.`;
+}
+
+export function formatCollection(
+  cards: readonly CollectionCard[],
+  format: Format,
+  requestedRarity?: string,
+): string {
+  if (format === "json") {
+    return JSON.stringify(
+      cards.map(
+        ({
+          id,
+          title,
+          rarity,
+          copies,
+          starred,
+          shiny,
+          labels,
+          obtainedAt,
+        }) => ({
+          id,
+          title,
+          rarity,
+          copies,
+          starred,
+          shiny,
+          labels,
+          obtainedAt,
+        }),
+      ),
+    );
+  }
+  if (cards.length === 0) {
+    return requestedRarity === undefined
+      ? "The collection is empty."
+      : `The collection holds no card of rarity ${requestedRarity}.`;
+  }
+  return cards
+    .map(({ id, title, rarity, copies, starred, shiny, labels, obtainedAt }) =>
+      [
+        `${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
+        ...(starred ? ["[favourite]"] : []),
+        ...(shiny ? ["[shiny]"] : []),
+        ...(labels.length > 0
+          ? [
+              `[labels: ${labels.map((label) => JSON.stringify(label)).join(", ")}]`,
+            ]
+          : []),
+      ].join("  "),
+    )
+    .join("\n");
 }
 
 function cards(count: number, noun: string): string {

@@ -3,6 +3,7 @@ import { Command } from "commander";
 import {
   addToWishlist,
   discardCommons,
+  listCollection,
   listWishlist,
   loginInBrowser,
   parseAuctionId,
@@ -13,11 +14,13 @@ import {
   tagCard,
   unstarCard,
   untagCard,
+  type CollectionFilter,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
   formatAddition,
   formatBid,
+  formatCollection,
   formatDiscard,
   formatFavourite,
   formatLogin,
@@ -64,6 +67,17 @@ auction
 const collection = program
   .command("collection")
   .description("Manage your collection");
+
+collection
+  .command("list")
+  .description(
+    "List the cards of your collection, earliest obtained first, with their owned rarity, copies, favourite and shiny state, labels and obtention date",
+  )
+  .option("--rarity <code>", "list only the cards of this owned rarity")
+  .action(async (filter: CollectionFilter) => {
+    const cards = await listCollection(await openSession(), filter);
+    console.log(formatCollection(cards, format(), filter.rarity));
+  });
 
 collection
   .command("discard-commons")
