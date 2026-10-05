@@ -6,7 +6,7 @@ Une carte étiquetée (`user_card_tags`) est protégée : `wikimasters collectio
 
 L'écriture n'est pas encore connue : elle demande une capture HAR du parcours dans l'interface.
 
-Dépend de : [Étiqueter une carte de ma collection](collection-tag.md).
+Dépend de : [Étiqueter une carte de ma collection](../collection-tag.md).
 
 ## User story
 

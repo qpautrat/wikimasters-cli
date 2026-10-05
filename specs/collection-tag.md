@@ -4,9 +4,7 @@
 
 L'interface permet de poser sur une carte de ma collection des étiquettes que j'ai créées (`tags`, reliées aux cartes par `user_card_tags`). Une carte étiquetée est protégée : `wikimasters collection discard-commons` ne la défausse pas. Je veux poser une étiquette depuis le terminal.
 
-L'écriture n'est pas encore connue : elle demande une capture HAR du parcours dans l'interface.
-
-Dépend de : [Défausser toutes mes cartes communes](../discard-commons.md).
+Dépend de : [Défausser toutes mes cartes communes](discard-commons.md).
 
 ## User story
 
