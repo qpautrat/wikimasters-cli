@@ -18,7 +18,7 @@ Present a backlog listing in two tables, functional and technical, sorted by eac
 
 ## Command scope
 
-A command exposes an API call and nothing more. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands.
+A command exposes an API call and nothing more. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec goes into the player's own private skill, outside the repo.
 
 ## Spec before code
 
