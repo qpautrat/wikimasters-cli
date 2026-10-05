@@ -21,7 +21,7 @@ The user names cards in natural language. Resolve each name to its id with the l
 - several matches: show their titles and rarities, and act only after the user picks one;
 - no match: say so and change nothing.
 
-No command finds a card of the catalogue by name: to add a card to the wishlist, ask the user for its id.
+To add a card to the wishlist, ask the user for its id.
 
 Report results by card title, never by id alone.
 
