@@ -4,7 +4,7 @@
 
 Certaines specs font entrer dans le code des règles de l'interface ou du joueur. `collection discard-commons` choisit la rareté à défausser et les cartes à protéger (favori, brillante, étiquetée), et écarte comme l'interface les cartes engagées dans un échange en cours. Le critère 6 de `auction bid` justifie une mise par une tactique (« surenchérir sur ma propre mise décourage les concurrents »).
 
-Dépend de : [Énoncer que la CLI n'a pas de règle propre](../cli-scope-rule.md).
+Dépend de : [Énoncer que la CLI n'a pas de règle propre](cli-scope-rule.md).
 
 ## User story
 
