@@ -12,7 +12,7 @@ import {
   type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
-import { RETRY_DELAYS_MS } from "./transient.js";
+import { RETRY_DELAYS_MS, fetchRetrying } from "./transient.js";
 
 const NO_DELAY = [0, 0, 0];
 const ROWS = [{ id: 1 }];
@@ -164,4 +164,22 @@ describe("retry on transient API errors", () => {
       expect(requestsTo(requests, path)).toHaveLength(1);
     },
   );
+
+  it("resends the body of a request object on each retry", async () => {
+    const { fetch, requests } = fakeFetch(
+      failingFirst(1, 503, ({ method }) =>
+        method === "POST" ? { status: 200 } : undefined,
+      ),
+    );
+
+    const response = await fetchRetrying(
+      fetch,
+      NO_DELAY,
+      (status) => status === 503,
+      new Request("https://example.test/", { method: "POST", body: "{}" }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(requests.map(({ body }) => body)).toEqual(["{}", "{}"]);
+  });
 });

@@ -45,7 +45,10 @@ export async function fetchRetrying(
   init?: RequestInit,
 ): Promise<Response> {
   for (const delayMs of delaysMs) {
-    const response = await fetch(input, init);
+    const response = await fetch(
+      input instanceof Request ? input.clone() : input,
+      init,
+    );
     if (!retryOn(response.status)) return response;
     await response.body?.cancel();
     await sleep(delayMs);
