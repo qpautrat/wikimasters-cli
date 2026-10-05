@@ -23,6 +23,7 @@ A command exposes an API call and nothing more. Never write a criterion that rep
 ## Spec before code
 
 - Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first.
+- Change an implemented spec in `specs/` only in the commit that makes the code meet it. A change planned for later goes into a correction spec in `specs/backlog/`, whose implementation amends or removes the implemented spec in the same commit.
 - Work in small batches: one atomic spec, implemented and delivered, before the next. Atomicity is mandatory, submission is not.
 - When confident in a spec, commit it and implement it without waiting, then name each decision taken on the user's behalf in the end-of-increment summary. Submit it first when confidence is low, all the more for a functional spec.
 
