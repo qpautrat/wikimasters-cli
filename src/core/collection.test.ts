@@ -7,6 +7,8 @@ import {
   ACCESS_TOKEN,
   USER_ID,
   fakeFetch,
+  restRequest,
+  restRoute,
   tokenRefresh,
   type RecordedRequest,
   type Route,
@@ -31,9 +33,10 @@ function commons(count: number) {
 }
 
 function collectionSelect(rows: unknown[]): Route {
-  return ({ method, url }) => {
-    if (method !== "GET" || url.pathname !== "/rest/v1/user_cards")
-      return undefined;
+  const isCollectionRead = restRequest("GET", "user_cards");
+  return (request) => {
+    if (!isCollectionRead(request)) return undefined;
+    const { url } = request;
     const offset = Number(url.searchParams.get("offset") ?? 0);
     const limit = Number(url.searchParams.get("limit") ?? rows.length);
     return { status: 200, body: rows.slice(offset, offset + limit) };
@@ -47,10 +50,10 @@ function myCollection(pendingTradeCardIds: string[] = []): Route {
       : undefined;
 }
 
-const profile: Route = ({ method, url }) =>
-  method === "POST" && url.pathname === "/rest/v1/rpc/get_my_profile"
-    ? { status: 200, body: { wikibidous_balance: INITIAL_BALANCE } }
-    : undefined;
+const profile = restRoute("POST", "rpc/get_my_profile", {
+  status: 200,
+  body: { wikibidous_balance: INITIAL_BALANCE },
+});
 
 function bulkDiscard(): Route {
   let balance = INITIAL_BALANCE;
@@ -101,9 +104,7 @@ describe("discardCommons", () => {
 
     await discardCommons(session);
 
-    const select = requests.find(({ url }) =>
-      url.pathname.endsWith("/user_cards"),
-    );
+    const select = requests.find(restRequest("GET", "user_cards"));
     const params = select?.url.searchParams;
     expect(params?.get("user_id")).toBe(`eq.${USER_ID}`);
     expect(params?.get("snapshot_rarity")).toBe("eq.C");

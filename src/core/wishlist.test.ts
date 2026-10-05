@@ -6,9 +6,10 @@ import {
   ACCESS_TOKEN,
   USER_ID,
   fakeFetch,
+  restRequest,
+  restRoute,
   tokenRefresh,
   type FakeResponse,
-  type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
 import { addToWishlist, listWishlist, removeFromWishlist } from "./wishlist.js";
@@ -16,10 +17,10 @@ import { addToWishlist, listWishlist, removeFromWishlist } from "./wishlist.js";
 const cardId = parseCardId("3fc9a132-31db-4b14-832c-04823e02113d");
 
 function wishlistDelete(deletedRows: number): Route {
-  return ({ method, url }) =>
-    method === "DELETE" && url.pathname === "/rest/v1/wishlist_items"
-      ? { status: 204, headers: { "content-range": `*/${deletedRows}` } }
-      : undefined;
+  return restRoute("DELETE", "wishlist_items", {
+    status: 204,
+    headers: { "content-range": `*/${deletedRows}` },
+  });
 }
 
 async function sessionWith(...routes: Route[]) {
@@ -33,18 +34,13 @@ async function sessionWith(...routes: Route[]) {
 }
 
 function catalogueCard(rows: unknown[]): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/cards"
-      ? { status: 200, body: rows }
-      : undefined;
+  return restRoute("GET", "cards", { status: 200, body: rows });
 }
 
-function isWishlistInsert({ method, url }: RecordedRequest): boolean {
-  return method === "POST" && url.pathname === "/rest/v1/wishlist_items";
-}
+const isWishlistInsert = restRequest("POST", "wishlist_items");
 
 function wishlistInsert(response: FakeResponse): Route {
-  return (request) => (isWishlistInsert(request) ? response : undefined);
+  return restRoute("POST", "wishlist_items", response);
 }
 
 describe("addToWishlist", () => {
@@ -122,10 +118,11 @@ describe("addToWishlist", () => {
   });
 
   it("requires a new login when the catalogue read rejects the session", async () => {
-    const { session, requests } = await sessionWith(({ method, url }) =>
-      method === "GET" && url.pathname === "/rest/v1/cards"
-        ? { status: 401, body: { code: "PGRST303", message: "JWT expired" } }
-        : undefined,
+    const { session, requests } = await sessionWith(
+      restRoute("GET", "cards", {
+        status: 401,
+        body: { code: "PGRST303", message: "JWT expired" },
+      }),
     );
 
     await expect(addToWishlist(session, cardId)).rejects.toThrow(
@@ -230,10 +227,7 @@ describe("parseCardId", () => {
 });
 
 function wishlistSelect(rows: unknown[]): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/wishlist_items"
-      ? { status: 200, body: rows }
-      : undefined;
+  return restRoute("GET", "wishlist_items", { status: 200, body: rows });
 }
 
 describe("listWishlist", () => {

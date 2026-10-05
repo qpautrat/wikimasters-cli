@@ -7,6 +7,7 @@ import {
   ACCESS_TOKEN,
   USER_ID,
   fakeFetch,
+  restRoute,
   tokenRefresh,
   type Route,
 } from "./testing/fake-supabase.js";
@@ -15,20 +16,17 @@ const cardId = parseCardId("3fc9a132-31db-4b14-832c-04823e02113d");
 const entryId = "944d72cb-9118-41ff-ba3b-026c47ec27fc";
 
 function collectionEntry(starred: boolean | null): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/user_cards"
-      ? {
-          status: 200,
-          body: starred === null ? [] : [{ id: entryId, starred }],
-        }
-      : undefined;
+  return restRoute("GET", "user_cards", {
+    status: 200,
+    body: starred === null ? [] : [{ id: entryId, starred }],
+  });
 }
 
 function entryUpdate(updatedRows: number): Route {
-  return ({ method, url }) =>
-    method === "PATCH" && url.pathname === "/rest/v1/user_cards"
-      ? { status: 204, headers: { "content-range": `*/${updatedRows}` } }
-      : undefined;
+  return restRoute("PATCH", "user_cards", {
+    status: 204,
+    headers: { "content-range": `*/${updatedRows}` },
+  });
 }
 
 async function sessionWith(...routes: Route[]) {

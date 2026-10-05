@@ -13,6 +13,20 @@ export interface FakeResponse {
 
 export type Route = (request: RecordedRequest) => FakeResponse | undefined;
 
+export function restRequest(method: string, table: string) {
+  return (request: RecordedRequest): boolean =>
+    request.method === method && request.url.pathname === `/rest/v1/${table}`;
+}
+
+export function restRoute(
+  method: string,
+  table: string,
+  response: FakeResponse,
+): Route {
+  const matches = restRequest(method, table);
+  return (request) => (matches(request) ? response : undefined);
+}
+
 export const USER_ID = "5d14f22b-ea20-4a25-bc4a-fa879af3d0ee";
 export const ACCESS_TOKEN = "fake-access-token";
 export const ROTATED_REFRESH_TOKEN = "rotated-refresh-token";

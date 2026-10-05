@@ -7,6 +7,8 @@ import {
   ACCESS_TOKEN,
   USER_ID,
   fakeFetch,
+  restRequest,
+  restRoute,
   tokenRefresh,
   type RecordedRequest,
   type Route,
@@ -24,34 +26,25 @@ const films = {
 };
 
 function collectionEntry(tagIds: string[] | null): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/user_cards"
-      ? {
-          status: 200,
-          body:
-            tagIds === null
-              ? []
-              : [
-                  {
-                    id: entryId,
-                    user_card_tags: tagIds.map((tag_id) => ({ tag_id })),
-                  },
-                ],
-        }
-      : undefined;
+  return restRoute("GET", "user_cards", {
+    status: 200,
+    body:
+      tagIds === null
+        ? []
+        : [
+            {
+              id: entryId,
+              user_card_tags: tagIds.map((tag_id) => ({ tag_id })),
+            },
+          ],
+  });
 }
 
 function labels(...tags: { id: string; name: string }[]): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/tags"
-      ? { status: 200, body: tags }
-      : undefined;
+  return restRoute("GET", "tags", { status: 200, body: tags });
 }
 
-const tagInsert: Route = ({ method, url }) =>
-  method === "POST" && url.pathname === "/rest/v1/user_card_tags"
-    ? { status: 201 }
-    : undefined;
+const tagInsert = restRoute("POST", "user_card_tags", { status: 201 });
 
 async function sessionWith(...routes: Route[]) {
   const { fetch, requests } = fakeFetch(tokenRefresh, ...routes);
@@ -84,20 +77,13 @@ describe("tagCard", () => {
       tagged: true,
       changed: true,
     });
-    const entryRead = requests.find(
-      ({ url }) => url.pathname === "/rest/v1/user_cards",
-    );
+    const entryRead = requests.find(restRequest("GET", "user_cards"));
     expect(entryRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
     expect(entryRead?.url.searchParams.get("card_id")).toBe(`eq.${cardId}`);
     expect(entryRead?.url.searchParams.get("count")).toBe("gt.0");
-    const labelRead = requests.find(
-      ({ url }) => url.pathname === "/rest/v1/tags",
-    );
+    const labelRead = requests.find(restRequest("GET", "tags"));
     expect(labelRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-    const insert = requests.find(
-      ({ method, url }) =>
-        method === "POST" && url.pathname === "/rest/v1/user_card_tags",
-    );
+    const insert = requests.find(restRequest("POST", "user_card_tags"));
     expect(JSON.parse(insert?.body ?? "null")).toEqual({
       user_card_id: entryId,
       tag_id: history.id,
@@ -191,10 +177,10 @@ describe("tagCard", () => {
 });
 
 function tagDeletion(deletedRows: number): Route {
-  return ({ method, url }) =>
-    method === "DELETE" && url.pathname === "/rest/v1/user_card_tags"
-      ? { status: 204, headers: { "content-range": `*/${deletedRows}` } }
-      : undefined;
+  return restRoute("DELETE", "user_card_tags", {
+    status: 204,
+    headers: { "content-range": `*/${deletedRows}` },
+  });
 }
 
 describe("untagCard", () => {
@@ -211,9 +197,7 @@ describe("untagCard", () => {
       tagged: false,
       changed: true,
     });
-    const labelRead = requests.find(
-      ({ url }) => url.pathname === "/rest/v1/tags",
-    );
+    const labelRead = requests.find(restRequest("GET", "tags"));
     expect(labelRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
     const deletion = requests.find(({ method }) => method === "DELETE");
     expect(deletion?.url.searchParams.get("user_card_id")).toBe(

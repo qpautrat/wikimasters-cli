@@ -6,6 +6,8 @@ import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
+  restRequest,
+  restRoute,
   tokenRefresh,
   type RecordedRequest,
   type Route,
@@ -27,10 +29,7 @@ function auction(overrides: Record<string, unknown> = {}) {
 }
 
 function auctionSelect(rows: unknown[]): Route {
-  return ({ method, url }) =>
-    method === "GET" && url.pathname === "/rest/v1/auctions"
-      ? { status: 200, body: rows }
-      : undefined;
+  return restRoute("GET", "auctions", { status: 200, body: rows });
 }
 
 function bidRoute(
@@ -99,9 +98,7 @@ describe("placeMinimumBid", () => {
       balance: BALANCE_AFTER_BID,
     });
 
-    const select = requests.find(({ url }) =>
-      url.pathname.endsWith("/auctions"),
-    );
+    const select = requests.find(restRequest("GET", "auctions"));
     expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
     const [bid] = bidRequests(requests);
     expect(JSON.parse(bid?.body ?? "{}")).toEqual({ amount: 359 });
