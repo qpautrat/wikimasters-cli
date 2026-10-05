@@ -92,6 +92,7 @@ Source: read-only query, 2026-10-05.
 | `created_at` | creation time |
 
 - Row-level security returns only the user's own rows.
+- `listCollection`: reads `name` through the `user_card_tags(tags(name))` embed in `user_cards`.
 - `tagCard` / `untagCard`: `GET` of `id, name` filtered on `user_id` and ordered by `name`, to find the label by its exact name or list the user's labels.
 
 ## `rpc/get_my_profile`: the signed-in user's profile

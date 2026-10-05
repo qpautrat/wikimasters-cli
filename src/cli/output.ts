@@ -65,31 +65,7 @@ export function formatCollection(
   format: Format,
   requestedRarity?: string,
 ): string {
-  if (format === "json") {
-    return JSON.stringify(
-      cards.map(
-        ({
-          id,
-          title,
-          rarity,
-          copies,
-          starred,
-          shiny,
-          labels,
-          obtainedAt,
-        }) => ({
-          id,
-          title,
-          rarity,
-          copies,
-          starred,
-          shiny,
-          labels,
-          obtainedAt,
-        }),
-      ),
-    );
-  }
+  if (format === "json") return JSON.stringify(cards);
   if (cards.length === 0) {
     return requestedRarity === undefined
       ? "The collection is empty."

@@ -73,7 +73,10 @@ collection
   .description(
     "List the cards of your collection, earliest obtained first, with their owned rarity, copies, favourite and shiny state, labels and obtention date",
   )
-  .option("--rarity <code>", "list only the cards of this owned rarity")
+  .option(
+    "--rarity <code>",
+    "list only the cards of this owned rarity: C, PC, R, SR, UR or L",
+  )
   .action(async (filter: CollectionFilter) => {
     const cards = await listCollection(await openSession(), filter);
     console.log(formatCollection(cards, format(), filter.rarity));

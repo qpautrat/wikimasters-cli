@@ -39,7 +39,7 @@ function labelsOf({ card_id, user_card_tags }: OwnedCardRow): string[] {
       }
       return tags.name;
     })
-    .sort();
+    .sort((a, b) => a.localeCompare(b));
 }
 
 export async function listCollection(
