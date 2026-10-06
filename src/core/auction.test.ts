@@ -201,7 +201,7 @@ describe("placeBid", () => {
 });
 
 describe("showAuction", () => {
-  it("returns the auctioned copy and its bids", async () => {
+  it("returns the auctioned copy and its current bid", async () => {
     const row = auction();
     const { session, requests } = await sessionWith(auctionSelect([row]));
 
