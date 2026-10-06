@@ -22,7 +22,7 @@ Present a backlog listing in three tables, an empty one included:
 
 ## Command scope
 
-A command exposes an API call and nothing more. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec goes into the player's own untracked `CLAUDE.local.md`.
+A command exposes an API call and nothing more. A command takes every parameter its API call takes and never checks beforehand what the API checks: it sends the request and reports the API's refusal. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec goes into the player's own untracked `CLAUDE.local.md`.
 
 ## Spec before code
 
