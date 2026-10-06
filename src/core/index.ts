@@ -1,3 +1,4 @@
+export { listRunningBids, type BidAuction } from "./auction-bids.js";
 export {
   parseAuctionId,
   placeMinimumBid,

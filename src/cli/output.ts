@@ -1,5 +1,6 @@
 import type {
   Auction,
+  BidAuction,
   CardSearch,
   CatalogueCard,
   CollectionCard,
@@ -145,6 +146,24 @@ export function formatBid(
   if (format === "json")
     return JSON.stringify({ id: auctionId, amount, balance });
   return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
+}
+
+export function formatRunningBids(
+  auctions: readonly BidAuction[],
+  format: Format,
+): string {
+  if (format === "json") {
+    return JSON.stringify(
+      auctions.map(({ auctionId, ...state }) => ({ id: auctionId, ...state })),
+    );
+  }
+  if (auctions.length === 0) return "You have no bid on a running auction.";
+  return auctions
+    .map(
+      ({ auctionId, title, myHighestBid, currentBid, leading, endsAt }) =>
+        `${auctionId}  ${title}: your bid ${wikibidous(myHighestBid)}, current bid ${wikibidous(currentBid)} by ${leading ? "you" : "another player"}, ends ${endsAt}`,
+    )
+    .join("\n");
 }
 
 export function formatAuction(auction: Auction, format: Format): string {

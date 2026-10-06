@@ -4,7 +4,7 @@
 
 Pour remiser sur une enchère, `wikimasters auction bid` demande son identifiant, que je dois aujourd'hui retrouver dans l'interface. Je veux voir depuis le terminal les enchères en cours sur lesquelles j'ai misé, avec leur identifiant et l'état de ma mise.
 
-Dépend de : [Miser sur une enchère](../auction-bid.md).
+Dépend de : [Miser sur une enchère](auction-bid.md).
 
 ## User story
 

@@ -40,6 +40,7 @@ Source: read-only query.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
 - `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first.
 - `placeMinimumBid` / `showAuction` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
+- `listRunningBids` embeds it the same way through `auction_bids` → `auctions`.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection
@@ -125,6 +126,23 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 | `is_shiny` | whether the auctioned copy is shiny |
 
 - `placeMinimumBid` / `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`. `placeMinimumBid` checks the auction is running and not the user's own, and computes the minimum bid; `showAuction` reports it with the minimum bid.
+- `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
+
+## `auction_bids`: the bids
+
+Source: read-only queries, 2026-10-06.
+
+| Column | Meaning |
+|---|---|
+| `id` | bid UUID |
+| `auction_id` | auction bid on, relation to `auctions.id` |
+| `bidder_id` | author of the bid |
+| `amount` | wikibidous bid |
+| `placed_at` | when the bid was placed |
+
+- Row-level security returns only the user's own bids: none of another bidder's, even on an auction they lead.
+- One row per bid: an auction the user bid on several times appears several times.
+- `listRunningBids`: `GET` of `auction_id, amount` and the `auctions` embed above, filtered on `bidder_id`, ordered by `id`, paged by 1000; it keeps the highest `amount` per auction and sorts by `end_at`.
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 

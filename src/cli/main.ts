@@ -4,6 +4,7 @@ import {
   addToWishlist,
   discardCards,
   listCollection,
+  listRunningBids,
   listWishlist,
   loginInBrowser,
   parseAuctionId,
@@ -29,6 +30,7 @@ import {
   formatFavourite,
   formatLogin,
   formatRemoval,
+  formatRunningBids,
   formatTag,
   formatWishlist,
   type Format,
@@ -66,6 +68,16 @@ auction
     const auctionId = parseAuctionId(rawAuctionId);
     const session = await openSession();
     console.log(formatBid(await placeMinimumBid(session, auctionId), format()));
+  });
+
+auction
+  .command("bids")
+  .description(
+    "List the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead",
+  )
+  .action(async () => {
+    const auctions = await listRunningBids(await openSession());
+    console.log(formatRunningBids(auctions, format()));
   });
 
 auction

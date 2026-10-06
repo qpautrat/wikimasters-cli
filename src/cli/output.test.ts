@@ -10,6 +10,7 @@ import {
   formatFavourite,
   formatLogin,
   formatRemoval,
+  formatRunningBids,
   formatTag,
   formatWishlist,
 } from "./output.js";
@@ -40,6 +41,14 @@ const shownAuction = {
   selling: false,
   minimumBid: 359,
 };
+const runningBid = {
+  auctionId: bid.auctionId,
+  title: "Pointe de la Sambuy",
+  myHighestBid: 22,
+  currentBid: 25,
+  leading: false,
+  endsAt: "2026-10-06T08:56:58.649051+00:00",
+};
 const owned = {
   id: cardId,
   title: "Pointe de la Sambuy",
@@ -53,6 +62,13 @@ const owned = {
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
+  it("lists each running auction bid on with its state in its own field", () => {
+    const { auctionId, ...state } = runningBid;
+    expect(JSON.parse(formatRunningBids([runningBid], "json"))).toEqual([
+      { id: auctionId, ...state },
+    ]);
+  });
+
   it("reports each piece of the auction state in its own field", () => {
     const { auctionId, ...state } = shownAuction;
     expect(JSON.parse(formatAuction(shownAuction, "json"))).toEqual({
@@ -173,6 +189,18 @@ describe("JSON output", () => {
 });
 
 describe("text output", () => {
+  it("prints one line per running auction bid on", () => {
+    expect(formatRunningBids([runningBid], "text")).toBe(
+      `${bid.auctionId}  Pointe de la Sambuy: your bid 22 wikibidous, current bid 25 wikibidous by another player, ends 2026-10-06T08:56:58.649051+00:00`,
+    );
+  });
+
+  it("says when the user has no bid on a running auction", () => {
+    expect(formatRunningBids([], "text")).toBe(
+      "You have no bid on a running auction.",
+    );
+  });
+
   it("prints the auction state", () => {
     expect(formatAuction(shownAuction, "text").split("\n")).toEqual([
       `Auction ${bid.auctionId}: Musique celtique (R) [shiny]`,
