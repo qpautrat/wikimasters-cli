@@ -24,7 +24,6 @@ export interface Auction {
   currentBid: number | null;
   leading: boolean;
   selling: boolean;
-  minimumBid: number;
 }
 
 export interface AuctionRow {
@@ -56,16 +55,6 @@ export function parseBidAmount(raw: string): BidAmount {
     );
   }
   return amount as BidAmount;
-}
-
-export function minimumBid({
-  base_amount,
-  current_bid,
-}: Pick<AuctionRow, "base_amount" | "current_bid">): number {
-  // Same expression as the site's front-end, float rounding included (docs/game-rules.md): 1.1 * 200 rounds up to 221.
-  return current_bid === null
-    ? base_amount
-    : Math.max(Math.ceil(1.1 * current_bid), current_bid + 1);
 }
 
 export function auctionedTitle(
@@ -122,7 +111,6 @@ export async function showAuction(
     currentBid: auction.current_bid,
     leading: leads(session, auction),
     selling: auction.seller_id === session.userId,
-    minimumBid: minimumBid(auction),
   };
 }
 

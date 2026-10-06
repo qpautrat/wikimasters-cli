@@ -188,13 +188,11 @@ export function formatAuction(auction: Auction, format: Format): string {
     currentBid,
     leading,
     selling,
-    minimumBid,
   } = auction;
   return [
     `Auction ${auctionId}: ${title} (${rarity})${shiny ? " [shiny]" : ""}`,
     `Status ${status}, ends ${endsAt}`,
     `Starting price ${wikibidous(startingPrice)}; ${currentBidState(currentBid, leading)}`,
-    `Minimum bid ${wikibidous(minimumBid)}`,
     `Sold by ${selling ? "you" : "another player"}`,
   ].join("\n");
 }

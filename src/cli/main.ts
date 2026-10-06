@@ -90,7 +90,7 @@ auction
 auction
   .command("show")
   .description(
-    "Show an auction's card, status, end time, starting price, current bid, whether you lead or sell it, and the minimum bid the game accepts now",
+    "Show an auction's card, status, end time, starting price, current bid, and whether you lead or sell it",
   )
   .argument("<auction-id>", "auction UUID")
   .action(async (rawAuctionId: string) => {

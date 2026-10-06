@@ -125,7 +125,7 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 | `snapshot_rarity` | rarity of the auctioned copy |
 | `is_shiny` | whether the auctioned copy is shiny |
 
-- `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`, reported with the minimum bid it computes.
+- `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`.
 - `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
 
 ## `auction_bids`: the bids

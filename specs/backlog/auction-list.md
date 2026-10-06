@@ -28,4 +28,4 @@ En tant que joueur, je liste les enchères, au besoin d'un seul statut, pour obt
 - Filtrer sur d'autres critères que le statut (rareté, brillance, vendeur, heure de fin, enchères que je mène) : ils seront ajoutés selon les besoins.
 - Choisir l'ordre des enchères.
 - Parcourir les enchères au-delà des `<n>` premières.
-- La mise minimale que le jeu accepterait, donnée par `wikimasters auction show`.
+- La mise minimale que le jeu accepterait.

@@ -18,6 +18,6 @@ En tant que joueur, je donne l'identifiant d'une enchère et un montant, et la c
 
 ## Hors périmètre
 
-- Calculer la mise minimale : `wikimasters auction show` la donne.
+- Calculer la mise minimale.
 - Lister ou rechercher les enchères pour obtenir leur identifiant.
 - Miser automatiquement à la place du joueur.

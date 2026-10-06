@@ -39,7 +39,6 @@ const shownAuction = {
   currentBid: 326,
   leading: true,
   selling: false,
-  minimumBid: 359,
 };
 const runningBid = {
   auctionId: bid.auctionId,
@@ -206,7 +205,6 @@ describe("text output", () => {
       `Auction ${bid.auctionId}: Musique celtique (R) [shiny]`,
       "Status active, ends 2026-10-05T18:36:38.07319+00:00",
       "Starting price 200 wikibidous; current bid 326 wikibidous by you",
-      "Minimum bid 359 wikibidous",
       "Sold by another player",
     ]);
   });

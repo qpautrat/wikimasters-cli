@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import {
-  minimumBid,
   parseAuctionId,
   parseBidAmount,
   placeBid,
@@ -79,22 +78,6 @@ async function sessionWith(...routes: Route[]) {
 function bidRequests(requests: RecordedRequest[]) {
   return requests.filter(({ url }) => url.pathname.endsWith("/bid"));
 }
-
-describe("minimumBid", () => {
-  it("is the base amount while nobody has bid", () => {
-    expect(minimumBid({ base_amount: 200, current_bid: null })).toBe(200);
-  });
-
-  it("is the current bid plus 10%, rounded up as the site does", () => {
-    expect(minimumBid({ base_amount: 200, current_bid: 200 })).toBe(221);
-    expect(minimumBid({ base_amount: 200, current_bid: 244 })).toBe(269);
-    expect(minimumBid({ base_amount: 200, current_bid: 326 })).toBe(359);
-  });
-
-  it("is at least one more than the current bid", () => {
-    expect(minimumBid({ base_amount: 0, current_bid: 0 })).toBe(1);
-  });
-});
 
 describe("parseBidAmount", () => {
   it("accepts a strictly positive integer", () => {
@@ -218,7 +201,7 @@ describe("placeBid", () => {
 });
 
 describe("showAuction", () => {
-  it("returns the auctioned copy, the bids and the minimum bid", async () => {
+  it("returns the auctioned copy and its bids", async () => {
     const row = auction();
     const { session, requests } = await sessionWith(auctionSelect([row]));
 
@@ -233,7 +216,6 @@ describe("showAuction", () => {
       currentBid: 326,
       leading: false,
       selling: false,
-      minimumBid: 359,
     });
     const select = requests.find(restRequest("GET", "auctions"));
     expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
@@ -262,7 +244,7 @@ describe("showAuction", () => {
     });
   });
 
-  it("reports no bid and the starting price as minimum while nobody has bid", async () => {
+  it("reports no bid while nobody has bid", async () => {
     const { session } = await sessionWith(
       auctionSelect([auction({ current_bid: null, current_bidder_id: null })]),
     );
@@ -270,7 +252,6 @@ describe("showAuction", () => {
     await expect(showAuction(session, auctionId)).resolves.toMatchObject({
       currentBid: null,
       leading: false,
-      minimumBid: 200,
     });
   });
 
