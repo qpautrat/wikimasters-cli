@@ -12,10 +12,9 @@ En tant que développeur qui vient de cloner le dépôt, je lance `wikimasters l
 
 ## Critères d'acceptation
 
-1. Sans `WIKIMASTERS_SUPABASE_ANON_KEY` dans `.env` ni dans l'environnement, `wikimasters login` puis toute autre commande fonctionnent avec la clé publique du site, connue du cœur.
-2. Une valeur de `WIKIMASTERS_SUPABASE_ANON_KEY` dans `.env` ou dans l'environnement remplace celle du cœur, avec la même priorité qu'aujourd'hui (le fichier l'emporte).
-3. Sans `.env`, `wikimasters login` crée le fichier et y enregistre la session.
-4. `.env.example`, le README et `CLAUDE.md` ne demandent plus de renseigner la clé et indiquent qu'elle peut être remplacée.
+1. Sans `.env` ni `WIKIMASTERS_SUPABASE_ANON_KEY` dans l'environnement, `wikimasters login` réussit avec la clé publique du site, connue du cœur, puis toute autre commande fonctionne.
+2. Une valeur non vide de `WIKIMASTERS_SUPABASE_ANON_KEY` dans `.env` ou dans l'environnement remplace celle du cœur, avec la même priorité qu'aujourd'hui (le fichier l'emporte). Une valeur vide revient à la clé du cœur.
+3. `.env.example`, le README et `CLAUDE.md` ne demandent plus de renseigner la clé et indiquent qu'elle peut être remplacée.
 
 ## Hors périmètre
 
