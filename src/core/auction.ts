@@ -5,6 +5,8 @@ import { parseUuid } from "./uuid.js";
 
 export type AuctionId = string & { readonly __brand: "AuctionId" };
 
+export type BidAmount = number & { readonly __brand: "BidAmount" };
+
 export interface PlacedBid {
   auctionId: AuctionId;
   amount: number;
@@ -44,6 +46,16 @@ interface BidResponse {
 
 export function parseAuctionId(raw: string): AuctionId {
   return parseUuid(raw, "auction") as AuctionId;
+}
+
+export function parseBidAmount(raw: string): BidAmount {
+  const amount = Number(raw);
+  if (!/^[1-9][0-9]*$/.test(raw) || !Number.isSafeInteger(amount)) {
+    throw new WikiMastersError(
+      `Invalid bid amount: ${raw} is not a strictly positive integer of wikibidous; nothing was bid`,
+    );
+  }
+  return amount as BidAmount;
 }
 
 export function minimumBid({
@@ -125,23 +137,11 @@ function isBidResponse(body: unknown): body is BidResponse {
   );
 }
 
-export async function placeMinimumBid(
+export async function placeBid(
   session: Session,
   auctionId: AuctionId,
+  amount: BidAmount,
 ): Promise<PlacedBid> {
-  const auction = await readAuction(session, auctionId);
-  if (auction.status !== "active" || Date.parse(auction.end_at) <= Date.now()) {
-    throw new WikiMastersError(
-      `Auction ${auctionId} is no longer running (status ${auction.status}, ends ${auction.end_at}); nothing was bid`,
-    );
-  }
-  if (auction.seller_id === session.userId) {
-    throw new WikiMastersError(
-      `Auction ${auctionId} is yours: you cannot bid on it; nothing was bid`,
-    );
-  }
-
-  const amount = minimumBid(auction);
   const action = "Placing the bid";
   const body = await siteRequest(
     session,

@@ -8,8 +8,9 @@ import {
   listWishlist,
   loginInBrowser,
   parseAuctionId,
+  parseBidAmount,
   parseCardId,
-  placeMinimumBid,
+  placeBid,
   removeFromWishlist,
   searchCards,
   showAuction,
@@ -62,12 +63,18 @@ const auction = program.command("auction").description("Take part in auctions");
 
 auction
   .command("bid")
-  .description("Place the minimum bid the game accepts on an auction")
+  .description(
+    "Bid an exact amount on an auction; the game accepts or refuses it and gives its reason",
+  )
   .argument("<auction-id>", "auction UUID")
-  .action(async (rawAuctionId: string) => {
+  .argument("<amount>", "wikibidous to bid, a strictly positive integer")
+  .action(async (rawAuctionId: string, rawAmount: string) => {
     const auctionId = parseAuctionId(rawAuctionId);
+    const amount = parseBidAmount(rawAmount);
     const session = await openSession();
-    console.log(formatBid(await placeMinimumBid(session, auctionId), format()));
+    console.log(
+      formatBid(await placeBid(session, auctionId, amount), format()),
+    );
   });
 
 auction

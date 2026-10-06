@@ -3,7 +3,8 @@ import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import {
   minimumBid,
   parseAuctionId,
-  placeMinimumBid,
+  parseBidAmount,
+  placeBid,
   showAuction,
 } from "./auction.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
@@ -95,127 +96,100 @@ describe("minimumBid", () => {
   });
 });
 
-describe("placeMinimumBid", () => {
-  it("bids the minimum on the auction and returns the new balance", async () => {
-    const { session, requests } = await sessionWith(
-      auctionSelect([auction()]),
-      acceptBid,
-    );
+describe("parseBidAmount", () => {
+  it("accepts a strictly positive integer", () => {
+    expect(parseBidAmount("30")).toBe(30);
+  });
 
-    await expect(placeMinimumBid(session, auctionId)).resolves.toEqual({
+  it.each([
+    "0",
+    "-5",
+    "2.5",
+    "1e3",
+    "030",
+    " 30",
+    "abc",
+    "",
+    "9007199254740993",
+  ])("refuses %j", (raw) => {
+    expect(() => parseBidAmount(raw)).toThrow(
+      /not a strictly positive integer/,
+    );
+  });
+});
+
+describe("placeBid", () => {
+  const amount = parseBidAmount("400");
+
+  it("bids the exact amount on the auction and returns the new balance", async () => {
+    const { session, requests } = await sessionWith(acceptBid);
+
+    await expect(placeBid(session, auctionId, amount)).resolves.toEqual({
       auctionId,
-      amount: 359,
+      amount: 400,
       balance: BALANCE_AFTER_BID,
     });
 
-    const select = requests.find(restRequest("GET", "auctions"));
-    expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
     const [bid] = bidRequests(requests);
-    expect(JSON.parse(bid?.body ?? "{}")).toEqual({ amount: 359 });
+    expect(JSON.parse(bid?.body ?? "{}")).toEqual({ amount: 400 });
     expect(bid?.headers.get("cookie")).toMatch(
       new RegExp(`^${AUTH_COOKIE_NAME}=base64-`),
     );
   });
 
+  it("sends the bid without reading the auction first", async () => {
+    const { session, requests } = await sessionWith(acceptBid);
+
+    await placeBid(session, auctionId, amount);
+
+    expect(requests.filter(restRequest("GET", "auctions"))).toHaveLength(0);
+  });
+
   it("reports the amount the site records", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction()]),
       bidRoute(() => ({
         status: 200,
-        body: { current_bid: 360, bidder_balance: BALANCE_AFTER_BID },
+        body: { current_bid: 401, bidder_balance: BALANCE_AFTER_BID },
       })),
     );
 
-    const { amount } = await placeMinimumBid(session, auctionId);
+    const { amount: recorded } = await placeBid(session, auctionId, amount);
 
-    expect(amount).toBe(360);
+    expect(recorded).toBe(401);
   });
 
-  it("bids the base amount when nobody has bid yet", async () => {
-    const { session, requests } = await sessionWith(
-      auctionSelect([auction({ current_bid: null })]),
-      acceptBid,
+  it("reports the minimum the game gives when the bid is too low", async () => {
+    const { session } = await sessionWith(
+      bidRoute(() => ({
+        status: 400,
+        body: { error: "Mise trop basse", code: "bid_too_low", min: 359 },
+      })),
     );
 
-    await placeMinimumBid(session, auctionId);
-
-    expect(JSON.parse(bidRequests(requests)[0]?.body ?? "{}")).toEqual({
-      amount: 200,
-    });
-  });
-
-  it.each([
-    ["settled", auction({ status: "settled_sold" })],
-    [
-      "past its end",
-      auction({ end_at: new Date(Date.now() - 1000).toISOString() }),
-    ],
-  ])("refuses an auction %s without bidding", async (_, row) => {
-    const { session, requests } = await sessionWith(
-      auctionSelect([row]),
-      acceptBid,
-    );
-
-    await expect(placeMinimumBid(session, auctionId)).rejects.toThrow(
-      /no longer running/,
-    );
-    expect(bidRequests(requests)).toHaveLength(0);
-  });
-
-  it("outbids the user's own lead", async () => {
-    const { session, requests } = await sessionWith(
-      auctionSelect([auction({ current_bidder_id: USER_ID })]),
-      acceptBid,
-    );
-
-    await placeMinimumBid(session, auctionId);
-
-    expect(JSON.parse(bidRequests(requests)[0]?.body ?? "{}")).toEqual({
-      amount: 359,
-    });
-  });
-
-  it("refuses to bid on the user's own auction", async () => {
-    const { session, requests } = await sessionWith(
-      auctionSelect([auction({ seller_id: USER_ID })]),
-      acceptBid,
-    );
-
-    await expect(placeMinimumBid(session, auctionId)).rejects.toThrow(
-      /is yours/,
-    );
-    expect(bidRequests(requests)).toHaveLength(0);
-  });
-
-  it("fails on an unknown auction", async () => {
-    const { session } = await sessionWith(auctionSelect([]), acceptBid);
-
-    await expect(placeMinimumBid(session, auctionId)).rejects.toThrow(
-      `Auction ${auctionId} not found`,
-    );
+    const failure = placeBid(session, auctionId, amount);
+    await expect(failure).rejects.toThrow(WikiMastersError);
+    await expect(failure).rejects.toThrow(/bid_too_low.*"min":359/);
   });
 
   it("reports the reason the site gives for refusing the bid", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction()]),
       bidRoute(() => ({
         status: 400,
         body: { error: "Solde insuffisant", code: "insufficient_balance" },
       })),
     );
 
-    const failure = placeMinimumBid(session, auctionId);
+    const failure = placeBid(session, auctionId, amount);
     await expect(failure).rejects.toThrow(WikiMastersError);
     await expect(failure).rejects.toThrow(/insufficient_balance/);
   });
 
   it("asks for a new login when the site rejects the session", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction()]),
       bidRoute(() => ({ status: 401, body: { error: "Unauthorized" } })),
     );
 
-    await expect(placeMinimumBid(session, auctionId)).rejects.toThrow(
+    await expect(placeBid(session, auctionId, amount)).rejects.toThrow(
       AuthRequiredError,
     );
   });

@@ -2,23 +2,22 @@
 
 ## Contexte
 
-Les enchères permettent d'acheter une carte précise avec des wikibidous. Le jeu impose à chaque mise un montant minimal, qui dépend de la mise précédente (voir `docs/game-rules.md`). Miser le minimum est la première brique pour déléguer ses mises à l'agent.
+Les enchères permettent d'acheter une carte précise avec des wikibidous. L'API expose une seule route de mise, qui prend un montant et juge seule si la mise est recevable : statut de l'enchère, vendeur, montant minimal (voir `docs/game-rules.md`). La commande est à son image.
 
 ## User story
 
-En tant que joueur, je donne l'identifiant d'une enchère et la commande y place la mise minimale fixée par le jeu.
+En tant que joueur, je donne l'identifiant d'une enchère et un montant, et la commande y place une mise de ce montant exact.
 
 ## Critères d'acceptation
 
-1. La commande prend en argument l'identifiant unique de l'enchère (UUID `auctions.id`).
-2. La commande place une mise égale au montant minimal que le jeu accepte pour cette enchère au moment de la mise.
-3. La commande affiche le montant misé et mon nouveau solde de wikibidous.
-4. La commande échoue sans rien miser, avec un message explicite, quand l'enchère n'est plus en cours ou quand j'en suis le vendeur.
-5. Quand le jeu refuse la mise (solde insuffisant, mise dépassée entre-temps, vérification humaine demandée), la commande échoue en affichant le motif donné par le jeu.
-6. La commande mise même quand je suis déjà le meilleur enchérisseur.
+1. La commande prend en arguments l'identifiant unique de l'enchère (UUID `auctions.id`) et un montant en wikibidous.
+2. Un montant qui n'est pas un entier strictement positif est refusé sans rien envoyer.
+3. La commande envoie une mise de ce montant exact, ni arrondi ni ajusté, sans vérifier au préalable le statut de l'enchère, son vendeur, son meilleur enchérisseur ni le montant minimal.
+4. La commande affiche le montant misé et mon nouveau solde de wikibidous.
+5. Quand le jeu refuse la mise (enchère terminée, mise trop basse, solde insuffisant, vérification humaine demandée), la commande échoue en affichant le motif donné par le jeu, et pour une mise trop basse le minimum qu'il accepte.
 
 ## Hors périmètre
 
-- Miser un montant choisi.
+- Calculer la mise minimale : `wikimasters auction show` la donne.
 - Lister ou rechercher les enchères pour obtenir leur identifiant.
 - Miser automatiquement à la place du joueur.

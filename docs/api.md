@@ -39,7 +39,7 @@ Source: read-only query.
 - The whole catalogue is readable, owned or not: more than 100,000 cards.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
 - `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first.
-- `placeMinimumBid` / `showAuction` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
+- `showAuction` embeds it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
 - `listRunningBids` embeds it the same way through `auction_bids` → `auctions`.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
@@ -125,7 +125,7 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 | `snapshot_rarity` | rarity of the auctioned copy |
 | `is_shiny` | whether the auctioned copy is shiny |
 
-- `placeMinimumBid` / `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`. `placeMinimumBid` checks the auction is running and not the user's own, and computes the minimum bid; `showAuction` reports it with the minimum bid.
+- `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`, reported with the minimum bid it computes.
 - `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
 
 ## `auction_bids`: the bids
@@ -146,9 +146,10 @@ Source: read-only queries, 2026-10-06.
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 
-Source: capture `place-bid.har`, and the auction page's JavaScript for the error codes.
+Source: capture `place-bid.har`, the auction page's JavaScript for the error codes, and refused bids on the account (2026-10-06).
 
 - Body `{"amount": <wikibidous>}`; response `{"auction_id", "current_bid": <amount>, "bidder_balance": <wikibidous left>}`.
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The page handles `bid_too_low` (with `min`, the minimum it accepts), `insufficient_balance` and `human_verification_required` (the page then shows a captcha).
+- Observed refusals: an ended auction gets HTTP 409 `{"error":"Cette enchère est terminée"}`, without `code`; a bid below the minimum gets HTTP 409 `{"error":"Mise trop basse (minimum 28 wikibidous)","code":"bid_too_low","min":28}`.
 - The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
-- `placeMinimumBid`: sends the minimum bid and reports `bidder_balance`.
+- `placeBid`: sends the amount given, without reading the auction first, reports `current_bid` and `bidder_balance`, and reports a refusal with its body.
