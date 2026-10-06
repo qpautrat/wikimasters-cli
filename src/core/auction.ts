@@ -52,7 +52,7 @@ export function parseBidAmount(raw: string): BidAmount {
   const amount = Number(raw);
   if (!/^[1-9][0-9]*$/.test(raw) || !Number.isSafeInteger(amount)) {
     throw new WikiMastersError(
-      `Invalid bid amount: ${raw} is not a strictly positive integer of wikibidous; nothing was bid`,
+      `Invalid bid amount: ${JSON.stringify(raw)} is not a strictly positive integer of wikibidous; nothing was bid`,
     );
   }
   return amount as BidAmount;

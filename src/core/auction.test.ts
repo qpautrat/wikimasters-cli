@@ -116,6 +116,10 @@ describe("parseBidAmount", () => {
       /not a strictly positive integer/,
     );
   });
+
+  it("quotes the refused value", () => {
+    expect(() => parseBidAmount(" 30")).toThrow('Invalid bid amount: " 30"');
+  });
 });
 
 describe("placeBid", () => {
