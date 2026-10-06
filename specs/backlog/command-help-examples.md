@@ -11,7 +11,7 @@ En tant que développeur qui découvre la CLI, l'aide d'une commande me montre c
 ## Critères d'acceptation
 
 1. `wikimasters <commande> --help` affiche, après les options, au moins un exemple d'appel complet de cette commande, pour chaque commande qui n'a pas de sous-commande.
-2. Chaque exemple utilise des valeurs à la forme valide (un UUID pour un identifiant, un entier pour un montant), et l'exemple d'une commande qui a des options en utilise au moins une.
+2. Chaque exemple utilise des valeurs à la forme valide (un UUID pour un identifiant, un entier pour un montant), et l'exemple d'une commande qui a ses propres options en utilise au moins une, l'option globale `--json` ne comptant pas.
 3. Les exemples écrivent l'appel sous la forme `wikimasters …`.
 4. Un test vérifie que chaque commande sans sous-commande a au moins un exemple dans son aide.
 
