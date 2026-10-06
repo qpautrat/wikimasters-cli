@@ -152,4 +152,4 @@ Source: capture `place-bid.har`, the auction page's JavaScript for the error cod
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The page handles `bid_too_low` (with `min`, the minimum it accepts), `insufficient_balance` and `human_verification_required` (the page then shows a captcha).
 - Observed refusals: an ended auction gets HTTP 409 `{"error":"Cette enchère est terminée"}`, without `code`; a bid below the minimum gets HTTP 409 `{"error":"Mise trop basse (minimum 28 wikibidous)","code":"bid_too_low","min":28}`.
 - The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
-- `placeBid`: sends the amount given, without reading the auction first, reports `current_bid` and `bidder_balance`, and reports a refusal with its body.
+- `placeBid`: sends the amount given, reports `current_bid` and `bidder_balance`, and reports a refusal with its body.
