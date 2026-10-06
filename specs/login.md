@@ -2,7 +2,7 @@
 
 ## Contexte
 
-La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. L'agent lance lui-même `wikimasters login` quand c'est nécessaire : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
+La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. Quand c'est nécessaire, l'agent se connecte comme le prévoit [Se connecter depuis un agent](login-agent.md) : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
 
 ## User stories
 

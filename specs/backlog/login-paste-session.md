@@ -10,7 +10,7 @@ Supabase révoque toute la session quand un refresh token déjà échangé est r
 
 Je garde la connexion par Firefox, transparente pour moi sur macOS, que mon agent lance selon mes règles.
 
-Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](login-agent.md).
+Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](../login-agent.md).
 
 ## User stories
 
@@ -40,5 +40,5 @@ Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](login-agen
 
 - Lancer Firefox ailleurs que sur macOS.
 - Lire les cookies d'un autre navigateur que Firefox.
-- La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](login-agent.md).
+- La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](../login-agent.md).
 - L'absence de `sqlite3` pour `--firefox`, traitée dans [Signaler l'absence de `sqlite3`](login-firefox-sqlite-missing.md).
