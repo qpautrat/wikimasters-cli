@@ -25,8 +25,9 @@ En tant que développeur qui vient de cloner le dépôt, je lis le README et j'e
 9. Une section décrit la connexion pas à pas et ce que la CLI fait de la session :
    - la CLI ne voit jamais l'email ni le mot de passe, la connexion se fait sur le site ;
    - la valeur collée est une session, dont le refresh token change à chaque commande et ne sert qu'une fois ;
-   - le refresh token n'est enregistré que dans `.env`, ignoré par git et lisible par son seul propriétaire, n'est jamais affiché et n'est envoyé qu'au Supabase du site ;
-   - pourquoi fermer la fenêtre privée sans se déconnecter, et ce que la déconnexion depuis le site fait à la session de la CLI ;
+   - le refresh token n'est enregistré que dans `.env`, ignoré par git, lisible par son seul propriétaire sur macOS et Linux, et n'est jamais affiché ;
+   - la session n'est envoyée qu'au site, à son Supabase et à ses routes `/api/...`, comme le fait le navigateur ;
+   - pourquoi fermer la fenêtre privée sans se déconnecter avant de coller, et ce que la déconnexion depuis le site fait à la session de la CLI ;
    - les fichiers du code qui lisent, enregistrent et envoient la session.
 10. Chaque exemple d'une commande en lecture seule, exécuté tel quel sur le compte, se comporte comme le README le décrit. Chaque exemple d'une commande qui modifie le compte suit la syntaxe que donne `--help` pour cette commande, et n'est pas exécuté pour vérifier le README.
 
