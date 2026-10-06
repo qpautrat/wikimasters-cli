@@ -137,7 +137,7 @@ describe("placeBid", () => {
     );
   });
 
-  it("sends the bid without reading the auction first", async () => {
+  it("leaves judging the bid to the game", async () => {
     const { session, requests } = await sessionWith(acceptBid);
 
     await placeBid(session, auctionId, amount);
@@ -161,14 +161,32 @@ describe("placeBid", () => {
   it("reports the minimum the game gives when the bid is too low", async () => {
     const { session } = await sessionWith(
       bidRoute(() => ({
-        status: 400,
-        body: { error: "Mise trop basse", code: "bid_too_low", min: 359 },
+        status: 409,
+        body: {
+          error: "Mise trop basse (minimum 359 wikibidous)",
+          code: "bid_too_low",
+          min: 359,
+        },
       })),
     );
 
     const failure = placeBid(session, auctionId, amount);
     await expect(failure).rejects.toThrow(WikiMastersError);
-    await expect(failure).rejects.toThrow(/bid_too_low.*"min":359/);
+    await expect(failure).rejects.toThrow(/"code":"bid_too_low"/);
+    await expect(failure).rejects.toThrow(/"min":359/);
+  });
+
+  it("reports the game's refusal of a bid on an ended auction", async () => {
+    const { session } = await sessionWith(
+      bidRoute(() => ({
+        status: 409,
+        body: { error: "Cette enchère est terminée" },
+      })),
+    );
+
+    const failure = placeBid(session, auctionId, amount);
+    await expect(failure).rejects.toThrow(WikiMastersError);
+    await expect(failure).rejects.toThrow(/Cette enchère est terminée/);
   });
 
   it("reports the reason the site gives for refusing the bid", async () => {
