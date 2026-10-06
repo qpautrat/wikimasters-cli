@@ -25,7 +25,7 @@ export interface Auction {
   minimumBid: number;
 }
 
-interface AuctionRow {
+export interface AuctionRow {
   status: string;
   end_at: string;
   seller_id: string;
@@ -56,6 +56,25 @@ export function minimumBid({
     : Math.max(Math.ceil(1.1 * current_bid), current_bid + 1);
 }
 
+export function auctionedTitle(
+  auctionId: string,
+  { cards }: Pick<AuctionRow, "cards">,
+): string {
+  if (!cards) {
+    throw new WikiMastersError(
+      `Auction ${auctionId} has no readable card details`,
+    );
+  }
+  return cards.wikipedia_title;
+}
+
+export function leads(
+  session: Session,
+  { current_bidder_id }: Pick<AuctionRow, "current_bidder_id">,
+): boolean {
+  return current_bidder_id === session.userId;
+}
+
 async function readAuction(
   session: Session,
   auctionId: AuctionId,
@@ -80,21 +99,16 @@ export async function showAuction(
   auctionId: AuctionId,
 ): Promise<Auction> {
   const auction = await readAuction(session, auctionId);
-  if (!auction.cards) {
-    throw new WikiMastersError(
-      `Auction ${auctionId} has no readable card details`,
-    );
-  }
   return {
     auctionId,
-    title: auction.cards.wikipedia_title,
+    title: auctionedTitle(auctionId, auction),
     rarity: auction.snapshot_rarity,
     shiny: auction.is_shiny,
     status: auction.status,
     endsAt: auction.end_at,
     startingPrice: auction.base_amount,
     currentBid: auction.current_bid,
-    leading: auction.current_bidder_id === session.userId,
+    leading: leads(session, auction),
     selling: auction.seller_id === session.userId,
     minimumBid: minimumBid(auction),
   };

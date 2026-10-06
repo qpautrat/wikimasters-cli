@@ -148,6 +148,12 @@ export function formatBid(
   return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
 }
 
+function currentBidState(currentBid: number | null, leading: boolean): string {
+  return currentBid === null
+    ? "no bid yet"
+    : `current bid ${wikibidous(currentBid)} by ${leading ? "you" : "another player"}`;
+}
+
 export function formatRunningBids(
   auctions: readonly BidAuction[],
   format: Format,
@@ -161,7 +167,7 @@ export function formatRunningBids(
   return auctions
     .map(
       ({ auctionId, title, myHighestBid, currentBid, leading, endsAt }) =>
-        `${auctionId}  ${title}: your bid ${wikibidous(myHighestBid)}, current bid ${wikibidous(currentBid)} by ${leading ? "you" : "another player"}, ends ${endsAt}`,
+        `${auctionId}  ${title}: your bid ${wikibidous(myHighestBid)}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
     )
     .join("\n");
 }
@@ -187,11 +193,7 @@ export function formatAuction(auction: Auction, format: Format): string {
   return [
     `Auction ${auctionId}: ${title} (${rarity})${shiny ? " [shiny]" : ""}`,
     `Status ${status}, ends ${endsAt}`,
-    `Starting price ${wikibidous(startingPrice)}; ${
-      currentBid === null
-        ? "no bid yet"
-        : `current bid ${wikibidous(currentBid)} by ${leading ? "you" : "another player"}`
-    }`,
+    `Starting price ${wikibidous(startingPrice)}; ${currentBidState(currentBid, leading)}`,
     `Minimum bid ${wikibidous(minimumBid)}`,
     `Sold by ${selling ? "you" : "another player"}`,
   ].join("\n");

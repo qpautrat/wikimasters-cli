@@ -59,6 +59,7 @@ describe("listRunningBids", () => {
       "auction_id,amount,auctions!inner(end_at,current_bid,current_bidder_id,cards(wikipedia_title))",
     );
     expect(params?.get("bidder_id")).toBe(`eq.${USER_ID}`);
+    expect(params?.get("order")).toBe("placed_at.asc,id.asc");
     expect(params?.get("auctions.status")).toBe("eq.active");
     const endsAfter = params?.get("auctions.end_at") ?? "";
     expect(endsAfter).toMatch(/^gt\./);

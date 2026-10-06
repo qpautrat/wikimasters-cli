@@ -142,7 +142,7 @@ Source: read-only queries, 2026-10-06.
 
 - Row-level security returns only the user's own bids: none of another bidder's, even on an auction they lead.
 - One row per bid: an auction the user bid on several times appears several times.
-- `listRunningBids`: `GET` of `auction_id, amount` and the `auctions` embed above, filtered on `bidder_id`, ordered by `id`, paged by 1000; it keeps the highest `amount` per auction and sorts by `end_at`.
+- `listRunningBids`: `GET` of `auction_id, amount` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, paged by 1000; it keeps the highest `amount` per auction and sorts by `end_at`.
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 
