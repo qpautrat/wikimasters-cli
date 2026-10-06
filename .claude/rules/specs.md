@@ -28,6 +28,7 @@ A command exposes an API call and nothing more. A command takes every parameter 
 
 - Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first.
 - Change an implemented spec in `specs/` only in the commit that makes the code meet it. A change planned for later goes into a correction spec in `specs/backlog/`, whose implementation amends or removes the implemented spec in the same commit.
+- Propose the design with the fewest new components, manual user steps included, and keep every existing behaviour unless the user asks to drop it.
 - Work in small batches: one atomic spec, implemented and delivered, before the next. Atomicity is mandatory, submission is not.
 - When confident in a spec, commit it and implement it without waiting, then name each decision taken on the user's behalf in the end-of-increment summary. Submit it first when confidence is low, all the more for a functional spec.
 
