@@ -35,7 +35,7 @@ Tests sit next to the code as `*.test.ts` and never hit the network: they pass a
 
 Before committing a command, run it on the account against data in the state its spec targets, read just before the run (e.g. an auction with `status=eq.active` and `end_at` a few minutes ahead), and check its output against each acceptance criterion.
 
-Update `README.md` in the commit that adds, changes or removes a command, or changes the installation.
+Update `README.md` in the commit that changes anything it describes: a command, a global option, an exit code, the sign-in, a file it names or the installation.
 
 Dev tools such as `api:get` and `api:site` live in `tools/`, outside `src/`, and never reach `dist/`. They import the core and `src/cli/session.ts`. The npm script running a tool first compiles it with `tsconfig.tools.json`, along with the code it imports, into the gitignored `dist-tools/`.
 
