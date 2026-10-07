@@ -6,7 +6,7 @@ Report only what the user needs: blockers, questions, and decisions taken on the
 
 ## Code review
 
-Run `/code-review` on the increment's commits, `medium` for a batch of fixes, `high` for a feature or new tooling, and fix its valid findings within the same increment, with no new review after. A finding that the increment's change leaves stale in another file (README, skill, spec) is fixed in the increment, amending that file's spec in the same commit; only a finding the spec puts out of scope is left unfixed. Report a finding left unfixed in one line of the summary.
+Run `/code-review low` on the increment's commits and fix its valid findings within the same increment, with no new review after. A finding that the increment's change leaves stale in another file (README, skill, spec) is fixed in the increment, amending that file's spec in the same commit; only a finding the spec puts out of scope is left unfixed. Report a finding left unfixed in one line of the summary.
 
 ## Continuous improvement
 
