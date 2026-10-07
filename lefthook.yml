@@ -15,6 +15,8 @@ pre-commit:
       run: echo "HAR captures hold account data and stay local" >&2; exit 1
     - name: scan staged changes for secrets
       run: betterleaks git --staged --no-banner .
+    - name: audit production dependencies
+      run: scripts/audit-staged.sh
     - name: verify staged content
       exclude:
         - "specs/**"

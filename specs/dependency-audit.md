@@ -4,7 +4,7 @@
 
 Le hook de pre-commit installe les dépendances indexées avec `npm ci --no-audit` : aucune vérification ne porte sur leurs vulnérabilités connues. Une vulnérabilité ne se voit que dans la sortie de `npm ci` lors d'un `mise install`, où personne ne la relève. Le 2026-10-07, un test sur clone neuf a affiché « 1 high severity vulnerability », dans `source-map-js`, une dépendance de développement.
 
-Dépend de : [Vérifications avant chaque commit](../commit-checks.md).
+Dépend de : [Vérifications avant chaque commit](commit-checks.md).
 
 ## User story
 
