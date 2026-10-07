@@ -30,6 +30,7 @@ En tant que développeur qui vient de cloner le dépôt, je lis le README et j'e
    - pourquoi fermer la fenêtre privée sans se déconnecter avant de coller, et ce que la déconnexion depuis le site fait à la session de la CLI ;
    - les fichiers du code qui lisent, enregistrent et envoient la session.
 10. Chaque exemple d'une commande en lecture seule, exécuté tel quel sur le compte, se comporte comme le README le décrit. Chaque exemple d'une commande qui modifie le compte suit la syntaxe que donne `--help` pour cette commande, et n'est pas exécuté pour vérifier le README.
+11. Chaque commande que donne le README s'exécute depuis la racine du dépôt sans que mise soit activé dans le shell.
 
 ## Hors périmètre
 
