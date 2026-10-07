@@ -39,3 +39,5 @@ Sections, in order: `Contexte`, `User story` (or `User stories`), `Critères d'a
 ## Backlog
 
 Specs in `specs/backlog/` are accepted but not scheduled. Do not implement them until the user schedules one, which moves it up to `specs/`.
+
+Record an order the user sets between backlog specs as a numbered list in `specs/backlog/README.md`, drop a spec from it when it moves up to `specs/`, and present the backlog listing in that order.
