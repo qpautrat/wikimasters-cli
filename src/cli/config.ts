@@ -2,11 +2,7 @@ import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
-import {
-  AuthRequiredError,
-  SUPABASE_ANON_KEY,
-  WikiMastersError,
-} from "../core/index.js";
+import { AuthRequiredError, WikiMastersError } from "../core/index.js";
 
 function packageRoot(): string {
   let dir = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +26,7 @@ const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";
 type Env = Record<string, string | undefined>;
 
 export interface Config {
-  anonKey: string;
+  anonKey: string | undefined;
   refreshToken: string | undefined;
 }
 
@@ -44,7 +40,7 @@ export function loadConfig(
   const read = (name: string) => fileEnv[name] || env[name] || undefined;
 
   return {
-    anonKey: read(ANON_KEY) ?? SUPABASE_ANON_KEY,
+    anonKey: read(ANON_KEY),
     refreshToken: read(REFRESH_TOKEN),
   };
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
+import { SUPABASE_ANON_KEY } from "./supabase.js";
 import {
   ROTATED_REFRESH_TOKEN,
   USER_ID,
@@ -26,6 +27,14 @@ describe("resumeSession", () => {
       refresh_token: "stored-token",
     });
     expect(request?.headers.get("apikey")).toBe("anon-key");
+  });
+
+  it("sends the site's public key when given none", async () => {
+    const { fetch, requests } = fakeFetch(tokenRefresh);
+
+    await resumeSession({ refreshToken: "stored-token", fetch });
+
+    expect(requests[0]?.headers.get("apikey")).toBe(SUPABASE_ANON_KEY);
   });
 
   it("requires a new login when the refresh token is revoked", async () => {

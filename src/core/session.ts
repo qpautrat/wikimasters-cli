@@ -9,7 +9,7 @@ import {
   WikiMastersError,
   apiUnavailable,
 } from "./errors.js";
-import { SUPABASE_URL } from "./supabase.js";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./supabase.js";
 import {
   RETRY_DELAYS_MS,
   fetchRetrying,
@@ -20,7 +20,7 @@ const SESSION_REJECTED_STATUSES = new Set([400, 401, 403]);
 const AUTH_PATH = "/auth/v1/";
 
 export interface ResumeSessionOptions {
-  anonKey: string;
+  anonKey?: string | undefined;
   refreshToken: string;
   fetch?: typeof fetch;
   retryDelaysMs?: readonly number[];
@@ -39,7 +39,7 @@ function requestUrl(input: string | URL | Request): URL {
 }
 
 export async function resumeSession({
-  anonKey,
+  anonKey = SUPABASE_ANON_KEY,
   refreshToken,
   fetch = globalThis.fetch,
   retryDelaysMs = RETRY_DELAYS_MS,

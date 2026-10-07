@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { AuthRequiredError, SUPABASE_ANON_KEY } from "../core/index.js";
+import { AuthRequiredError } from "../core/index.js";
 import { loadConfig, requireRefreshToken, saveRefreshToken } from "./config.js";
 
 function envFile(content?: string): string {
@@ -40,19 +40,22 @@ describe("loadConfig", () => {
     ).toBe("anon-key");
   });
 
-  it("uses the core's anon key without .env or environment variable", () => {
+  it("leaves the anon key to the core without .env or environment variable", () => {
     expect(loadConfig(envFile(), {})).toEqual({
-      anonKey: SUPABASE_ANON_KEY,
+      anonKey: undefined,
       refreshToken: undefined,
     });
   });
 
-  it("uses the core's anon key when the set value is empty", () => {
+  it("ignores an empty anon key", () => {
     const path = envFile("WIKIMASTERS_SUPABASE_ANON_KEY=\n");
 
     expect(
       loadConfig(path, { WIKIMASTERS_SUPABASE_ANON_KEY: "" }).anonKey,
-    ).toBe(SUPABASE_ANON_KEY);
+    ).toBeUndefined();
+    expect(
+      loadConfig(path, { WIKIMASTERS_SUPABASE_ANON_KEY: "env-key" }).anonKey,
+    ).toBe("env-key");
   });
 
   it("asks to log in when no refresh token is stored", () => {
