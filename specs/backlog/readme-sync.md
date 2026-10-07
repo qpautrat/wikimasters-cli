@@ -4,7 +4,7 @@
 
 Le README présente chaque commande et l'installation. Sans règle, une commande ajoutée, modifiée ou retirée le rend faux sans que rien ne le signale.
 
-Dépend de : [Présenter le dépôt dans un README](readme.md).
+Dépend de : [Présenter le dépôt dans un README](../readme.md).
 
 ## User story
 

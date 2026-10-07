@@ -6,7 +6,7 @@ Le dépôt GitHub est public et je veux le faire tester par des développeurs au
 
 La connexion demande de coller dans la CLI la session de son navigateur : le développeur doit comprendre ce qu'il confie à la CLI pour lui faire confiance.
 
-Dépend de : [Se connecter en collant la session](../login-paste-session.md).
+Dépend de : [Se connecter en collant la session](login-paste-session.md).
 
 ## User story
 

@@ -4,7 +4,7 @@
 
 Avant sa première commande, l'utilisateur doit trouver la clé publique Supabase du site (`WIKIMASTERS_SUPABASE_ANON_KEY`) dans son JavaScript et la copier dans `.env`. Cette clé est la même pour tous les joueurs et le site la publie : la demander à chacun ralentit la prise en main sans rien protéger.
 
-Dépend de : [Présenter le dépôt dans un README](readme.md).
+Dépend de : [Présenter le dépôt dans un README](../readme.md).
 
 ## User story
 
