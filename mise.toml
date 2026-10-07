@@ -5,3 +5,10 @@ node = { version = "24.21.0", postinstall = { run = "npm ci && npm run build", w
 "github:betterleaks/betterleaks" = "1.9.0"
 jq = "1.8.2"
 lefthook = { version = "2.1.16", postinstall = { run = "lefthook install", when = "always" } }
+
+[tasks.wikimasters]
+description = "Run the wikimasters CLI"
+run = "node dist/cli/main.js"
+raw = true
+quiet = true
+raw_args = true

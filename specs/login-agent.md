@@ -15,6 +15,6 @@ En tant que joueur qui passe par un agent, quand une commande demande de me reco
 ## Critères d'acceptation
 
 1. Sur le code 4, quand les règles du joueur indiquent une méthode de connexion, le skill la suit, puis relance une fois la commande d'origine.
-2. Sinon, le skill ne lance pas `wikimasters login` : il demande au joueur de lancer dans un terminal `mise -C <racine du dépôt> exec -- npm run -s wikimasters -- login`, avec le chemin absolu de la racine, qui fonctionne depuis n'importe quel dossier, même quand le shell du joueur n'active pas mise, puis relance une fois la commande d'origine quand le joueur indique s'être connecté.
+2. Sinon, le skill ne lance pas `wikimasters login` : il demande au joueur de lancer dans un terminal `mise -C <racine du dépôt> run wikimasters login`, avec le chemin absolu de la racine, qui fonctionne depuis n'importe quel dossier, même quand le shell du joueur n'active pas mise, puis relance une fois la commande d'origine quand le joueur indique s'être connecté.
 3. Le skill ne demande jamais au joueur de lui transmettre la session ou son cookie dans la conversation.
 4. Le commit qui implémente cette spec met à jour `specs/login.md`, dont le contexte dit que l'agent lance lui-même `wikimasters login`, et `CLAUDE.md`, pour que `CLAUDE.local.md` puisse aussi indiquer la méthode de connexion du joueur.
