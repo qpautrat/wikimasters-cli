@@ -2,7 +2,7 @@
   "permissions": {
     "deny": [
       "Bash(npx prettier *)",
-      "Bash(mise exec -- npx prettier *)"
+      "Bash(mise * npx prettier *)"
     ]
   },
   "hooks": {
@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(mise -C \"$CLAUDE_PROJECT_DIR\" exec -- jq -r '.tool_response.filePath // .tool_input.file_path'); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/src/*.ts|\"$CLAUDE_PROJECT_DIR\"/tools/*.ts) mise -C \"$CLAUDE_PROJECT_DIR\" exec -- npx biome format --write \"$f\" >/dev/null 2>&1 || true ;; esac",
+            "command": "mise -C \"$CLAUDE_PROJECT_DIR\" exec -- sh -c 'f=$(jq -r \".tool_response.filePath // .tool_input.file_path\"); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/src/*.ts|\"$CLAUDE_PROJECT_DIR\"/tools/*.ts) npx biome format --write \"$f\" ;; esac' >/dev/null 2>&1 || true",
             "statusMessage": "Formatting with Biome"
           }
         ]
