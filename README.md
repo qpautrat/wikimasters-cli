@@ -31,6 +31,8 @@
    npm run -s wikimasters -- wishlist list
    ```
 
+After a `git pull` or a change to `src/`, rebuild the CLI with `npm run build`.
+
 The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SUPABASE_ANON_KEY` in `.env` at the repository root or in the environment; `.env` wins, and an empty value is ignored.
 
 ## Commands
