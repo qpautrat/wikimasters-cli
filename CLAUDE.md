@@ -12,11 +12,11 @@ That front-end is a Next.js app whose data layer is Supabase: the browser calls 
 
 TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and PostgREST, `commander` for the CLI, Vitest for tests.
 
-`mise.toml` pins the exact Node version used to develop and the tools git calls (lefthook, `betterleaks`, `jq`); `package.json` `engines` keeps the minimum Node supported at runtime. Tools called by npm scripts stay devDependencies, locked by `package-lock.json`. `mise install` installs the pinned tools, then runs `npm ci` and `lefthook install`.
+`mise.toml` pins the exact Node version used to develop and the tools git calls (lefthook, `betterleaks`, `jq`); `package.json` `engines` keeps the minimum Node supported at runtime. Tools called by npm scripts stay devDependencies, locked by `package-lock.json`. `mise install` installs the pinned tools, then runs `npm ci`, builds `dist/` and runs `lefthook install`.
 
 | Task | Command |
 |---|---|
-| Install tools, dependencies and the git hook | `mise install` |
+| Install tools, dependencies and the git hook, and build to `dist/` | `mise install` |
 | Build to `dist/` | `npm run build` |
 | Typecheck | `npm run typecheck` |
 | Lint `src/` and `tools/` / apply safe fixes | `npm run lint` / `npm run lint:fix` |

@@ -10,7 +10,7 @@
 
 ## Getting started
 
-1. Clone the repository and install the tools and dependencies:
+1. Clone the repository, install the tools and dependencies, and build the CLI:
 
    ```sh
    git clone https://github.com/qpautrat/wikimasters-cli.git
@@ -19,19 +19,13 @@
    mise install
    ```
 
-2. Build the CLI:
-
-   ```sh
-   npm run build
-   ```
-
-3. Sign in, as described in [Signing in](#signing-in):
+2. Sign in, as described in [Signing in](#signing-in):
 
    ```sh
    npm run -s wikimasters -- login
    ```
 
-4. Run a first read-only command:
+3. Run a first read-only command:
 
    ```sh
    npm run -s wikimasters -- wishlist list
