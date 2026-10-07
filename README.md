@@ -6,7 +6,7 @@
 
 - [mise](https://mise.jdx.dev), which installs the pinned Node version and the git hook tools.
 - A browser, to sign in to the site.
-- For `wikimasters login --firefox` only: Firefox installed in `/Applications` on macOS, and the `sqlite3` CLI.
+- For `login --firefox` only: Firefox installed in `/Applications` on macOS, and the `sqlite3` CLI.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SU
 
 ## Commands
 
-Run every command from the repository root as `mise exec -- npm run -s wikimasters -- <command>`, which uses the Node version `mise.toml` pins even when mise is not activated in your shell. `mise exec -- npm run -s wikimasters -- <command> --help` gives its arguments and options.
+Run every command from the repository root as `mise exec -- npm run -s wikimasters -- <command>`. `mise exec -- npm run -s wikimasters -- <command> --help` gives its arguments and options.
 
 | Command | What it does | Example |
 |---|---|---|
