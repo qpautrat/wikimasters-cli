@@ -18,6 +18,7 @@ import {
 
 const SESSION_REJECTED_STATUSES = new Set([400, 401, 403]);
 const AUTH_PATH = "/auth/v1/";
+const INVALID_API_KEY = "Invalid API key";
 
 export interface ResumeSessionOptions {
   anonKey?: string | undefined;
@@ -65,6 +66,11 @@ export async function resumeSession({
   if (error) {
     if (isAuthRetryableFetchError(error) && isTransientStatus(error.status)) {
       throw apiUnavailable(error.status);
+    }
+    if (isAuthApiError(error) && error.message === INVALID_API_KEY) {
+      throw new WikiMastersError(
+        `Supabase rejected the site's public key (${error.message}); the site may have changed it`,
+      );
     }
     throw isAuthApiError(error) && SESSION_REJECTED_STATUSES.has(error.status)
       ? new AuthRequiredError(

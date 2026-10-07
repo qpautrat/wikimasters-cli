@@ -37,6 +37,25 @@ describe("resumeSession", () => {
     expect(requests[0]?.headers.get("apikey")).toBe(SUPABASE_ANON_KEY);
   });
 
+  it("blames the public key, not the session, when Supabase rejects the key", async () => {
+    const { fetch } = fakeFetch(() => ({
+      status: 401,
+      body: {
+        message: "Invalid API key",
+        hint: "Double check your Supabase `anon` or `service_role` API key.",
+      },
+    }));
+
+    const failure = resumeSession({
+      anonKey: "stale-key",
+      refreshToken: "stored-token",
+      fetch,
+    });
+
+    await expect(failure).rejects.toThrow(/public key/);
+    await expect(failure).rejects.not.toThrow(AuthRequiredError);
+  });
+
   it("requires a new login when the refresh token is revoked", async () => {
     const { fetch } = fakeFetch(() => ({
       status: 400,
