@@ -41,4 +41,4 @@ Dépend de : [Connexion](login.md), [Se connecter depuis un agent](login-agent.m
 - Lancer Firefox ailleurs que sur macOS.
 - Lire les cookies d'un autre navigateur que Firefox.
 - La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](login-agent.md).
-- L'absence de `sqlite3` pour `--firefox`, traitée dans [Signaler l'absence de `sqlite3`](backlog/login-firefox-sqlite-missing.md).
+- L'absence de `sqlite3` pour `--firefox`, traitée dans [Lire les cookies Firefox sans `sqlite3`](backlog/login-firefox-node-sqlite.md).
