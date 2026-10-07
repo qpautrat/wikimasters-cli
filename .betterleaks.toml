@@ -1,0 +1,6 @@
+filter = '''
+finding["rule_id"] == "jwt" && get(attributes, "path", "") == "src/core/supabase.ts"
+'''
+
+[extend]
+useDefault = true
