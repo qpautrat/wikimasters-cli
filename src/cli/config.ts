@@ -2,7 +2,11 @@ import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
-import { AuthRequiredError, WikiMastersError } from "../core/index.js";
+import {
+  AuthRequiredError,
+  SUPABASE_ANON_KEY,
+  WikiMastersError,
+} from "../core/index.js";
 
 function packageRoot(): string {
   let dir = dirname(fileURLToPath(import.meta.url));
@@ -39,11 +43,10 @@ export function loadConfig(
     : {};
   const read = (name: string) => fileEnv[name] || env[name] || undefined;
 
-  const anonKey = read(ANON_KEY);
-  if (!anonKey) {
-    throw new WikiMastersError(`Missing ${ANON_KEY}: set it in ${envFile}`);
-  }
-  return { anonKey, refreshToken: read(REFRESH_TOKEN) };
+  return {
+    anonKey: read(ANON_KEY) ?? SUPABASE_ANON_KEY,
+    refreshToken: read(REFRESH_TOKEN),
+  };
 }
 
 export function requireRefreshToken(config: Config): string {

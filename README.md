@@ -25,25 +25,19 @@
    npm run build
    ```
 
-3. Create `.env` and set the site's public Supabase key in it:
-
-   ```sh
-   cp .env.example .env
-   ```
-
-   Open the site with the browser's developer tools, Network tab, and copy the `apikey` header of any request to `cyrxjeppjqsxxjayfrur.supabase.co` into `WIKIMASTERS_SUPABASE_ANON_KEY=`.
-
-4. Sign in, as described in [Signing in](#signing-in):
+3. Sign in, as described in [Signing in](#signing-in):
 
    ```sh
    npm run -s wikimasters -- login
    ```
 
-5. Run a first read-only command:
+4. Run a first read-only command:
 
    ```sh
    npm run -s wikimasters -- wishlist list
    ```
+
+The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SUPABASE_ANON_KEY` in `.env` at the repository root or in the environment; `.env` wins, and an empty value keeps the CLI's key.
 
 ## Commands
 

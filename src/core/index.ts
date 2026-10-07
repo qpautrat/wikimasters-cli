@@ -1,4 +1,4 @@
-export { SITE_URL } from "./supabase.js";
+export { SITE_URL, SUPABASE_ANON_KEY } from "./supabase.js";
 export { listRunningBids, type BidAuction } from "./auction-bids.js";
 export {
   parseAuctionId,
