@@ -8,14 +8,15 @@ Dépend de : [Vérifications avant chaque commit](commit-checks.md).
 
 ## User story
 
-En tant que développeur, un commit dont les dépendances de production indexées ont une vulnérabilité connue est refusé avant d'être créé.
+En tant que développeur, un commit qui modifie les dépendances et dont les dépendances de production indexées ont une vulnérabilité connue est refusé avant d'être créé.
 
 ## Critères d'acceptation
 
-1. Le hook de pre-commit lance `npm audit` sur les dépendances de production du `package-lock.json` indexé et refuse le commit si une vulnérabilité est signalée, quelle que soit sa sévérité.
-2. Le refus nomme chaque paquet vulnérable et la sévérité de sa vulnérabilité.
-3. Si le registre npm est injoignable, le hook laisse passer le commit et affiche un avertissement qui le dit.
-4. La vérification est documentée dans `CLAUDE.md`, avec les autres vérifications du hook.
+1. Quand le commit modifie `package.json` ou `package-lock.json`, le hook de pre-commit lance `npm audit` sur les dépendances de production du `package-lock.json` indexé et refuse le commit si une vulnérabilité est signalée, quelle que soit sa sévérité.
+2. Un commit qui ne modifie ni `package.json` ni `package-lock.json` n'est pas audité.
+3. Le refus nomme chaque paquet vulnérable et la sévérité de sa vulnérabilité.
+4. Si le registre npm est injoignable, le hook laisse passer le commit et affiche un avertissement qui le dit.
+5. La vérification est documentée dans `CLAUDE.md`, avec les autres vérifications du hook.
 
 ## Hors périmètre
 

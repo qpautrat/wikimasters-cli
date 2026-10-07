@@ -16,6 +16,9 @@ pre-commit:
     - name: scan staged changes for secrets
       run: betterleaks git --staged --no-banner .
     - name: audit production dependencies
+      glob:
+        - "package.json"
+        - "package-lock.json"
       run: scripts/audit-staged.sh
     - name: verify staged content
       exclude:
