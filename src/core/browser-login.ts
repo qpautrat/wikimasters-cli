@@ -1,4 +1,4 @@
-import { execFile, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
@@ -8,8 +8,8 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { setTimeout as sleep } from "node:timers/promises";
-import { promisify } from "node:util";
 import {
   AUTH_COOKIE_NAME,
   refreshTokenFromAuthCookies,
@@ -30,17 +30,15 @@ const PROFILE_PREFS = [
   'user_pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);',
 ];
 
-const execFileAsync = promisify(execFile);
-
 export interface BrowserLoginOptions {
   firefoxBinary?: string;
   timeoutMs?: number;
   pollIntervalMs?: number;
 }
 
-export async function readRefreshTokenFromFirefoxProfile(
+export function readRefreshTokenFromFirefoxProfile(
   profileDir: string,
-): Promise<string | undefined> {
+): string | undefined {
   const database = join(profileDir, COOKIES_DB);
   if (!existsSync(database)) return undefined;
 
@@ -50,14 +48,21 @@ export async function readRefreshTokenFromFirefoxProfile(
       if (existsSync(database + suffix))
         copyFileSync(database + suffix, join(snapshot, COOKIES_DB + suffix));
     }
-    const query = `SELECT name, value FROM moz_cookies WHERE host LIKE '%wiki-masters.com' AND name LIKE '${AUTH_COOKIE_NAME}%'`;
-    const { stdout } = await execFileAsync("sqlite3", [
-      "-json",
-      join(snapshot, COOKIES_DB),
-      query,
-    ]);
-    const cookies: Cookie[] = stdout.trim() ? JSON.parse(stdout) : [];
-    return refreshTokenFromAuthCookies(cookies);
+    const db = new DatabaseSync(join(snapshot, COOKIES_DB));
+    try {
+      const cookies: Cookie[] = db
+        .prepare(
+          "SELECT name, value FROM moz_cookies WHERE host LIKE '%wiki-masters.com' AND name LIKE ? || '%'",
+        )
+        .all(AUTH_COOKIE_NAME)
+        .map(({ name, value }) => ({
+          name: String(name),
+          value: String(value),
+        }));
+      return refreshTokenFromAuthCookies(cookies);
+    } finally {
+      db.close();
+    }
   } catch {
     return undefined;
   } finally {
@@ -105,7 +110,7 @@ export async function loginInBrowser({
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
       const closed = exited;
-      const refreshToken = await readRefreshTokenFromFirefoxProfile(profileDir);
+      const refreshToken = readRefreshTokenFromFirefoxProfile(profileDir);
       if (refreshToken) return refreshToken;
       if (closed)
         throw new WikiMastersError("Firefox was closed before signing in");

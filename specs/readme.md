@@ -15,7 +15,7 @@ En tant que développeur qui vient de cloner le dépôt, je lis le README et j'e
 ## Critères d'acceptation
 
 1. Un `README.md` à la racine du dépôt, en anglais comme `docs/`, dit en une phrase ce que fait la CLI et précise que le site n'a pas d'API publique.
-2. Il liste les prérequis de l'utilisateur : mise et un navigateur, plus Firefox sur macOS et `sqlite3` pour `wikimasters login --firefox`.
+2. Il liste les prérequis de l'utilisateur : mise et un navigateur, plus Firefox sur macOS pour `wikimasters login --firefox`.
 3. Il donne, dans l'ordre, chaque étape qui mène d'un clone à une première commande sur le compte, configuration comprise : installation, construction, `login`, puis une commande en lecture seule.
 4. Il présente chaque commande de la CLI dans un tableau, avec ce qu'elle fait et un exemple d'appel.
 5. Il explique les codes de sortie 0, 1, 4 et 75, et l'option `--json`.

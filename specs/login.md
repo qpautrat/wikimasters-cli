@@ -2,7 +2,7 @@
 
 ## Contexte
 
-La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. Quand c'est nécessaire, l'agent se connecte comme le prévoit [Se connecter depuis un agent](login-agent.md) : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
+La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. `wikimasters login --firefox` lit la session dans les cookies du profil avec `node:sqlite`, que Node charge sans option depuis la version 22.13.0. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. Quand c'est nécessaire, l'agent se connecte comme le prévoit [Se connecter depuis un agent](login-agent.md) : il doit donc savoir, à la sortie d'une commande, si une reconnexion est requise.
 
 ## User stories
 
@@ -30,3 +30,8 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
    - l'API rejette la session (HTTP 401).
 6. Dans ces cas, le message d'erreur indique de lancer `wikimasters login`.
 7. Les autres erreurs (réseau, indisponibilité de l'API, argument invalide…) sortent avec le code 1.
+
+### Prérequis de `--firefox`
+
+8. Sans `sqlite3` dans le `PATH`, `wikimasters login --firefox` se connecte et enregistre la session, et les tests passent.
+9. `engines` dans `package.json` exige Node 22.13.0 au minimum.

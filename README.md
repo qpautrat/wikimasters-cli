@@ -6,7 +6,7 @@
 
 - [mise](https://mise.jdx.dev), which installs the pinned Node version and the git hook tools.
 - A browser, to sign in to the site.
-- For `login --firefox` only: Firefox installed in `/Applications` on macOS, and the `sqlite3` CLI.
+- For `login --firefox` only: Firefox installed in `/Applications` on macOS.
 
 ## Getting started
 
