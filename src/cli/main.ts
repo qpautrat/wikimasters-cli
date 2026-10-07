@@ -36,6 +36,7 @@ import {
   formatWishlist,
   type Format,
 } from "./output.js";
+import { readPastedRefreshToken } from "./pasted-session.js";
 import { openSession, reportFailure } from "./session.js";
 
 const program = new Command("wikimasters")
@@ -47,15 +48,27 @@ function format(): Format {
   return program.opts<{ json?: boolean }>().json ? "json" : "text";
 }
 
+function loginInFirefox(): Promise<string> {
+  console.error(
+    "Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…",
+  );
+  return loginInBrowser();
+}
+
 program
   .command("login")
-  .description("Sign in through a browser window and store the session in .env")
-  .action(async () => {
+  .description(
+    "Sign in by pasting the session of your browser and store it in .env",
+  )
+  .option(
+    "--firefox",
+    "sign in through a Firefox window the command opens instead, on macOS",
+  )
+  .action(async ({ firefox }: { firefox?: boolean }) => {
     loadConfig();
-    console.error(
-      "Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…",
+    const session = await openSession(
+      firefox ? await loginInFirefox() : await readPastedRefreshToken(),
     );
-    const session = await openSession(await loginInBrowser());
     console.log(formatLogin(session.userId, format()));
   });
 

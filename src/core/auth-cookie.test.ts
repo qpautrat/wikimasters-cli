@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AUTH_COOKIE_NAME,
+  refreshTokenFromAuthCookieChunks,
   refreshTokenFromAuthCookies,
 } from "./auth-cookie.js";
 import { WikiMastersError } from "./errors.js";
@@ -49,5 +50,26 @@ describe("refreshTokenFromAuthCookies", () => {
         { name: `${AUTH_COOKIE_NAME}.0`, value: encoded.slice(0, 40) },
       ]),
     ).toThrow(WikiMastersError);
+  });
+});
+
+describe("refreshTokenFromAuthCookieChunks", () => {
+  it("joins the chunks in the given order", () => {
+    expect(
+      refreshTokenFromAuthCookieChunks([
+        encoded.slice(0, 40),
+        encoded.slice(40),
+      ]),
+    ).toBe("refresh-token");
+  });
+
+  it.each([
+    ["an empty value", ""],
+    ["text that is not a session", "not-a-session"],
+    ["a session without refresh token", encodeURIComponent("{}")],
+  ])("rejects %s without echoing it", (_, value) => {
+    expect(() => refreshTokenFromAuthCookieChunks([value])).toThrow(
+      `The ${AUTH_COOKIE_NAME} cookie holds no refresh token`,
+    );
   });
 });

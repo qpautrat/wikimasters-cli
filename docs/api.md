@@ -10,7 +10,7 @@ Next.js routes live at `https://www.wiki-masters.com/api/...` and read the sessi
 |---|---|---|
 | `POST /auth/v1/token?grant_type=refresh_token` | `resumeSession`, through `supabase-js`: exchanges the refresh token for a session and returns a rotated refresh token | `supabase-js` |
 | `https://www.wiki-masters.com/login` | `loginInBrowser`: page opened in Firefox for the user to sign in | site navigation |
-| Cookies `sb-<ref>-auth-token`, `sb-<ref>-auth-token.<n>` | `loginInBrowser`: hold the refresh token after the user signs in on the site | Firefox profile after a manual sign-in |
+| Cookies `sb-<ref>-auth-token`, `sb-<ref>-auth-token.<n>` | `loginInBrowser` and `refreshTokenFromAuthCookieChunks`: hold the refresh token after the user signs in on the site | Firefox profile after a manual sign-in |
 
 ## `wishlist_items`: the wishlist
 

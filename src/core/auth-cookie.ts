@@ -10,16 +10,16 @@ export interface Cookie {
   value: string;
 }
 
-function combineChunks(cookies: readonly Cookie[]): string | undefined {
+function authCookieChunks(cookies: readonly Cookie[]): string[] | undefined {
   const byName = new Map(cookies.map(({ name, value }) => [name, value]));
   const whole = byName.get(AUTH_COOKIE_NAME);
-  if (whole) return whole;
+  if (whole) return [whole];
 
   const chunks: string[] = [];
   for (let index = 0; byName.has(`${AUTH_COOKIE_NAME}.${index}`); index++) {
     chunks.push(byName.get(`${AUTH_COOKIE_NAME}.${index}`) ?? "");
   }
-  return chunks.length > 0 ? chunks.join("") : undefined;
+  return chunks.length > 0 ? chunks : undefined;
 }
 
 function decodeSession(raw: string): unknown {
@@ -32,23 +32,30 @@ function decodeSession(raw: string): unknown {
 export function refreshTokenFromAuthCookies(
   cookies: readonly Cookie[],
 ): string | undefined {
-  const raw = combineChunks(cookies);
-  if (raw === undefined) return undefined;
+  const chunks = authCookieChunks(cookies);
+  return chunks === undefined
+    ? undefined
+    : refreshTokenFromAuthCookieChunks(chunks);
+}
 
+export function refreshTokenFromAuthCookieChunks(
+  chunks: readonly string[],
+): string {
   let session: unknown;
   try {
-    session = decodeSession(raw);
+    session = decodeSession(chunks.join(""));
   } catch {
-    throw new WikiMastersError(`Unreadable ${AUTH_COOKIE_NAME} cookie`);
+    session = undefined;
   }
   if (
     typeof session !== "object" ||
     session === null ||
     !("refresh_token" in session) ||
-    typeof session.refresh_token !== "string"
+    typeof session.refresh_token !== "string" ||
+    session.refresh_token === ""
   ) {
     throw new WikiMastersError(
-      `The ${AUTH_COOKIE_NAME} cookie holds no refresh token`,
+      `The ${AUTH_COOKIE_NAME} cookie holds no refresh token: check that every chunk is there, in order`,
     );
   }
   return session.refresh_token;

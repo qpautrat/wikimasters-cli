@@ -6,13 +6,13 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
 
 ## User stories
 
-1. En tant que joueur, je me connecte depuis le terminal en résolvant le captcha dans une fenêtre de navigateur que la commande ouvre pour moi.
+1. En tant que joueur, je me connecte depuis le terminal en collant la session de mon navigateur ([Se connecter en collant la session](login-paste-session.md)) ou, sur macOS, en résolvant le captcha dans une fenêtre Firefox que la commande ouvre pour moi.
 2. En tant que joueur, je ne me reconnecte pas tant que ma session reste valide.
 3. En tant qu'agent, je sais à la sortie d'une commande si l'utilisateur doit se reconnecter.
 
 ## Critères d'acceptation
 
-### `wikimasters login`
+### `wikimasters login --firefox`
 
 1. La commande ouvre Firefox sur la page de connexion, avec un profil temporaire distinct du Firefox habituel.
 2. Dès que la session apparaît, Firefox se ferme et la session est enregistrée localement, hors de tout fichier versionné.

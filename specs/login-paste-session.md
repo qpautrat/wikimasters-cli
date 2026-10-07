@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wikimasters login` lance Firefox depuis son emplacement sur macOS et lit ses cookies avec le CLI `sqlite3` ([Connexion](../login.md)). Les développeurs à qui je partage le dépôt utilisent d'autres systèmes et d'autres navigateurs : ils ne peuvent pas se connecter.
+`wikimasters login` lance Firefox depuis son emplacement sur macOS et lit ses cookies avec le CLI `sqlite3` ([Connexion](login.md)). Les développeurs à qui je partage le dépôt utilisent d'autres systèmes et d'autres navigateurs : ils ne peuvent pas se connecter.
 
 Le site ne propose qu'une connexion par email et mot de passe, protégée par un captcha (`signInWithPassword` avec un `captchaToken` Turnstile, lu dans le JavaScript de `/login` le 2026-10-06). La session doit donc venir d'un navigateur où l'utilisateur s'est connecté lui-même. Le site la garde dans le cookie `sb-cyrxjeppjqsxxjayfrur-auth-token`, parfois découpé en morceaux `.0`, `.1`… que les outils de développement de tout navigateur affichent.
 
@@ -10,7 +10,7 @@ Supabase révoque toute la session quand un refresh token déjà échangé est r
 
 Je garde la connexion par Firefox, transparente pour moi sur macOS, que mon agent lance selon mes règles.
 
-Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](../login-agent.md).
+Dépend de : [Connexion](login.md), [Se connecter depuis un agent](login-agent.md).
 
 ## User stories
 
@@ -30,7 +30,7 @@ Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](../login-a
 
 ### `wikimasters login --firefox`
 
-7. L'option `--firefox` garde la connexion par Firefox, avec les critères 1 à 3 de [Connexion](../login.md).
+7. L'option `--firefox` garde la connexion par Firefox, avec les critères 1 à 3 de [Connexion](login.md).
 
 ### Documentation
 
@@ -40,5 +40,5 @@ Dépend de : [Connexion](../login.md), [Se connecter depuis un agent](../login-a
 
 - Lancer Firefox ailleurs que sur macOS.
 - Lire les cookies d'un autre navigateur que Firefox.
-- La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](../login-agent.md).
-- L'absence de `sqlite3` pour `--firefox`, traitée dans [Signaler l'absence de `sqlite3`](login-firefox-sqlite-missing.md).
+- La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](login-agent.md).
+- L'absence de `sqlite3` pour `--firefox`, traitée dans [Signaler l'absence de `sqlite3`](backlog/login-firefox-sqlite-missing.md).

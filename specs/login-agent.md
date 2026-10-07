@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wikimasters login` ouvre Firefox sur macOS. La connexion par collage prévue ([Se connecter en collant la session](backlog/login-paste-session.md)) demande qu'un humain colle la session dans un terminal, ce que l'agent ne peut pas faire à sa place. Chaque joueur peut préférer une méthode de connexion, qu'il écrit dans son `CLAUDE.local.md`.
+`wikimasters login` ouvre Firefox sur macOS. La connexion par collage ([Se connecter en collant la session](login-paste-session.md)) demande qu'un humain colle la session dans un terminal, ce que l'agent ne peut pas faire à sa place. Chaque joueur peut préférer une méthode de connexion, qu'il écrit dans son `CLAUDE.local.md`.
 
 Une commande lancée par le préfixe `!` de Claude Code n'a probablement pas de terminal interactif (non mesuré) : la connexion se lance dans un terminal du joueur.
 
