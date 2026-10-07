@@ -21,6 +21,7 @@ En tant que joueur, je lance une commande `wikimasters` par `mise run wikimaster
 7. Le README, `CLAUDE.md` et le skill `wikimasters` donnent chaque commande de la CLI sous la forme `mise run wikimasters <commande>`, et le skill donne la commande de connexion sous la forme `mise -C '<racine du dépôt>' run wikimasters login`.
 8. `npm run -s wikimasters -- <commande>` fonctionne toujours.
 9. Le commit qui implémente cette spec modifie le critère 2 de [Construire la CLI à l'installation](build-on-install.md), le critère 2 de [Se connecter depuis un agent](login-agent.md) et le critère 1 de [Indiquer la commande de connexion exacte](backlog/login-hint-command.md).
+10. Sur un échec, la sortie d'erreur contient ce qu'écrit la CLI, suivi de la ligne `[wikimasters] ERROR task failed` que mise ajoute. Le README la mentionne, et le skill `wikimasters` ne la rapporte pas comme le message de la CLI.
 
 ## Hors périmètre
 

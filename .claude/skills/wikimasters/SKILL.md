@@ -9,6 +9,8 @@ Run every command from the repo root as `mise run wikimasters <command> --json`.
 
 ## Results and exit codes
 
+On a non-zero exit, mise adds the line `[wikimasters] ERROR task failed` to stderr after the CLI's message: never report that line as the CLI's message.
+
 - `0`: success. Read the JSON on stdout.
 - `4`: the user must log in, whatever the stderr message says to run. When the player rules in `CLAUDE.local.md` give a login method, tell the user a Firefox window is about to open for them to sign in if that method is `--firefox`, run that login with a tool timeout above the 5 minutes it waits for the sign-in, then retry the original command once. If the login fails, report its stderr message and do not retry. Otherwise, do not run `wikimasters login`: ask the user to run `mise -C '<repo root>' run wikimasters login` in a terminal, with the absolute path `git rev-parse --show-toplevel` prints, single-quoted, and retry the original command once when they say they are logged in. Never ask the user to share the session or its cookie in the conversation.
 - `75`: the API stayed unavailable after the CLI's own retries. Report the stderr message in one sentence and tell the user to retry later; do not rerun the command on your own. If the message says the request may have taken effect, tell the user to check its outcome first.

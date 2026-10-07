@@ -60,7 +60,7 @@ A card id is the `id` that `cards search`, `collection list` and `wishlist list`
 
 ### Output and exit codes
 
-Results are text by default. With the global `--json` option, stdout carries only the result as JSON, e.g. `mise run wikimasters wishlist list --json`. Messages and errors go to stderr.
+Results are text by default. With the global `--json` option, stdout carries only the result as JSON, e.g. `mise run wikimasters wishlist list --json`. Messages and errors go to stderr. When a command fails, mise adds the line `[wikimasters] ERROR task failed` after the CLI's message.
 
 | Code | Meaning |
 |---|---|
