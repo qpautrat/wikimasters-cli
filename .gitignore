@@ -3,3 +3,4 @@ dist/
 .env
 capture-reseau-har/
 dist-tools/
+CLAUDE.local.md
