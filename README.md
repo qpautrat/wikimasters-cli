@@ -22,13 +22,13 @@
 2. Sign in, as described in [Signing in](#signing-in):
 
    ```sh
-   mise run wikimasters login
+   mise run wikimasters -- login
    ```
 
 3. Run a first read-only command:
 
    ```sh
-   mise run wikimasters wishlist list
+   mise run wikimasters -- wishlist list
    ```
 
 After a `git pull` or a change to `src/`, rebuild the CLI with `mise exec -- npm run build`.
@@ -37,36 +37,36 @@ The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SU
 
 ## Commands
 
-Run every command from the repository root as `mise run wikimasters <command>`. `mise run wikimasters <command> --help` gives its arguments and options.
+Run every command from the repository root as `mise run wikimasters -- <command>`. `mise run wikimasters -- <command> --help` gives its arguments and options.
 
 | Command | What it does | Example |
 |---|---|---|
-| `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `.env` | `mise run wikimasters login` |
-| `cards search <name...>` | Finds the catalogue cards whose title contains the text, regardless of case, exact title first, at most 50 | `mise run wikimasters cards search half dome` |
-| `collection list [--rarity <code>]` | Lists your collection, earliest obtained first, with owned rarity, copies, favourite and shiny state, labels and obtention date; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L` | `mise run wikimasters collection list --rarity L` |
-| `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters collection discard <card-uuid> <card-uuid>` |
-| `collection star <card-id>` | Marks a card of your collection as favourite | `mise run wikimasters collection star <card-uuid>` |
-| `collection unstar <card-id>` | Removes a card of your collection from the favourites | `mise run wikimasters collection unstar <card-uuid>` |
-| `collection tag <card-id> <label>` | Puts one of your labels on a card of your collection | `mise run wikimasters collection tag <card-uuid> Favourites` |
-| `collection untag <card-id> <label>` | Removes one of your labels from a card of your collection | `mise run wikimasters collection untag <card-uuid> Favourites` |
-| `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `mise run wikimasters wishlist list` |
-| `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `mise run wikimasters wishlist add <card-uuid>` |
-| `wishlist remove <card-id>` | Removes a card from your wishlist | `mise run wikimasters wishlist remove <card-uuid>` |
-| `auction show <auction-id>` | Shows an auction's card, status, end time, starting price, current bid, and whether you lead or sell it | `mise run wikimasters auction show 6e6bd506-4045-445c-8b6f-16a29592fe4d` |
-| `auction bids` | Lists the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead | `mise run wikimasters auction bids` |
-| `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters auction bid <auction-uuid> 25` |
+| `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `.env` | `mise run wikimasters -- login` |
+| `cards search <name...>` | Finds the catalogue cards whose title contains the text, regardless of case, exact title first, at most 50 | `mise run wikimasters -- cards search half dome` |
+| `collection list [--rarity <code>]` | Lists your collection, earliest obtained first, with owned rarity, copies, favourite and shiny state, labels and obtention date; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L` | `mise run wikimasters -- collection list --rarity L` |
+| `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
+| `collection star <card-id>` | Marks a card of your collection as favourite | `mise run wikimasters -- collection star <card-uuid>` |
+| `collection unstar <card-id>` | Removes a card of your collection from the favourites | `mise run wikimasters -- collection unstar <card-uuid>` |
+| `collection tag <card-id> <label>` | Puts one of your labels on a card of your collection | `mise run wikimasters -- collection tag <card-uuid> Favourites` |
+| `collection untag <card-id> <label>` | Removes one of your labels from a card of your collection | `mise run wikimasters -- collection untag <card-uuid> Favourites` |
+| `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `mise run wikimasters -- wishlist list` |
+| `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `mise run wikimasters -- wishlist add <card-uuid>` |
+| `wishlist remove <card-id>` | Removes a card from your wishlist | `mise run wikimasters -- wishlist remove <card-uuid>` |
+| `auction show <auction-id>` | Shows an auction's card, status, end time, starting price, current bid, and whether you lead or sell it | `mise run wikimasters -- auction show 6e6bd506-4045-445c-8b6f-16a29592fe4d` |
+| `auction bids` | Lists the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead | `mise run wikimasters -- auction bids` |
+| `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction bid <auction-uuid> 25` |
 
 A card id is the `id` that `cards search`, `collection list` and `wishlist list` print. An auction id is the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
 
 ### Output and exit codes
 
-Results are text by default. With the global `--json` option, stdout carries only the result as JSON, e.g. `mise run wikimasters wishlist list --json`. Messages and errors go to stderr. When a command fails, mise adds the line `[wikimasters] ERROR task failed` after the CLI's message.
+Results are text by default. With the global `--json` option, stdout carries only the result as JSON, e.g. `mise run wikimasters -- wishlist list --json`. Messages and errors go to stderr. When a command fails, mise adds the line `[wikimasters] ERROR task failed` after the CLI's message.
 
 | Code | Meaning |
 |---|---|
 | `0` | Success. |
 | `1` | Failure: invalid argument, refusal by the game, network error. `collection discard` also exits 1 when the game refused some of the cards, after printing which ones and why. |
-| `4` | You must sign in: no stored session, or the session expired, was revoked or was rejected by the API. Run `mise run wikimasters login` again. |
+| `4` | You must sign in: no stored session, or the session expired, was revoked or was rejected by the API. Run `mise run wikimasters -- login` again. |
 | `75` | The API stayed unavailable after the CLI's own retries. Retry later. |
 
 ## Playing through an agent
@@ -85,9 +85,9 @@ The site signs in with an email and a password behind a captcha, so the CLI neve
 1. Open `https://www.wiki-masters.com/login` in a private browser window and sign in.
 2. Open the developer tools: Storage tab in Firefox, Application tab in Chrome. In the cookies of `www.wiki-masters.com`, copy the value of `sb-cyrxjeppjqsxxjayfrur-auth-token`, or of each of its chunks `sb-cyrxjeppjqsxxjayfrur-auth-token.0`, `.1`…
 3. Close the private window without logging out.
-4. Run `mise run wikimasters login` and paste each value in order, one per line, then an empty line. What you paste is not displayed.
+4. Run `mise run wikimasters -- login` and paste each value in order, one per line, then an empty line. What you paste is not displayed.
 
-On macOS with Firefox, `mise run wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most.
+On macOS with Firefox, `mise run wikimasters -- login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most.
 
 What the CLI does with your session:
 
@@ -96,7 +96,7 @@ What the CLI does with your session:
 - The refresh token is stored only in `.env` at the repository root, which git ignores and which the CLI makes readable by its owner only on macOS and Linux. The CLI never prints it.
 - The session is sent only where the browser sends it: the site's Supabase (`https://cyrxjeppjqsxxjayfrur.supabase.co`) and the site's own `/api/...` routes (`https://www.wiki-masters.com`).
 - Close the private window without logging out because logging out ends the very session you paste. Closing the window also stops the browser from refreshing that session: Supabase revokes a whole session when one of its used refresh tokens is reused, so the browser and the CLI cannot share it.
-- Logging out on the site ends the CLI's session when it ends all your sessions, which is what Supabase's JavaScript sign-out does by default. The next command then exits with code 4; run `mise run wikimasters login` again.
+- Logging out on the site ends the CLI's session when it ends all your sessions, which is what Supabase's JavaScript sign-out does by default. The next command then exits with code 4; run `mise run wikimasters -- login` again.
 
 The code handling the session:
 

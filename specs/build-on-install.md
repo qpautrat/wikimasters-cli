@@ -13,7 +13,7 @@ En tant que développeur qui vient de cloner le dépôt, je lance ma première c
 ## Critères d'acceptation
 
 1. Sur un clone neuf, `mise install` construit `dist/` après l'installation des dépendances npm.
-2. Juste après, `mise run wikimasters --help` affiche l'aide sans autre commande.
+2. Juste après, `mise run wikimasters -- --help` affiche l'aide sans autre commande.
 3. Le commit qui implémente cette spec modifie le critère 2 de [Outils du dépôt](toolchain.md) et la description de `mise install` dans `CLAUDE.md`.
 
 ## Hors périmètre

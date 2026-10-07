@@ -23,7 +23,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Check formatting of `src/` and `tools/` / format it | `mise exec -- npm run format:check` / `mise exec -- npm run format` |
 | All tests | `mise exec -- npm test` |
 | One test file / one test | `mise exec -- npx vitest run src/core/wishlist.test.ts` / `mise exec -- npx vitest run -t "already absent"` |
-| Run the CLI after a build | `mise run wikimasters login`, then `mise run wikimasters wishlist remove <card-uuid>` |
+| Run the CLI after a build | `mise run wikimasters -- login`, then `mise run wikimasters -- wishlist remove <card-uuid>` |
 | Query a table read-only with the stored session (compiles the tool first) | `mise exec -- npm run -s api:get -- 'user_cards?select=*&limit=1'` |
 | Send one request to the Next.js site with the stored session; status on stderr, body on stdout (compiles the tool first) | `mise exec -- npm run -s api:site -- GET /api/wikibidous` |
 

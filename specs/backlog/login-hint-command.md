@@ -12,6 +12,6 @@ En tant que développeur, quand une commande me demande de me reconnecter, je co
 
 ## Critères d'acceptation
 
-1. Sur le code 4, le message d'erreur de la CLI indique de lancer `mise -C <racine du dépôt> run wikimasters login`, avec le chemin absolu de la racine, et cette commande fonctionne telle quelle depuis n'importe quel dossier.
+1. Sur le code 4, le message d'erreur de la CLI indique de lancer `mise -C <racine du dépôt> run wikimasters -- login`, avec le chemin absolu de la racine, et cette commande fonctionne telle quelle depuis n'importe quel dossier.
 2. L'erreur levée par le cœur ne nomme aucune commande : c'est la CLI qui ajoute la commande à lancer.
 3. Le commit qui implémente cette spec modifie le critère 6 de [Connexion](../login.md).
