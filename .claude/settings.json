@@ -5,6 +5,9 @@
       "Bash(mise * npx prettier *)"
     ]
   },
+  "skillOverrides": {
+    "code-review": "off"
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -31,6 +34,7 @@
   "enabledPlugins": {
     "session-report@claude-plugins-official": true,
     "datadog@claude-plugins-official": false,
-    "csharp-lsp@claude-plugins-official": false
+    "csharp-lsp@claude-plugins-official": false,
+    "mattpocock-skills@claude-plugins-official": true
   }
 }

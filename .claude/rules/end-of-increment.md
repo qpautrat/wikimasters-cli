@@ -6,18 +6,12 @@ Report only what the user needs: blockers, questions, and decisions taken on the
 
 ## Code review
 
-Run `/code-review low` on the increment's commits and fix its valid findings within the same increment, with no new review after. A finding that the increment's change leaves stale in another file (README, skill, spec) is fixed in the increment, amending that file's spec in the same commit; only a finding the spec puts out of scope is left unfixed. Report a finding left unfixed in one line of the summary.
+Run `/mattpocock-skills:code-review` with the increment's first commit's parent as the fixed point, and fix its valid findings within the same increment, with no new review after. A finding that the increment's change leaves stale in another file (README, skill, spec) is fixed in the increment, amending that file's spec in the same commit; only a finding the spec puts out of scope is left unfixed. Report a finding left unfixed in one line of the summary.
 
-## Continuous improvement
+## Retrospective
 
-Run `/workflow-review` in parallel with `/code-review` and relay its report as is: at most one improvement per part, drawn from what went wrong or was missing during the session, never a review of the delivered work:
-
-1. **Code**: a problem or gap met in the code, tools, configs or rules.
-2. **Workflow**: a problem in how the agent and the user worked together: round trips, corrections the user had to make, unverified claims, wasted steps, rule breaches.
-3. **Cost**: the session's token figures, the turn that cost the most and, when one is worth it, a way to spend less.
-
-Each item states the problem observed, its cost, and a concrete proposal the user can accept as is: what to change, and where. Leave out an item without a proposal, and a problem already fixed during the session.
+End the summary by offering the user to run `/mattpocock-skills:retro` on the session.
 
 ## Next subject
 
-End the summary by asking the user, for each `/workflow-review` proposal, whether to apply it. A reply that asks for anything beyond answering the summary's questions opens a new subject. When it does, apply the accepted proposals, then hand the subject to a `general-purpose` subagent with a self-contained brief: the request in the user's words, every decision they gave on it, and the repo rules it falls under. The brief tells the subagent to ask, through `SendMessage` to main, before any change that breaks one of its constraints, and to wait for the answer. Relay its questions and results to the user, and send their answers back to it with `SendMessage`. Never ask the user to run `/clear` or to repeat a request.
+A reply that asks for anything beyond answering the summary's questions opens a new subject. Hand it to a `general-purpose` subagent with a self-contained brief: the request in the user's words, every decision they gave on it, and the repo rules it falls under. The brief tells the subagent to ask, through `SendMessage` to main, before any change that breaks one of its constraints, and to wait for the answer. Relay its questions and results to the user, and send their answers back to it with `SendMessage`. Never ask the user to run `/clear` or to repeat a request.
