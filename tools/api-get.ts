@@ -9,7 +9,7 @@ try {
   const [query] = process.argv.slice(2);
   if (!query) {
     throw new WikiMastersError(
-      `Usage: npm run -s ${COMMAND} -- '<table>?<PostgREST parameters>'`,
+      `Usage: mise exec -- npm run -s ${COMMAND} -- '<table>?<PostgREST parameters>'`,
     );
   }
   const rows = await queryTable(await openSession(), query);

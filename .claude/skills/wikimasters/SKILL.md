@@ -5,7 +5,7 @@ description: Act on the user's WikiMasters account through the `wikimasters` CLI
 
 # Using `wikimasters`
 
-Run every command from the repo root as `mise run wikimasters <command> --json`. If `dist/` is missing or older than `src/`, run `npm run -s build` first. `mise run wikimasters --help` lists the available commands.
+Run every command from the repo root as `mise run wikimasters <command> --json`. If `dist/` is missing or older than `src/`, run `mise exec -- npm run -s build` first. `mise run wikimasters --help` lists the available commands.
 
 ## Results and exit codes
 

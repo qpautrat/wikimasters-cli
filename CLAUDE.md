@@ -17,15 +17,15 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Task | Command |
 |---|---|
 | Install tools, dependencies and the git hook, and build to `dist/` | `mise install` |
-| Build to `dist/` | `npm run build` |
-| Typecheck | `npm run typecheck` |
-| Lint `src/` and `tools/` / apply safe fixes | `npm run lint` / `npm run lint:fix` |
-| Check formatting of `src/` and `tools/` / format it | `npm run format:check` / `npm run format` |
-| All tests | `npm test` |
-| One test file / one test | `npx vitest run src/core/wishlist.test.ts` / `npx vitest run -t "already absent"` |
+| Build to `dist/` | `mise exec -- npm run build` |
+| Typecheck | `mise exec -- npm run typecheck` |
+| Lint `src/` and `tools/` / apply safe fixes | `mise exec -- npm run lint` / `mise exec -- npm run lint:fix` |
+| Check formatting of `src/` and `tools/` / format it | `mise exec -- npm run format:check` / `mise exec -- npm run format` |
+| All tests | `mise exec -- npm test` |
+| One test file / one test | `mise exec -- npx vitest run src/core/wishlist.test.ts` / `mise exec -- npx vitest run -t "already absent"` |
 | Run the CLI after a build | `mise run wikimasters login`, then `mise run wikimasters wishlist remove <card-uuid>` |
-| Query a table read-only with the stored session (compiles the tool first) | `npm run -s api:get -- 'user_cards?select=*&limit=1'` |
-| Send one request to the Next.js site with the stored session; status on stderr, body on stdout (compiles the tool first) | `npm run -s api:site -- GET /api/wikibidous` |
+| Query a table read-only with the stored session (compiles the tool first) | `mise exec -- npm run -s api:get -- 'user_cards?select=*&limit=1'` |
+| Send one request to the Next.js site with the stored session; status on stderr, body on stdout (compiles the tool first) | `mise exec -- npm run -s api:site -- GET /api/wikibidous` |
 
 The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. When the commit changes `package.json` or `package-lock.json`, `scripts/audit-staged.sh` runs `npm audit` on the production dependencies of the staged `package-lock.json` and refuses any known vulnerability, whatever its severity, naming each package and its severity; when the npm registry is unreachable it warns and lets the commit through. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests, build and tools build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit. Never pass `--no-verify`, including with `--amend`.
 

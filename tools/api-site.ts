@@ -11,7 +11,7 @@ import {
 } from "../src/core/site.js";
 
 const COMMAND = "api:site";
-const USAGE = `Usage: npm run -s ${COMMAND} -- <${SITE_METHODS.join("|")}> <path> [JSON body]`;
+const USAGE = `Usage: mise exec -- npm run -s ${COMMAND} -- <${SITE_METHODS.join("|")}> <path> [JSON body]`;
 
 function isSiteMethod(method: string): method is SiteMethod {
   return (SITE_METHODS as readonly string[]).includes(method);
