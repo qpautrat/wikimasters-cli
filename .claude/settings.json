@@ -5,9 +5,6 @@
       "Bash(mise * npx prettier *)"
     ]
   },
-  "skillOverrides": {
-    "code-review": "off"
-  },
   "hooks": {
     "PostToolUse": [
       {
