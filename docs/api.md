@@ -172,4 +172,5 @@ Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-0
 - `q` matches `auctions.snapshot_search_document`, the card title and category in lower case without accents, regardless of case. Only `active` auctions came back.
 - Response `{"auctions": [...], "page", "limit", "hasMore"}`. Each auction holds the `auctions` columns, `card` (the `cards` row, `wikipedia_title` included), `seller`, `current_bidder` and `owned`. No match gives `"auctions": []`.
 - A `limit` above 50 gets HTTP 403 `{"code":"automation_limit","error":"Trop de requêtes automatisées. L'automatisation n'est pas autorisée — voir le règlement."}`; `limit=0` answers 50 auctions at most (observed 2026-10-08).
-- `searchAuctions`: sends `page=1`, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, `card` standing for `cards`, reports `hasMore`, and reports a refusal with its body.
+- `page` starts at 1 and gives the next `limit` auctions; a page beyond the matches answers `"auctions": []` and `"hasMore": false` (observed 2026-10-08).
+- `searchAuctions`: sends the `page` given, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, `card` standing for `cards`, reports `hasMore`, and reports a refusal with its body.

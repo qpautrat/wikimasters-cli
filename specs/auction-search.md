@@ -19,9 +19,13 @@ En tant que joueur, je donne un texte et j'obtiens les enchères qui y correspon
 5. Chaque ligne donne les mêmes informations qu'une ligne de `wikimasters auction list`.
 6. Aucune enchère trouvée n'est pas une erreur : la commande le signale et sort avec le code 0.
 7. Avec `--json`, stdout porte la liste des enchères trouvées, chacune avec ces informations dans des champs distincts, et un champ indiquant si d'autres enchères correspondent.
+8. L'option `--page <p>` transmet au jeu le numéro de page `<p>`, 1 par défaut, avec le texte et la limite donnés.
+9. Une valeur de `--page` qui n'est pas un entier strictement positif est refusée sans interroger le jeu.
+10. La commande affiche les enchères de cette page dans l'ordre du jeu et signale quand le jeu indique que d'autres enchères correspondent au-delà.
+11. Une page au-delà des enchères trouvées n'est pas une erreur : la commande signale qu'aucune enchère n'est trouvée et sort avec le code 0.
 
 ## Hors périmètre
 
 - Les autres filtres de l'interface : rareté, tri, enchères qui me concernent.
-- Parcourir les enchères au-delà des `<n>` premières.
+- Lire toutes les pages en une seule commande.
 - Rechercher une carte du catalogue, couvert par `wikimasters cards search`.

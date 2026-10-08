@@ -340,7 +340,7 @@ describe("text output", () => {
     ).toBe(formatAuctions([shownAuction], "text"));
   });
 
-  it("says when more auctions match than are shown", () => {
+  it("says when more auctions match beyond the page shown", () => {
     expect(
       formatAuctionSearch(
         { auctions: [shownAuction], truncated: true },
@@ -348,7 +348,7 @@ describe("text output", () => {
       ).split("\n"),
     ).toEqual([
       formatAuctions([shownAuction], "text"),
-      "Only the first 1 matches are shown.",
+      "More auctions match beyond this page.",
     ]);
   });
 

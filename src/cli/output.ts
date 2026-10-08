@@ -217,9 +217,7 @@ export function formatAuctionSearch(
   if (auctions.length === 0) return "No auction matches.";
   return [
     ...auctions.map(auctionLine),
-    ...(truncated
-      ? [`Only the first ${auctions.length} matches are shown.`]
-      : []),
+    ...(truncated ? ["More auctions match beyond this page."] : []),
   ].join("\n");
 }
 

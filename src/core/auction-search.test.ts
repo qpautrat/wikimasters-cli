@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
-import { searchAuctions } from "./auction-search.js";
+import { parseAuctionSearchPage, searchAuctions } from "./auction-search.js";
 import { parseAuctionLimit } from "./auction.js";
 import { WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
@@ -16,6 +16,7 @@ const AUCTION_ID = "5c214da4-d9ae-4222-9803-052554994ed6";
 const OTHER_AUCTION_ID = "be8fea60-405b-416b-becc-a270992de0fd";
 const OTHER_PLAYER_ID = "de78c800-d3b9-4942-a26d-e7942441aa72";
 const limit = parseAuctionLimit("50");
+const firstPage = parseAuctionSearchPage("1");
 
 function found(overrides: Record<string, unknown> = {}) {
   return {
@@ -52,6 +53,21 @@ async function sessionAnswering(response: FakeResponse) {
   return { session, searchRequest };
 }
 
+describe("parseAuctionSearchPage", () => {
+  it("accepts a strictly positive integer", () => {
+    expect(parseAuctionSearchPage("2")).toBe(2);
+  });
+
+  it.each(["0", "-1", "2.5", "1e3", "07", "", "abc", "9007199254740993"])(
+    "refuses %j",
+    (raw) => {
+      expect(() => parseAuctionSearchPage(raw)).toThrow(
+        `Invalid page: ${JSON.stringify(raw)} is not a strictly positive integer; nothing was read`,
+      );
+    },
+  );
+});
+
 describe("searchAuctions", () => {
   it("returns the auctions the game finds, in its order, with the user's part in them", async () => {
     const first = found();
@@ -69,7 +85,9 @@ describe("searchAuctions", () => {
       body: { auctions: [first, second], page: 1, limit: 50, hasMore: false },
     });
 
-    await expect(searchAuctions(session, "celtique", limit)).resolves.toEqual({
+    await expect(
+      searchAuctions(session, "celtique", limit, firstPage),
+    ).resolves.toEqual({
       auctions: [
         {
           auctionId: AUCTION_ID,
@@ -111,7 +129,7 @@ describe("searchAuctions", () => {
 
     const {
       auctions: [listed],
-    } = await searchAuctions(session, "celtique", limit);
+    } = await searchAuctions(session, "celtique", limit, firstPage);
 
     expect(listed?.leading).toBe(true);
   });
@@ -122,7 +140,12 @@ describe("searchAuctions", () => {
       body: { auctions: [], hasMore: false },
     });
 
-    await searchAuctions(session, "Genre musical & co", parseAuctionLimit("7"));
+    await searchAuctions(
+      session,
+      "Genre musical & co",
+      parseAuctionLimit("7"),
+      firstPage,
+    );
 
     const request = searchRequest();
     expect(Object.fromEntries(request?.url.searchParams ?? [])).toEqual({
@@ -136,13 +159,40 @@ describe("searchAuctions", () => {
     );
   });
 
+  it("sends the page given", async () => {
+    const { session, searchRequest } = await sessionAnswering({
+      status: 200,
+      body: { auctions: [], hasMore: false },
+    });
+
+    await searchAuctions(
+      session,
+      "caliste",
+      limit,
+      parseAuctionSearchPage("3"),
+    );
+
+    expect(searchRequest()?.url.searchParams.get("page")).toBe("3");
+  });
+
+  it("returns no auction on a page beyond the matches", async () => {
+    const { session } = await sessionAnswering({
+      status: 200,
+      body: { auctions: [], page: 9999, limit: 50, hasMore: false },
+    });
+
+    await expect(
+      searchAuctions(session, "caliste", limit, parseAuctionSearchPage("9999")),
+    ).resolves.toEqual({ auctions: [], truncated: false });
+  });
+
   it("leaves the text out when it is blank, as the interface does", async () => {
     const { session, searchRequest } = await sessionAnswering({
       status: 200,
       body: { auctions: [], hasMore: false },
     });
 
-    await searchAuctions(session, "  ", limit);
+    await searchAuctions(session, "  ", limit, firstPage);
 
     expect(searchRequest()?.url.searchParams.has("q")).toBe(false);
   });
@@ -154,7 +204,7 @@ describe("searchAuctions", () => {
     });
 
     await expect(
-      searchAuctions(session, "celtique", parseAuctionLimit("1")),
+      searchAuctions(session, "celtique", parseAuctionLimit("1"), firstPage),
     ).resolves.toMatchObject({ truncated: true });
   });
 
@@ -164,7 +214,9 @@ describe("searchAuctions", () => {
       body: { auctions: [], page: 1, limit: 50, hasMore: false },
     });
 
-    await expect(searchAuctions(session, "zzz", limit)).resolves.toEqual({
+    await expect(
+      searchAuctions(session, "zzz", limit, firstPage),
+    ).resolves.toEqual({
       auctions: [],
       truncated: false,
     });
@@ -179,7 +231,7 @@ describe("searchAuctions", () => {
       },
     });
 
-    const failure = searchAuctions(session, "celtique", limit);
+    const failure = searchAuctions(session, "celtique", limit, firstPage);
     await expect(failure).rejects.toThrow(WikiMastersError);
     await expect(failure).rejects.toThrow(/automation_limit/);
   });
@@ -190,8 +242,8 @@ describe("searchAuctions", () => {
       body: { auctions: [] },
     });
 
-    await expect(searchAuctions(session, "celtique", limit)).rejects.toThrow(
-      /unexpected response/,
-    );
+    await expect(
+      searchAuctions(session, "celtique", limit, firstPage),
+    ).rejects.toThrow(/unexpected response/);
   });
 });

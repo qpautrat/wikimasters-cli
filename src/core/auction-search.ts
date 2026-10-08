@@ -6,8 +6,22 @@ import {
   type AuctionRow,
 } from "./auction.js";
 import { WikiMastersError } from "./errors.js";
+import { isStrictlyPositiveInteger } from "./positive-integer.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
+
+export type AuctionSearchPage = number & {
+  readonly __brand: "AuctionSearchPage";
+};
+
+export function parseAuctionSearchPage(raw: string): AuctionSearchPage {
+  if (!isStrictlyPositiveInteger(raw)) {
+    throw new WikiMastersError(
+      `Invalid page: ${JSON.stringify(raw)} is not a strictly positive integer; nothing was read`,
+    );
+  }
+  return Number(raw) as AuctionSearchPage;
+}
 
 export interface AuctionSearch {
   auctions: Auction[];
@@ -39,10 +53,11 @@ export async function searchAuctions(
   session: Session,
   text: string,
   limit: AuctionLimit,
+  page: AuctionSearchPage,
 ): Promise<AuctionSearch> {
   const action = "Searching the auctions";
   const query = new URLSearchParams({
-    page: "1",
+    page: String(page),
     limit: String(limit),
     sort: "recent",
   });

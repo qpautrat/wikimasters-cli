@@ -12,6 +12,7 @@ import {
   loginInBrowser,
   parseAuctionId,
   parseAuctionLimit,
+  parseAuctionSearchPage,
   parseBidAmount,
   parseCardId,
   placeBid,
@@ -151,6 +152,11 @@ auction
     console.log(formatAuctions(auctions, format(), filter.status));
   });
 
+interface AuctionSearchOptions {
+  limit: string;
+  page: string;
+}
+
 auction
   .command("search")
   .description(
@@ -165,14 +171,24 @@ auction
     "maximum number of auctions, a strictly positive integer",
     String(AUCTION_LIMIT),
   )
+  .option(
+    "--page <p>",
+    "page of results to read, a strictly positive integer",
+    "1",
+  )
   .addHelpText(
     "after",
-    examples("wikimasters auction search Half Dome --limit 5"),
+    examples(
+      "wikimasters auction search Half Dome --limit 5",
+      "wikimasters auction search Half Dome --page 2",
+    ),
   )
-  .action(async (words: string[], { limit }: { limit: string }) => {
+  .action(async (words: string[], { limit, page }: AuctionSearchOptions) => {
     const maximum = parseAuctionLimit(limit);
+    const pageRead = parseAuctionSearchPage(page);
     const session = await openSession();
-    const result = await searchAuctions(session, words.join(" "), maximum);
+    const text = words.join(" ");
+    const result = await searchAuctions(session, text, maximum, pageRead);
     console.log(formatAuctionSearch(result, format()));
   });
 
