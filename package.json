@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Interact with WikiMasters from the command line",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "wikimasters": "dist/cli/main.js"

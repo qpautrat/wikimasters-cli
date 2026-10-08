@@ -6,7 +6,7 @@ Pour utiliser la CLI, il faut aujourd'hui cloner le dépôt, lancer `mise instal
 
 Le nom du paquet sera choisi au moment de la publication ; cette spec l'écrit `<nom>`. `wikimasters` et `wikimasters-cli` sont libres sur npm (`npm view` répond 404, mesuré le 2026-10-07).
 
-Dépend de : [Licence du dépôt](license.md), [Ranger la session dans le dossier de l'utilisateur](session-user-dir.md).
+Dépend de : [Licence du dépôt](../license.md), [Ranger la session dans le dossier de l'utilisateur](session-user-dir.md).
 
 ## User story
 
