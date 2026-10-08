@@ -6,9 +6,7 @@ Pour utiliser la CLI, il faut aujourd'hui cloner le dépôt, lancer `mise instal
 
 Le nom du paquet sera choisi au moment de la publication ; cette spec l'écrit `<nom>`. `wikimasters` et `wikimasters-cli` sont libres sur npm (`npm view` répond 404, mesuré le 2026-10-07).
 
-À trancher avant l'implémentation : où la CLI installée garde la session. Aujourd'hui elle lit et écrit `.env` à la racine du paquet (`packageRoot()` dans `src/cli/config.ts`). Installée par `npm install -g`, cette racine est le dossier du paquet dans le `node_modules` global : la session y disparaît à chaque mise à jour ou réinstallation, et `login` échoue quand ce dossier n'est pas accessible en écriture.
-
-Dépend de : [Licence du dépôt](license.md).
+Dépend de : [Licence du dépôt](license.md), [Ranger la session dans le dossier de l'utilisateur](session-user-dir.md).
 
 ## User story
 
@@ -22,6 +20,7 @@ En tant que joueur, j'installe la CLI depuis npm, sans cloner le dépôt, et je 
 4. Sur une machine sans clone du dépôt, avec un Node qui satisfait `engines`, `npm install -g <nom>` installe la commande `wikimasters`, et `wikimasters --help` affiche l'aide depuis n'importe quel dossier.
 5. Après cette installation, `wikimasters login` puis `wikimasters wishlist list` fonctionnent depuis n'importe quel dossier.
 6. Le README décrit l'installation depuis npm et donne les commandes sous la forme `wikimasters <commande>` pour la CLI installée, en gardant l'installation depuis un clone pour contribuer.
+7. Le commit qui implémente cette spec supprime [Indiquer la commande de connexion exacte](login-hint-command.md) du backlog, le message du code 4 (`run wikimasters login`) étant juste pour la CLI installée, et retire de [Lancer la CLI par une tâche mise](../cli-mise-task.md) les liens vers elle.
 
 ## Hors périmètre
 
