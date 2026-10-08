@@ -112,7 +112,7 @@ auction
   )
   .option(
     "--status <status>",
-    "list only the auctions of this status, e.g. active, settled_sold, settled_unsold or cancelled",
+    "list only the auctions of this status, e.g. active",
   )
   .option(
     "--limit <n>",
