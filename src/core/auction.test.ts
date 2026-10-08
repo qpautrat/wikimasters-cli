@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import {
   parseAuctionId,
+  parseAuctionLimit,
   parseBidAmount,
   placeBid,
   showAuction,
@@ -78,6 +79,21 @@ async function sessionWith(...routes: Route[]) {
 function bidRequests(requests: RecordedRequest[]) {
   return requests.filter(({ url }) => url.pathname.endsWith("/bid"));
 }
+
+describe("parseAuctionLimit", () => {
+  it("accepts a strictly positive integer", () => {
+    expect(parseAuctionLimit("3")).toBe(3);
+  });
+
+  it.each(["0", "-1", "2.5", "1e3", "07", "", "abc", "9007199254740993"])(
+    "refuses %j",
+    (raw) => {
+      expect(() => parseAuctionLimit(raw)).toThrow(
+        `Invalid limit: ${JSON.stringify(raw)} is not a strictly positive integer`,
+      );
+    },
+  );
+});
 
 describe("parseBidAmount", () => {
   it("accepts a strictly positive integer", () => {

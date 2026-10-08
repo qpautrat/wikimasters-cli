@@ -3,6 +3,7 @@ import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatAddition,
   formatAuction,
+  formatAuctionSearch,
   formatAuctions,
   formatBid,
   formatCardSearch,
@@ -78,6 +79,18 @@ describe("JSON output", () => {
 
   it("prints an empty auction list as []", () => {
     expect(formatAuctions([], "json", "active")).toBe("[]");
+  });
+
+  it("lists the found auctions with their state in their own fields, and whether more match", () => {
+    const { auctionId, ...state } = shownAuction;
+    expect(
+      JSON.parse(
+        formatAuctionSearch(
+          { auctions: [shownAuction], truncated: true },
+          "json",
+        ),
+      ),
+    ).toEqual({ auctions: [{ id: auctionId, ...state }], truncated: true });
   });
 
   it("reports each piece of the auction state in its own field", () => {
@@ -295,6 +308,33 @@ describe("text output", () => {
       "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
       `Card ${cardId} could not be discarded: card_not_owned`,
     ]);
+  });
+
+  it("prints a found auction as a listed one", () => {
+    expect(
+      formatAuctionSearch(
+        { auctions: [shownAuction], truncated: false },
+        "text",
+      ),
+    ).toBe(formatAuctions([shownAuction], "text"));
+  });
+
+  it("says when more auctions match than are shown", () => {
+    expect(
+      formatAuctionSearch(
+        { auctions: [shownAuction], truncated: true },
+        "text",
+      ).split("\n"),
+    ).toEqual([
+      formatAuctions([shownAuction], "text"),
+      "Only the first 1 matches are shown.",
+    ]);
+  });
+
+  it("says when no auction matches", () => {
+    expect(
+      formatAuctionSearch({ auctions: [], truncated: false }, "text"),
+    ).toBe("No auction matches.");
   });
 
   it("prints one line per found card", () => {

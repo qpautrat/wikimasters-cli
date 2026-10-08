@@ -1,19 +1,17 @@
 export { SITE_URL } from "./supabase.js";
 export { listRunningBids, type BidAuction } from "./auction-bids.js";
+export { listAuctions, type AuctionFilter } from "./auction-list.js";
+export { searchAuctions, type AuctionSearch } from "./auction-search.js";
 export {
-  AUCTION_LIST_LIMIT,
-  listAuctions,
-  parseAuctionListLimit,
-  type AuctionFilter,
-  type AuctionListLimit,
-} from "./auction-list.js";
-export {
+  AUCTION_LIMIT,
   parseAuctionId,
+  parseAuctionLimit,
   parseBidAmount,
   placeBid,
   showAuction,
   type Auction,
   type AuctionId,
+  type AuctionLimit,
   type BidAmount,
   type PlacedBid,
 } from "./auction.js";

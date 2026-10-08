@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { listAuctions, parseAuctionListLimit } from "./auction-list.js";
+import { listAuctions } from "./auction-list.js";
+import { parseAuctionLimit } from "./auction.js";
 import { WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -14,7 +15,7 @@ import {
 const AUCTION_ID = "d6669009-683d-44b6-b6e7-2c0960c37f2f";
 const OTHER_AUCTION_ID = "e8b3484c-86c2-4b36-95d1-503cc61f0979";
 const OTHER_PLAYER_ID = "4e795adc-61ec-4927-9a71-22a0ca69d08a";
-const limit = parseAuctionListLimit("50");
+const limit = parseAuctionLimit("50");
 
 function auction(overrides: Record<string, unknown> = {}) {
   return {
@@ -45,21 +46,6 @@ async function sessionAnswering(response: FakeResponse) {
   const listRequest = () => requests.find(restRequest("GET", "auctions"));
   return { session, listRequest };
 }
-
-describe("parseAuctionListLimit", () => {
-  it("accepts a strictly positive integer", () => {
-    expect(parseAuctionListLimit("3")).toBe(3);
-  });
-
-  it.each(["0", "-1", "2.5", "1e3", "07", "", "abc", "9007199254740993"])(
-    "refuses %j",
-    (raw) => {
-      expect(() => parseAuctionListLimit(raw)).toThrow(
-        `Invalid limit: ${JSON.stringify(raw)} is not a strictly positive integer`,
-      );
-    },
-  );
-});
 
 describe("listAuctions", () => {
   it("returns each auction's card, state, and the user's part in it, in the API's order", async () => {
@@ -124,7 +110,7 @@ describe("listAuctions", () => {
       body: [],
     });
 
-    await listAuctions(session, {}, parseAuctionListLimit("7"));
+    await listAuctions(session, {}, parseAuctionLimit("7"));
 
     const params = listRequest()?.url.searchParams;
     expect(params?.get("limit")).toBe("7");

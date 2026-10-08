@@ -1,6 +1,7 @@
 import type {
   Auction,
   AuctionId,
+  AuctionSearch,
   BidAuction,
   CardSearch,
   CatalogueCard,
@@ -197,12 +198,27 @@ export function formatAuctions(
       ? "No auction to list."
       : `No auction with status ${requestedStatus}.`;
   }
-  return auctions
-    .map(
-      (auction) =>
-        `${auction.auctionId}  ${auctionedCopy(auction)}: ${auction.status}, ends ${auction.endsAt}, starting price ${wikibidous(auction.startingPrice)}, ${currentBidState(auction.currentBid, auction.leading)}, sold by ${seller(auction.selling)}`,
-    )
-    .join("\n");
+  return auctions.map(auctionLine).join("\n");
+}
+
+function auctionLine(auction: Auction): string {
+  return `${auction.auctionId}  ${auctionedCopy(auction)}: ${auction.status}, ends ${auction.endsAt}, starting price ${wikibidous(auction.startingPrice)}, ${currentBidState(auction.currentBid, auction.leading)}, sold by ${seller(auction.selling)}`;
+}
+
+export function formatAuctionSearch(
+  { auctions, truncated }: AuctionSearch,
+  format: Format,
+): string {
+  if (format === "json") {
+    return JSON.stringify({ auctions: auctions.map(withId), truncated });
+  }
+  if (auctions.length === 0) return "No auction matches.";
+  return [
+    ...auctions.map(auctionLine),
+    ...(truncated
+      ? [`Only the first ${auctions.length} matches are shown.`]
+      : []),
+  ].join("\n");
 }
 
 export function formatAuction(auction: Auction, format: Format): string {

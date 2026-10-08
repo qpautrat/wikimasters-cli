@@ -154,3 +154,13 @@ Source: capture `place-bid.har`, the auction page's JavaScript for the error cod
 - Observed refusals: an ended auction gets HTTP 409 `{"error":"Cette enchère est terminée"}`, without `code`; a bid below the minimum gets HTTP 409 `{"error":"Mise trop basse (minimum 28 wikibidous)","code":"bid_too_low","min":28}`.
 - The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
 - `placeBid`: sends the amount given, reports `current_bid` and `bidder_balance`, and reports a refusal with its body.
+
+## `GET /api/marketplace`: search the auctions
+
+Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-05 and 2026-10-08).
+
+- Query `page`, `limit`, `sort` and `q`, as the page's search field sends them: `limit=50`, `sort=recent` by default, `q` the trimmed text, left out when empty. The page also sends `mine=1` on its first load and one `rarity` per rarity filter.
+- `q` matches `auctions.snapshot_search_document`, the card title and category in lower case without accents, regardless of case. Only `active` auctions came back.
+- Response `{"auctions": [...], "page", "limit", "hasMore"}`. Each auction holds the `auctions` columns, `card` (the `cards` row, `wikipedia_title` included), `seller`, `current_bidder` and `owned`. No match gives `"auctions": []`.
+- A `limit` above 50 gets HTTP 403 `{"code":"automation_limit","error":"Trop de requêtes automatisées. L'automatisation n'est pas autorisée — voir le règlement."}`; `limit=0` answers 50 auctions at most (observed 2026-10-08).
+- `searchAuctions`: sends `page=1`, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, `card` standing for `cards`, reports `hasMore`, and reports a refusal with its body.

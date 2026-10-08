@@ -6,6 +6,10 @@ import { parseUuid } from "./uuid.js";
 
 export type AuctionId = string & { readonly __brand: "AuctionId" };
 
+export const AUCTION_LIMIT = 50;
+
+export type AuctionLimit = number & { readonly __brand: "AuctionLimit" };
+
 export type BidAmount = number & { readonly __brand: "BidAmount" };
 
 export interface PlacedBid {
@@ -49,6 +53,15 @@ interface BidResponse {
 
 export function parseAuctionId(raw: string): AuctionId {
   return parseUuid(raw, "auction") as AuctionId;
+}
+
+export function parseAuctionLimit(raw: string): AuctionLimit {
+  if (!isStrictlyPositiveInteger(raw)) {
+    throw new WikiMastersError(
+      `Invalid limit: ${JSON.stringify(raw)} is not a strictly positive integer; nothing was read`,
+    );
+  }
+  return Number(raw) as AuctionLimit;
 }
 
 export function parseBidAmount(raw: string): BidAmount {

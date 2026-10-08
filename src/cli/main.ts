@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import {
-  AUCTION_LIST_LIMIT,
+  AUCTION_LIMIT,
   addToWishlist,
   discardCards,
   listAuctions,
@@ -10,11 +10,12 @@ import {
   listWishlist,
   loginInBrowser,
   parseAuctionId,
-  parseAuctionListLimit,
+  parseAuctionLimit,
   parseBidAmount,
   parseCardId,
   placeBid,
   removeFromWishlist,
+  searchAuctions,
   searchCards,
   showAuction,
   starCard,
@@ -28,6 +29,7 @@ import { loadConfig } from "./config.js";
 import {
   formatAddition,
   formatAuction,
+  formatAuctionSearch,
   formatAuctions,
   formatBid,
   formatCardSearch,
@@ -117,12 +119,33 @@ auction
   .option(
     "--limit <n>",
     "maximum number of auctions, a strictly positive integer",
-    String(AUCTION_LIST_LIMIT),
+    String(AUCTION_LIMIT),
   )
   .action(async ({ limit, ...filter }: AuctionFilter & { limit: string }) => {
-    const maximum = parseAuctionListLimit(limit);
+    const maximum = parseAuctionLimit(limit);
     const auctions = await listAuctions(await openSession(), filter, maximum);
     console.log(formatAuctions(auctions, format(), filter.status));
+  });
+
+auction
+  .command("search")
+  .description(
+    "Find the auctions the game matches with the given text, in the order it returns them, with their card, status, end time, starting price, current bid, and whether you lead or sell them",
+  )
+  .argument(
+    "<text...>",
+    "text to search for, as in the marketplace search field",
+  )
+  .option(
+    "--limit <n>",
+    "maximum number of auctions, a strictly positive integer",
+    String(AUCTION_LIMIT),
+  )
+  .action(async (words: string[], { limit }: { limit: string }) => {
+    const maximum = parseAuctionLimit(limit);
+    const session = await openSession();
+    const result = await searchAuctions(session, words.join(" "), maximum);
+    console.log(formatAuctionSearch(result, format()));
   });
 
 auction
