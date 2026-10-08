@@ -19,7 +19,7 @@ export interface AuctionFilter {
   status?: string;
 }
 
-type ListedAuctionRow = AuctionRow & { id: string };
+type ListedAuctionRow = AuctionRow & { id: AuctionId };
 
 export function parseAuctionListLimit(raw: string): AuctionListLimit {
   if (!isStrictlyPositiveInteger(raw)) {
@@ -50,5 +50,5 @@ export async function listAuctions(
   if (error) {
     throw apiFailure("Listing the auctions", httpStatus, error.message);
   }
-  return data.map((row) => toAuction(session, row.id as AuctionId, row));
+  return data.map((row) => toAuction(session, row.id, row));
 }

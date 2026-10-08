@@ -1,5 +1,6 @@
 import type {
   Auction,
+  AuctionId,
   BidAuction,
   CardSearch,
   CatalogueCard,
@@ -159,9 +160,7 @@ export function formatRunningBids(
   format: Format,
 ): string {
   if (format === "json") {
-    return JSON.stringify(
-      auctions.map(({ auctionId, ...state }) => ({ id: auctionId, ...state })),
-    );
+    return JSON.stringify(auctions.map(withId));
   }
   if (auctions.length === 0) return "You have no bid on a running auction.";
   return auctions
@@ -172,8 +171,19 @@ export function formatRunningBids(
     .join("\n");
 }
 
-function auctionJson({ auctionId, ...state }: Auction) {
+function withId<T extends { auctionId: AuctionId }>({
+  auctionId,
+  ...state
+}: T) {
   return { id: auctionId, ...state };
+}
+
+function auctionedCopy({ title, rarity, shiny }: Auction): string {
+  return `${title} (${rarity})${shiny ? " [shiny]" : ""}`;
+}
+
+function seller(selling: boolean): string {
+  return selling ? "you" : "another player";
 }
 
 export function formatAuctions(
@@ -181,7 +191,7 @@ export function formatAuctions(
   format: Format,
   requestedStatus?: string,
 ): string {
-  if (format === "json") return JSON.stringify(auctions.map(auctionJson));
+  if (format === "json") return JSON.stringify(auctions.map(withId));
   if (auctions.length === 0) {
     return requestedStatus === undefined
       ? "No auction to list."
@@ -189,42 +199,21 @@ export function formatAuctions(
   }
   return auctions
     .map(
-      ({
-        auctionId,
-        title,
-        rarity,
-        shiny,
-        status,
-        endsAt,
-        startingPrice,
-        currentBid,
-        leading,
-        selling,
-      }) =>
-        `${auctionId}  ${title} (${rarity})${shiny ? " [shiny]" : ""}: ${status}, ends ${endsAt}, starting price ${wikibidous(startingPrice)}, ${currentBidState(currentBid, leading)}, sold by ${selling ? "you" : "another player"}`,
+      (auction) =>
+        `${auction.auctionId}  ${auctionedCopy(auction)}: ${auction.status}, ends ${auction.endsAt}, starting price ${wikibidous(auction.startingPrice)}, ${currentBidState(auction.currentBid, auction.leading)}, sold by ${seller(auction.selling)}`,
     )
     .join("\n");
 }
 
 export function formatAuction(auction: Auction, format: Format): string {
-  if (format === "json") return JSON.stringify(auctionJson(auction));
-  const {
-    auctionId,
-    title,
-    rarity,
-    shiny,
-    status,
-    endsAt,
-    startingPrice,
-    currentBid,
-    leading,
-    selling,
-  } = auction;
+  if (format === "json") return JSON.stringify(withId(auction));
+  const { auctionId, status, endsAt, startingPrice, currentBid, leading } =
+    auction;
   return [
-    `Auction ${auctionId}: ${title} (${rarity})${shiny ? " [shiny]" : ""}`,
+    `Auction ${auctionId}: ${auctionedCopy(auction)}`,
     `Status ${status}, ends ${endsAt}`,
     `Starting price ${wikibidous(startingPrice)}; ${currentBidState(currentBid, leading)}`,
-    `Sold by ${selling ? "you" : "another player"}`,
+    `Sold by ${seller(auction.selling)}`,
   ].join("\n");
 }
 

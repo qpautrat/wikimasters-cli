@@ -99,19 +99,19 @@ async function readAuction(
 export function toAuction(
   session: Session,
   auctionId: AuctionId,
-  auction: AuctionRow,
+  row: AuctionRow,
 ): Auction {
   return {
     auctionId,
-    title: auctionedTitle(auctionId, auction),
-    rarity: auction.snapshot_rarity,
-    shiny: auction.is_shiny,
-    status: auction.status,
-    endsAt: auction.end_at,
-    startingPrice: auction.base_amount,
-    currentBid: auction.current_bid,
-    leading: leads(session, auction),
-    selling: auction.seller_id === session.userId,
+    title: auctionedTitle(auctionId, row),
+    rarity: row.snapshot_rarity,
+    shiny: row.is_shiny,
+    status: row.status,
+    endsAt: row.end_at,
+    startingPrice: row.base_amount,
+    currentBid: row.current_bid,
+    leading: leads(session, row),
+    selling: row.seller_id === session.userId,
   };
 }
 
