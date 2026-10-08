@@ -12,6 +12,8 @@ Present a backlog listing in three tables, an empty one included:
 2. **Player rules**: a choice of how the player plays, meant for `CLAUDE.local.md`.
 3. **Technical**: tooling, rules and infrastructure of the repo.
 
+Each table has a `Dépend de` column naming the backlog specs that row depends on, read with `grep -H "Dépend de" specs/backlog/*.md`.
+
 ## One subject per spec
 
 - A spec covers one subject, functional or technical. Every acceptance criterion must belong to the subject named in the title. Split anything else out.
