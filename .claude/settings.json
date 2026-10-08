@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(npx prettier *)",
+      "Bash(mise * npx prettier *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mise -C \"$CLAUDE_PROJECT_DIR\" exec -- sh -c 'f=$(jq -r \".tool_response.filePath // .tool_input.file_path\"); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/src/*.ts|\"$CLAUDE_PROJECT_DIR\"/tools/*.ts) npx biome format --write \"$f\" ;; esac' >/dev/null 2>&1 || true",
+            "statusMessage": "Formatting with Biome"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mise -C \"$CLAUDE_PROJECT_DIR\" exec -- node_modules/.bin/biome format --write src tools >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ]
+  }
+}
