@@ -39,7 +39,7 @@ Source: read-only query.
 - The whole catalogue is readable, owned or not: more than 100,000 cards.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
 - `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first.
-- `showAuction` embeds it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
+- `showAuction` and `listAuctions` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
 - `listRunningBids` embeds it the same way through `auction_bids` → `auctions`.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
@@ -126,6 +126,7 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 | `is_shiny` | whether the auctioned copy is shiny |
 
 - `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`.
+- `listAuctions`: `GET` of `id` and the same columns, filtered on `status` when given, limited to `limit`, without `order`. An unknown `status` value returns `[]` (observed 2026-10-08). Without a status filter, a read with `limit=3` answers (observed 2026-10-08); each status holds more than 100,000 auctions, and a read of the whole table times out (observed 2026-10-05).
 - `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
 
 ## `auction_bids`: the bids

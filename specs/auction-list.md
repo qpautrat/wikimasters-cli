@@ -6,7 +6,7 @@ Pour consulter ou miser sur une enchère, `wikimasters auction show` et `wikimas
 
 Chaque statut compte plus de 100 000 enchères, et l'API dépasse son délai quand on lit la table sans filtrer sur le statut (observé le 2026-10-05).
 
-Dépend de : [Consulter une enchère](../auction-show.md).
+Dépend de : [Consulter une enchère](auction-show.md).
 
 ## User story
 

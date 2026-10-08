@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import {
+  AUCTION_LIST_LIMIT,
   addToWishlist,
   discardCards,
+  listAuctions,
   listCollection,
   listRunningBids,
   listWishlist,
   loginInBrowser,
   parseAuctionId,
+  parseAuctionListLimit,
   parseBidAmount,
   parseCardId,
   placeBid,
@@ -18,12 +21,14 @@ import {
   tagCard,
   unstarCard,
   untagCard,
+  type AuctionFilter,
   type CollectionFilter,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
   formatAddition,
   formatAuction,
+  formatAuctions,
   formatBid,
   formatCardSearch,
   formatCollection,
@@ -98,6 +103,26 @@ auction
   .action(async () => {
     const auctions = await listRunningBids(await openSession());
     console.log(formatRunningBids(auctions, format()));
+  });
+
+auction
+  .command("list")
+  .description(
+    "List auctions in the order the game returns them, with their card, status, end time, starting price, current bid, and whether you lead or sell them",
+  )
+  .option(
+    "--status <status>",
+    "list only the auctions of this status, e.g. active, settled_sold, settled_unsold or cancelled",
+  )
+  .option(
+    "--limit <n>",
+    "maximum number of auctions, a strictly positive integer",
+    String(AUCTION_LIST_LIMIT),
+  )
+  .action(async ({ limit, ...filter }: AuctionFilter & { limit: string }) => {
+    const maximum = parseAuctionListLimit(limit);
+    const auctions = await listAuctions(await openSession(), filter, maximum);
+    console.log(formatAuctions(auctions, format(), filter.status));
   });
 
 auction

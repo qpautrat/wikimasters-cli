@@ -3,6 +3,7 @@ import { parseAuctionId, parseCardId } from "../core/index.js";
 import {
   formatAddition,
   formatAuction,
+  formatAuctions,
   formatBid,
   formatCardSearch,
   formatCollection,
@@ -66,6 +67,17 @@ describe("JSON output", () => {
     expect(JSON.parse(formatRunningBids([runningBid], "json"))).toEqual([
       { id: auctionId, ...state },
     ]);
+  });
+
+  it("lists each auction with its state in its own field", () => {
+    const { auctionId, ...state } = shownAuction;
+    expect(JSON.parse(formatAuctions([shownAuction], "json"))).toEqual([
+      { id: auctionId, ...state },
+    ]);
+  });
+
+  it("prints an empty auction list as []", () => {
+    expect(formatAuctions([], "json", "active")).toBe("[]");
   });
 
   it("reports each piece of the auction state in its own field", () => {
@@ -188,6 +200,34 @@ describe("JSON output", () => {
 });
 
 describe("text output", () => {
+  it("prints one line per auction with its card, state, and the user's part in it", () => {
+    expect(
+      formatAuctions(
+        [
+          shownAuction,
+          {
+            ...shownAuction,
+            shiny: false,
+            currentBid: null,
+            leading: false,
+            selling: true,
+          },
+        ],
+        "text",
+      ).split("\n"),
+    ).toEqual([
+      "d6669009-683d-44b6-b6e7-2c0960c37f2f  Musique celtique (R) [shiny]: active, ends 2026-10-05T18:36:38.07319+00:00, starting price 200 wikibidous, current bid 326 wikibidous by you, sold by another player",
+      "d6669009-683d-44b6-b6e7-2c0960c37f2f  Musique celtique (R): active, ends 2026-10-05T18:36:38.07319+00:00, starting price 200 wikibidous, no bid yet, sold by you",
+    ]);
+  });
+
+  it("says when there is no auction to list", () => {
+    expect(formatAuctions([], "text")).toBe("No auction to list.");
+    expect(formatAuctions([], "text", "cancelled")).toBe(
+      "No auction with status cancelled.",
+    );
+  });
+
   it("prints one line per running auction bid on", () => {
     expect(formatRunningBids([runningBid], "text")).toBe(
       `${bid.auctionId}  Pointe de la Sambuy: your bid 22 wikibidous, current bid 25 wikibidous by another player, ends 2026-10-06T08:56:58.649051+00:00`,

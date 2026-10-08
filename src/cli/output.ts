@@ -172,11 +172,42 @@ export function formatRunningBids(
     .join("\n");
 }
 
-export function formatAuction(auction: Auction, format: Format): string {
-  if (format === "json") {
-    const { auctionId, ...state } = auction;
-    return JSON.stringify({ id: auctionId, ...state });
+function auctionJson({ auctionId, ...state }: Auction) {
+  return { id: auctionId, ...state };
+}
+
+export function formatAuctions(
+  auctions: readonly Auction[],
+  format: Format,
+  requestedStatus?: string,
+): string {
+  if (format === "json") return JSON.stringify(auctions.map(auctionJson));
+  if (auctions.length === 0) {
+    return requestedStatus === undefined
+      ? "No auction to list."
+      : `No auction with status ${requestedStatus}.`;
   }
+  return auctions
+    .map(
+      ({
+        auctionId,
+        title,
+        rarity,
+        shiny,
+        status,
+        endsAt,
+        startingPrice,
+        currentBid,
+        leading,
+        selling,
+      }) =>
+        `${auctionId}  ${title} (${rarity})${shiny ? " [shiny]" : ""}: ${status}, ends ${endsAt}, starting price ${wikibidous(startingPrice)}, ${currentBidState(currentBid, leading)}, sold by ${selling ? "you" : "another player"}`,
+    )
+    .join("\n");
+}
+
+export function formatAuction(auction: Auction, format: Format): string {
+  if (format === "json") return JSON.stringify(auctionJson(auction));
   const {
     auctionId,
     title,

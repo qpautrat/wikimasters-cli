@@ -4,7 +4,7 @@
 
 Pour miser sur la carte que je cherche, je dois retrouver ses enchères. `wikimasters auction list` ne filtre que sur le statut, alors que l'interface du marché propose un champ de recherche. Ce champ envoie `GET /api/marketplace?q=<texte>&page=<p>&limit=50&sort=<tri>` au site (JavaScript de la page `/marketplace`, observé le 2026-10-05).
 
-Dépend de : [Lister les enchères](auction-list.md).
+Dépend de : [Lister les enchères](../auction-list.md).
 
 ## User story
 

@@ -50,11 +50,12 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `mise run wikimasters -- wishlist list` |
 | `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `mise run wikimasters -- wishlist add <card-uuid>` |
 | `wishlist remove <card-id>` | Removes a card from your wishlist | `mise run wikimasters -- wishlist remove <card-uuid>` |
+| `auction list [--status <status>] [--limit <n>]` | Lists auctions in the order the game returns them, at most 50 by default, with card, status, end time, starting price, current bid, and whether you lead or sell them; `--status` keeps one status, e.g. `active` | `mise run wikimasters -- auction list --status active --limit 20` |
 | `auction show <auction-id>` | Shows an auction's card, status, end time, starting price, current bid, and whether you lead or sell it | `mise run wikimasters -- auction show 6e6bd506-4045-445c-8b6f-16a29592fe4d` |
 | `auction bids` | Lists the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead | `mise run wikimasters -- auction bids` |
 | `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction bid <auction-uuid> 25` |
 
-A card id is the `id` that `cards search`, `collection list` and `wishlist list` print. An auction id is the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
+A card id is the `id` that `cards search`, `collection list` and `wishlist list` print. An auction id is the `id` that `auction list` and `auction bids` print, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
 
 ### Output and exit codes
 
