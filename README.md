@@ -35,7 +35,7 @@ The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SU
 
 ## Commands
 
-Run every command from the repository root as `mise run wikimasters -- <command>`. `mise run wikimasters -- <command> --help` gives its arguments and options.
+Run every command from the repository root as `mise run wikimasters -- <command>`. `mise run wikimasters -- <command> --help` gives its arguments, options and examples.
 
 | Command | What it does | Example |
 |---|---|---|
