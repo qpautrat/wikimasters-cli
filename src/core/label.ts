@@ -66,3 +66,34 @@ export async function createLabel(
   }
   return { ...data, created: true };
 }
+
+export interface LabelDeletion {
+  name: string;
+  deleted: boolean;
+}
+
+export async function deleteLabel(
+  session: Session,
+  name: string,
+): Promise<LabelDeletion> {
+  const label = JSON.stringify(name);
+  const { data, error, status } = await session.client
+    .from("tags")
+    .select("id")
+    .eq("user_id", session.userId)
+    .eq("name", name)
+    .maybeSingle<Pick<Label, "id">>();
+  if (error) throw apiFailure(`Reading label ${label}`, status, error.message);
+  if (!data) return { name, deleted: false };
+  const deletion = await session.client.rpc("delete_tag", {
+    p_tag_id: data.id,
+  });
+  if (deletion.error) {
+    throw apiFailure(
+      `Deleting label ${label}`,
+      deletion.status,
+      deletion.error.message,
+    );
+  }
+  return { name, deleted: true };
+}

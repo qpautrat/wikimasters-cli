@@ -48,6 +48,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `collection tag <card-id> <label>` | Puts one of your labels on a card of your collection | `mise run wikimasters -- collection tag <card-uuid> Favourites` |
 | `collection untag <card-id> <label>` | Removes one of your labels from a card of your collection | `mise run wikimasters -- collection untag <card-uuid> Favourites` |
 | `labels create <name> [--color <colour>]` | Creates a label, or reports the one you already have under that name regardless of case; `--color` is sent to the game as given, a hex colour such as `#facc15` | `mise run wikimasters -- labels create "Karmine Corp" --color "#facc15"` |
+| `labels delete <name>` | Deletes your label named `<name>`, matched by the API on the name as given, which removes it from your cards, or says you have none | `mise run wikimasters -- labels delete "Karmine Corp"` |
 | `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `mise run wikimasters -- wishlist list` |
 | `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `mise run wikimasters -- wishlist add <card-uuid>` |
 | `wishlist remove <card-id>` | Removes a card from your wishlist | `mise run wikimasters -- wishlist remove <card-uuid>` |

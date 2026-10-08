@@ -11,6 +11,7 @@ import {
   formatDiscard,
   formatFavourite,
   formatLabelCreation,
+  formatLabelDeletion,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -206,6 +207,14 @@ describe("JSON output", () => {
         ),
       ),
     ).toEqual({ name: "Karmine Corp", color: "#94a3b8", created: true });
+  });
+
+  it("reports a label deletion with its name and whether it was just deleted", () => {
+    expect(
+      JSON.parse(
+        formatLabelDeletion({ name: "Karmine Corp", deleted: true }, "json"),
+      ),
+    ).toEqual({ name: "Karmine Corp", deleted: true });
   });
 
   it("reports a discard with its count, gain, balance and refused cards", () => {
@@ -485,6 +494,18 @@ describe("text output", () => {
         "text",
       ),
     ).toBe('Label "Karmine Corp" (#94a3b8) already existed.');
+  });
+
+  it("says when a label is deleted", () => {
+    expect(
+      formatLabelDeletion({ name: "Karmine Corp", deleted: true }, "text"),
+    ).toBe('Label "Karmine Corp" deleted.');
+  });
+
+  it("says when there was no label of that name", () => {
+    expect(
+      formatLabelDeletion({ name: "Karmine Corp", deleted: false }, "text"),
+    ).toBe('You had no label named "Karmine Corp"; nothing was deleted.');
   });
 
   it("says when a card is labelled", () => {

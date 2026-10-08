@@ -4,6 +4,7 @@ import {
   AUCTION_LIMIT,
   addToWishlist,
   createLabel,
+  deleteLabel,
   discardCards,
   listAuctions,
   listCollection,
@@ -38,6 +39,7 @@ import {
   formatDiscard,
   formatFavourite,
   formatLabelCreation,
+  formatLabelDeletion,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -266,6 +268,19 @@ labels
     const session = await openSession();
     console.log(
       formatLabelCreation(await createLabel(session, name, color), format()),
+    );
+  });
+
+labels
+  .command("delete")
+  .description(
+    "Delete a label, removing it from your cards; succeeds without deleting if the API finds no label of yours with that name",
+  )
+  .argument("<name>", "label name")
+  .action(async (name: string) => {
+    const session = await openSession();
+    console.log(
+      formatLabelDeletion(await deleteLabel(session, name), format()),
     );
   });
 

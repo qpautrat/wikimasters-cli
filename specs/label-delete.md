@@ -4,7 +4,7 @@
 
 `wikimasters labels create` crée une étiquette, mais seule l'interface la supprime. L'interface appelle la fonction RPC `delete_tag` avec l'identifiant de l'étiquette (`p_tag_id`), après avoir annoncé de combien de cartes elle sera retirée (JavaScript du site, lu le 2026-10-08).
 
-Dépend de : [Créer une étiquette](../label-create.md).
+Dépend de : [Créer une étiquette](label-create.md).
 
 ## User story
 

@@ -9,6 +9,7 @@ import type {
   Discard,
   FavouriteChange,
   LabelCreation,
+  LabelDeletion,
   PlacedBid,
   TagChange,
   WishlistAddition,
@@ -257,6 +258,16 @@ export function formatLabelCreation(
   if (format === "json") return JSON.stringify({ name, color, created });
   const label = `Label ${JSON.stringify(name)} (${color})`;
   return created ? `${label} created.` : `${label} already existed.`;
+}
+
+export function formatLabelDeletion(
+  { name, deleted }: LabelDeletion,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ name, deleted });
+  return deleted
+    ? `Label ${JSON.stringify(name)} deleted.`
+    : `You had no label named ${JSON.stringify(name)}; nothing was deleted.`;
 }
 
 export function formatTag(
