@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 import { AuthRequiredError, WikiMastersError } from "../core/index.js";
 
-function packageRoot(): string {
+export function packageRoot(): string {
   let dir = dirname(fileURLToPath(import.meta.url));
   while (!existsSync(join(dir, "package.json"))) {
     const parent = dirname(dir);

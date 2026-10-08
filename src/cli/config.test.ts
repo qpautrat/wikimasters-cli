@@ -64,7 +64,7 @@ describe("loadConfig", () => {
     ).toThrow(AuthRequiredError);
     expect(() =>
       requireRefreshToken({ anonKey: "anon-key", refreshToken: undefined }),
-    ).toThrow(/wikimasters login/);
+    ).toThrow(/^Not logged in$/);
   });
 });
 

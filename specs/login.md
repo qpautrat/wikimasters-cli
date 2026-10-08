@@ -28,7 +28,7 @@ La connexion à WikiMasters est protégée par un captcha, qu'un humain doit ré
    - aucune session n'est enregistrée ;
    - la session enregistrée est expirée ou révoquée ;
    - l'API rejette la session (HTTP 401).
-6. Dans ces cas, le message d'erreur indique de lancer `wikimasters login`.
+6. Dans ces cas, le message d'erreur indique de lancer `mise -C '<racine du dépôt>' run wikimasters -- login`, avec le chemin absolu de la racine, et cette commande fonctionne telle quelle depuis n'importe quel dossier. L'erreur levée par le cœur ne nomme aucune commande : c'est la CLI qui ajoute la commande à lancer.
 7. Les autres erreurs (réseau, indisponibilité de l'API, argument invalide…) sortent avec le code 1.
 
 ### Prérequis de `--firefox`

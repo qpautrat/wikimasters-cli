@@ -20,7 +20,7 @@ En tant que joueur, j'installe la CLI depuis npm, sans cloner le dépôt, et je 
 4. Sur une machine sans clone du dépôt, avec un Node qui satisfait `engines`, `npm install -g <nom>` installe la commande `wikimasters`, et `wikimasters --help` affiche l'aide depuis n'importe quel dossier.
 5. Après cette installation, `wikimasters login` puis `wikimasters wishlist list` fonctionnent depuis n'importe quel dossier.
 6. Le README décrit l'installation depuis npm et donne les commandes sous la forme `wikimasters <commande>` pour la CLI installée, en gardant l'installation depuis un clone pour contribuer.
-7. Le commit qui implémente cette spec supprime [Indiquer la commande de connexion exacte](login-hint-command.md) du backlog, le message du code 4 (`run wikimasters login`) étant juste pour la CLI installée, et retire de [Lancer la CLI par une tâche mise](../cli-mise-task.md) les liens vers elle.
+7. Le commit qui implémente cette spec modifie le critère 6 de [Connexion](../login.md) : le message du code 4 indique de lancer `wikimasters login`, la commande de la CLI installée.
 
 ## Hors périmètre
 

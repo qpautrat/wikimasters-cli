@@ -6,10 +6,6 @@ export class WikiMastersError extends Error {
 
 export class AuthRequiredError extends WikiMastersError {
   override name = "AuthRequiredError";
-
-  constructor(reason: string) {
-    super(`${reason}: run \`wikimasters login\``);
-  }
 }
 
 export class ApiUnavailableError extends WikiMastersError {
