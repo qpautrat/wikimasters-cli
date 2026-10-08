@@ -1,5 +1,6 @@
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
+import { isStrictlyPositiveInteger } from "./positive-integer.js";
 import { siteCookie, siteRequest } from "./site.js";
 import { parseUuid } from "./uuid.js";
 
@@ -38,6 +39,9 @@ export interface AuctionRow {
   cards: { wikipedia_title: string } | null;
 }
 
+export const AUCTION_COLUMNS =
+  "status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)";
+
 interface BidResponse {
   current_bid: number;
   bidder_balance: number;
@@ -48,13 +52,12 @@ export function parseAuctionId(raw: string): AuctionId {
 }
 
 export function parseBidAmount(raw: string): BidAmount {
-  const amount = Number(raw);
-  if (!/^[1-9][0-9]*$/.test(raw) || !Number.isSafeInteger(amount)) {
+  if (!isStrictlyPositiveInteger(raw)) {
     throw new WikiMastersError(
       `Invalid bid amount: ${JSON.stringify(raw)} is not a strictly positive integer of wikibidous; nothing was bid`,
     );
   }
-  return amount as BidAmount;
+  return Number(raw) as BidAmount;
 }
 
 export function auctionedTitle(
@@ -82,9 +85,7 @@ async function readAuction(
 ): Promise<AuctionRow> {
   const { data, error, status } = await session.client
     .from("auctions")
-    .select(
-      "status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)",
-    )
+    .select(AUCTION_COLUMNS)
     .eq("id", auctionId)
     .maybeSingle()
     .overrideTypes<AuctionRow, { merge: false }>();
@@ -95,11 +96,11 @@ async function readAuction(
   return data;
 }
 
-export async function showAuction(
+export function toAuction(
   session: Session,
   auctionId: AuctionId,
-): Promise<Auction> {
-  const auction = await readAuction(session, auctionId);
+  auction: AuctionRow,
+): Auction {
   return {
     auctionId,
     title: auctionedTitle(auctionId, auction),
@@ -112,6 +113,13 @@ export async function showAuction(
     leading: leads(session, auction),
     selling: auction.seller_id === session.userId,
   };
+}
+
+export async function showAuction(
+  session: Session,
+  auctionId: AuctionId,
+): Promise<Auction> {
+  return toAuction(session, auctionId, await readAuction(session, auctionId));
 }
 
 function isBidResponse(body: unknown): body is BidResponse {
