@@ -34,15 +34,6 @@
   "enabledPlugins": {
     "session-report@claude-plugins-official": true,
     "datadog@claude-plugins-official": false,
-    "csharp-lsp@claude-plugins-official": false,
-    "mattpocock-skills@mattpocock": true
-  },
-  "extraKnownMarketplaces": {
-    "mattpocock": {
-      "source": {
-        "source": "github",
-        "repo": "mattpocock/skills"
-      }
-    }
+    "csharp-lsp@claude-plugins-official": false
   }
 }
