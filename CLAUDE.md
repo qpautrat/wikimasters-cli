@@ -29,7 +29,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 
 The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture, and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. When the commit changes `package.json` or `package-lock.json`, `scripts/audit-staged.sh` runs `npm audit` on the production dependencies of the staged `package-lock.json` and refuses any known vulnerability, whatever its severity, naming each package and its severity; when the npm registry is unreachable it warns and lets the commit through. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests, build and tools build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit. Never pass `--no-verify`, including with `--amend`.
 
-Edit `.claude/settings.json` directly, after reading the docs through Context7; never load the `update-config` skill.
+Edit Claude Code settings files directly, after reading the docs through Context7; never load the `update-config` skill.
 
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. `tsconfig.json` covers every file and serves the typecheck and the editor; `tsconfig.build.json` builds `src/` to `dist/`, without test files and `testing/`.
 
