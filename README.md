@@ -67,7 +67,7 @@ Results are text by default. With the global `--json` option, stdout carries onl
 | `4` | You must sign in: no stored session, or the session expired, was revoked or was rejected by the API. Run `mise run wikimasters -- login` again. |
 | `75` | The API stayed unavailable after the CLI's own retries. Retry later. |
 
-Each command first rebuilds the CLI from `src/`. When that build fails, the CLI does not run: stderr carries the compiler errors, and the exit code is the compiler's, neither 0, 4 nor 75.
+Each command first rebuilds the CLI from `src/`. When that build fails, the CLI does not run: stderr carries the compiler errors, and the command exits 1.
 
 ## Playing through an agent
 
