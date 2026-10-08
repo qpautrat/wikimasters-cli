@@ -8,6 +8,7 @@ import type {
   CollectionCard,
   Discard,
   FavouriteChange,
+  LabelCreation,
   PlacedBid,
   TagChange,
   WishlistAddition,
@@ -247,6 +248,15 @@ export function formatFavourite(
   return changed
     ? `Card ${cardId} removed from the favourites.`
     : `Card ${cardId} was not a favourite.`;
+}
+
+export function formatLabelCreation(
+  { name, color, created }: LabelCreation,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ name, color, created });
+  const label = `Label ${JSON.stringify(name)} (${color})`;
+  return created ? `${label} created.` : `${label} already existed.`;
 }
 
 export function formatTag(

@@ -97,7 +97,8 @@ Source: read-only query, 2026-10-05.
 
 - Row-level security returns only the user's own rows.
 - `listCollection`: reads `name` through the `user_card_tags(tags(name))` embed in `user_cards`.
-- `tagCard` / `untagCard`: `GET` of `id, name` filtered on `user_id` and ordered by `name`, to find the label by its exact name or list the user's labels.
+- `tagCard` / `untagCard`: `GET` of `id, name, color` filtered on `user_id` and ordered by `name`, to find the label by its exact name or list the user's labels.
+- `createLabel`: `POST tags?select=name,color` with `{"user_id":"<user id>","name":"<name>"}`, plus `"color"` when given, and `Prefer: return=representation`; PostgREST answers `201` with the created row. Without a colour the game stores `#94a3b8`. A colour that is not hex gets HTTP 400 `23514` from the check constraint `tags_color_hex_check`. A name the user already has, regardless of case, gets `23505`; `createLabel` then reads the user's labels as `tagCard` does and reports the one whose name is equal regardless of case. Source: the site's JavaScript for the request, runs on the account (2026-10-08) for the answers.
 
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 

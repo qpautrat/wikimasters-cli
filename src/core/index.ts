@@ -33,6 +33,7 @@ export {
   type CardSearch,
   type CatalogueCard,
 } from "./card-search.js";
+export { createLabel, type LabelCreation } from "./label.js";
 export {
   listCollection,
   type CollectionCard,

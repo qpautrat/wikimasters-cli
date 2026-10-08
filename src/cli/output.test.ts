@@ -10,6 +10,7 @@ import {
   formatCollection,
   formatDiscard,
   formatFavourite,
+  formatLabelCreation,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -194,6 +195,17 @@ describe("JSON output", () => {
         ),
       ),
     ).toEqual({ id: cardId, label: "Histoire", tagged: true, changed: false });
+  });
+
+  it("reports a label with its name, colour and whether it was just created", () => {
+    expect(
+      JSON.parse(
+        formatLabelCreation(
+          { name: "Karmine Corp", color: "#94a3b8", created: true },
+          "json",
+        ),
+      ),
+    ).toEqual({ name: "Karmine Corp", color: "#94a3b8", created: true });
   });
 
   it("reports a discard with its count, gain, balance and refused cards", () => {
@@ -455,6 +467,24 @@ describe("text output", () => {
     expect(
       formatFavourite({ cardId, starred: false, changed: false }, "text"),
     ).toBe(`Card ${cardId} was not a favourite.`);
+  });
+
+  it("says when a label is created, with its colour", () => {
+    expect(
+      formatLabelCreation(
+        { name: "Karmine Corp", color: "#facc15", created: true },
+        "text",
+      ),
+    ).toBe('Label "Karmine Corp" (#facc15) created.');
+  });
+
+  it("says when a label already existed, with its colour", () => {
+    expect(
+      formatLabelCreation(
+        { name: "Karmine Corp", color: "#94a3b8", created: false },
+        "text",
+      ),
+    ).toBe('Label "Karmine Corp" (#94a3b8) already existed.');
   });
 
   it("says when a card is labelled", () => {

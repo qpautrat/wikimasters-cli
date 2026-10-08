@@ -1,6 +1,7 @@
 import type { CardId } from "./card-id.js";
 import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
+import { readLabels, type Label } from "./label.js";
 import type { Session } from "./session.js";
 
 export interface TagChange {
@@ -10,28 +11,17 @@ export interface TagChange {
   changed: boolean;
 }
 
-interface Tag {
-  id: string;
-  name: string;
-}
-
 interface TaggedEntry {
   id: string;
   user_card_tags: { tag_id: string }[];
 }
 
-function hasTag(entry: TaggedEntry, tag: Tag): boolean {
+function hasTag(entry: TaggedEntry, tag: Label): boolean {
   return entry.user_card_tags.some(({ tag_id }) => tag_id === tag.id);
 }
 
-async function findTag(session: Session, label: string): Promise<Tag> {
-  const { data, error, status } = await session.client
-    .from("tags")
-    .select("id, name")
-    .eq("user_id", session.userId)
-    .order("name")
-    .overrideTypes<Tag[], { merge: false }>();
-  if (error) throw apiFailure("Reading your labels", status, error.message);
+async function findTag(session: Session, label: string): Promise<Label> {
+  const data = await readLabels(session);
   const tag = data.find(({ name }) => name === label);
   if (tag) return tag;
   const labels =

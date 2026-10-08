@@ -3,6 +3,7 @@ import { Command } from "commander";
 import {
   AUCTION_LIMIT,
   addToWishlist,
+  createLabel,
   discardCards,
   listAuctions,
   listCollection,
@@ -36,6 +37,7 @@ import {
   formatCollection,
   formatDiscard,
   formatFavourite,
+  formatLabelCreation,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -250,6 +252,22 @@ for (const [name, description, change] of [
       console.log(formatTag(await change(session, cardId, label), format()));
     });
 }
+
+const labels = program.command("labels").description("Manage your labels");
+
+labels
+  .command("create")
+  .description(
+    "Create a label; succeeds without creating if you already have a label of that name regardless of case",
+  )
+  .argument("<name>", "label name")
+  .option("--color <colour>", "label colour, sent to the game as given")
+  .action(async (name: string, { color }: { color?: string }) => {
+    const session = await openSession();
+    console.log(
+      formatLabelCreation(await createLabel(session, name, color), format()),
+    );
+  });
 
 const wishlist = program
   .command("wishlist")
