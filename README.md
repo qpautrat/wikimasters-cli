@@ -31,8 +31,6 @@
    mise run wikimasters -- wishlist list
    ```
 
-After a `git pull` or a change to `src/`, rebuild the CLI with `mise exec -- npm run build`.
-
 The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SUPABASE_ANON_KEY` in `.env` at the repository root or in the environment; `.env` wins, and an empty value is ignored.
 
 ## Commands
@@ -68,6 +66,8 @@ Results are text by default. With the global `--json` option, stdout carries onl
 | `1` | Failure: invalid argument, refusal by the game, network error. `collection discard` also exits 1 when the game refused some of the cards, after printing which ones and why. |
 | `4` | You must sign in: no stored session, or the session expired, was revoked or was rejected by the API. Run `mise run wikimasters -- login` again. |
 | `75` | The API stayed unavailable after the CLI's own retries. Retry later. |
+
+Each command first rebuilds the CLI from `src/`. When that build fails, the CLI does not run: stderr carries the compiler errors, and the exit code is the compiler's, neither 0, 4 nor 75.
 
 ## Playing through an agent
 

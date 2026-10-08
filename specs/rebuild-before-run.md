@@ -4,7 +4,7 @@
 
 `mise run wikimasters` lance la CLI construite dans `dist/`. Après un `git pull` ou une modification de `src/`, `dist/` reste celui du dernier build tant qu'on ne lance pas `mise exec -- npm run build` : le README le demande au développeur, et le skill `wikimasters` le vérifie avant chaque commande. Le build prend 0,5 s (mesuré le 2026-10-07 sur un clone neuf).
 
-Dépend de : [Lancer la CLI par une tâche mise](../cli-mise-task.md).
+Dépend de : [Lancer la CLI par une tâche mise](cli-mise-task.md).
 
 ## User story
 
