@@ -3,7 +3,7 @@ import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
-const COLLECTION_PAGE = "/collection";
+export const COLLECTION_PAGE = "/collection";
 
 const WIKIBIDOUS_PER_DISCARD = 1;
 const DISCARD_BATCH_SIZE = 100;

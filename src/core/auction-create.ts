@@ -1,5 +1,6 @@
 import type { AuctionId } from "./auction.js";
 import type { CardId } from "./card-id.js";
+import { COLLECTION_PAGE } from "./collection.js";
 import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError } from "./errors.js";
 import { parseStrictlyPositiveInteger } from "./positive-integer.js";
@@ -65,7 +66,7 @@ export async function createAuction(
     session,
     await siteCookie(session),
     action,
-    "/collection",
+    COLLECTION_PAGE,
     "/api/marketplace",
     {
       method: "POST",

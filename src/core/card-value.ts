@@ -1,4 +1,5 @@
 import type { CardId } from "./card-id.js";
+import { COLLECTION_PAGE } from "./collection.js";
 import { WikiMastersError } from "./errors.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
@@ -46,7 +47,7 @@ async function readCardValue(
     session,
     cookie,
     action,
-    "/collection",
+    COLLECTION_PAGE,
     `/api/marketplace/cards/${cardId}/sales?scope=summary`,
     { method: "GET" },
   );
