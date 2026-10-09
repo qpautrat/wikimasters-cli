@@ -81,7 +81,7 @@ Open [Claude Code](https://claude.com/claude-code) at the repository root and as
 - "Remove Half Dome from my wishlist."
 - "Which auctions am I leading?"
 
-Write your way of playing in a `CLAUDE.local.md` at the repository root, which git ignores: which cards to discard, how to bid, how you sign in. The agent follows it for every command it runs on your account.
+Write your way of playing in a `CLAUDE.local.md` at the repository root, which git ignores and Claude Code loads on its own: which cards to discard, how to bid, how you sign in. The agent follows it for every command it runs on your account.
 
 ## Signing in
 
