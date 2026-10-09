@@ -558,15 +558,11 @@ profile
     ),
   )
   .action(
-    async (
-      pseudo: string,
-      { rarity, wishlisted, ...query }: ProfileCollectionOptions,
-    ) => {
+    async (pseudo: string, { rarity, ...query }: ProfileCollectionOptions) => {
       const session = await openSession();
       const result = await readProfileCollection(session, pseudo, {
         ...query,
         rarities: rarity,
-        wishlisted: wishlisted === true,
       });
       console.log(formatProfileCollection(result, format()));
     },

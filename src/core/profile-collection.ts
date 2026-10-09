@@ -9,8 +9,8 @@ export interface ProfileCollectionQuery {
   page: string;
   sort?: string;
   search?: string;
-  rarities: readonly string[];
-  wishlisted: boolean;
+  rarities?: readonly string[];
+  wishlisted?: boolean;
 }
 
 export interface ProfileCollectionEntry {
@@ -32,7 +32,7 @@ export interface ProfileCollectionPage {
 
 interface ProfileCollectionRow {
   id: string;
-  card: { id: string; wikipedia_title: string; rarity: string };
+  card: { id: CardId; wikipedia_title: string; rarity: string };
   count: number;
   starred: boolean;
   is_shiny: boolean;
@@ -41,7 +41,7 @@ interface ProfileCollectionRow {
 
 interface ProfileCollectionResponse {
   collection: ProfileCollectionRow[];
-  pendingTradeCardIds: string[];
+  pendingTradeCardIds: CardId[];
 }
 
 function isProfileCollectionResponse(
@@ -66,7 +66,7 @@ export async function readProfileCollection(
   const query = new URLSearchParams({ page, stats: "0" });
   if (sort !== undefined) query.set("sort", sort);
   if (search !== undefined) query.set("q", search);
-  for (const rarity of rarities) query.append("rarity", rarity);
+  for (const rarity of rarities ?? []) query.append("rarity", rarity);
   if (wishlisted) query.set("wishlisted_by_me", "1");
   query.set("pending", "1");
   const body = await siteRequest(
@@ -86,7 +86,7 @@ export async function readProfileCollection(
   return {
     entries: body.collection.map((row) => ({
       entryId: row.id,
-      id: row.card.id as CardId,
+      id: row.card.id,
       title: row.card.wikipedia_title,
       rarity: row.card.rarity,
       count: row.count,
