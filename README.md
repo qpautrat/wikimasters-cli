@@ -57,6 +57,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `auction show <auction-id>` | Shows an auction's card, status, end time, starting price, current bid, and whether you lead or sell it | `mise run wikimasters -- auction show 6e6bd506-4045-445c-8b6f-16a29592fe4d` |
 | `auction bids` | Lists the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead | `mise run wikimasters -- auction bids` |
 | `auction create <card-id> <starting-price> <duration>` | Puts a card of your collection up for auction at a starting price in wikibidous, for a duration in minutes, and prints the auction id; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction create <card-uuid> 50 60` |
+| `auction cancel <auction-id>` | Cancels one of your auctions so its card returns to your collection, under a new id, and prints the auction id; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction cancel <auction-uuid>` |
 | `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction bid <auction-uuid> 25` |
 
 A card id is the `id` that `cards search`, `collection list` and `wishlist list` print. An auction id is the `id` that `auction list`, `auction search` and `auction bids` print, the `auctionId` that `auction create` prints, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.

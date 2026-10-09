@@ -6,6 +6,7 @@ import {
   formatAuctionSearch,
   formatAuctions,
   formatBid,
+  formatCancelledAuction,
   formatCardSearch,
   formatCollection,
   formatCreatedAuction,
@@ -30,6 +31,10 @@ const card = {
 const cards = [card];
 const createdAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
+};
+const cancelledAuction = {
+  auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
+  status: "cancelled",
 };
 const bid = {
   auctionId: parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f"),
@@ -111,6 +116,12 @@ describe("JSON output", () => {
     expect(JSON.parse(formatCreatedAuction(createdAuction, "json"))).toEqual({
       auctionId: createdAuction.auctionId,
     });
+  });
+
+  it("reports the cancelled auction's id and the status the game gives", () => {
+    expect(
+      JSON.parse(formatCancelledAuction(cancelledAuction, "json")),
+    ).toEqual({ auctionId: cancelledAuction.auctionId, status: "cancelled" });
   });
 
   it("reports the auction id, the amount bid and the balance", () => {
@@ -305,6 +316,12 @@ describe("text output", () => {
   it("prints the created auction's id", () => {
     expect(formatCreatedAuction(createdAuction, "text")).toBe(
       `Auction ${createdAuction.auctionId} created.`,
+    );
+  });
+
+  it("prints the cancelled auction's id and the status the game gives", () => {
+    expect(formatCancelledAuction(cancelledAuction, "text")).toBe(
+      `Auction ${cancelledAuction.auctionId} cancelled.`,
     );
   });
 

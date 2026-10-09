@@ -3,6 +3,7 @@ import type {
   AuctionId,
   AuctionSearch,
   BidAuction,
+  CancelledAuction,
   CardSearch,
   CatalogueCard,
   CollectionCard,
@@ -159,6 +160,14 @@ export function formatCreatedAuction(
 ): string {
   if (format === "json") return JSON.stringify({ auctionId });
   return `Auction ${auctionId} created.`;
+}
+
+export function formatCancelledAuction(
+  { auctionId, status }: CancelledAuction,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ auctionId, status });
+  return `Auction ${auctionId} ${status}.`;
 }
 
 function currentBidState(currentBid: number | null, leading: boolean): string {

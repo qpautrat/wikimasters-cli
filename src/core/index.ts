@@ -1,5 +1,6 @@
 export { SITE_URL } from "./supabase.js";
 export { listRunningBids, type BidAuction } from "./auction-bids.js";
+export { cancelAuction, type CancelledAuction } from "./auction-cancel.js";
 export {
   createAuction,
   parseAuctionDuration,

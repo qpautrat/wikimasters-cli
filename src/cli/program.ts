@@ -3,6 +3,7 @@ import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
   addToWishlist,
+  cancelAuction,
   createAuction,
   createLabel,
   deleteLabel,
@@ -39,6 +40,7 @@ import {
   formatAuctionSearch,
   formatAuctions,
   formatBid,
+  formatCancelledAuction,
   formatCardSearch,
   formatCollection,
   formatCreatedAuction,
@@ -170,6 +172,24 @@ auction
       );
     },
   );
+
+auction
+  .command("cancel")
+  .description(
+    "Cancel one of your auctions so its card returns to your collection; the game accepts or refuses it and gives its reason",
+  )
+  .argument("<auction-id>", "auction UUID")
+  .addHelpText(
+    "after",
+    examples(`wikimasters auction cancel ${EXAMPLE_AUCTION_ID}`),
+  )
+  .action(async (rawAuctionId: string) => {
+    const auctionId = parseAuctionId(rawAuctionId);
+    const session = await openSession();
+    console.log(
+      formatCancelledAuction(await cancelAuction(session, auctionId), format()),
+    );
+  });
 
 auction
   .command("list")

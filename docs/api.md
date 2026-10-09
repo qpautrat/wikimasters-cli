@@ -177,6 +177,14 @@ Source: the auction form's JavaScript, reached from `/collection`, and auctions 
 - The form offers 10, 30, 60, 180, 360 and 720 minutes, refuses a starting price below 1, and disables itself once the user's active auctions reach `maxConcurrentAuctions` from `GET /api/marketplace/mine` (`{"sellingCount", "maxConcurrentAuctions"}`, 5 for a regular account).
 - `createAuction`: sends the entry id, the starting price and the duration given, reports `auction_id`, and reports a refusal with its body.
 
+## `DELETE /api/marketplace/<auction id>`: cancel an auction
+
+Source: the auction page `/marketplace/<id>` and a cancellation on the account (2026-10-09).
+
+- No body. Response `{"status": "cancelled"}`, HTTP 200; the auction's `status` becomes `cancelled` and the card returns to the seller's `user_cards` under a new entry.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an already cancelled auction gets HTTP 409 `{"error":"Cette enchère n'est plus active"}`.
+- `cancelAuction`: sends the auction id given, reports `status`, and reports a refusal with its body.
+
 ## `GET /api/marketplace`: search the auctions
 
 Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-05 and 2026-10-08).
