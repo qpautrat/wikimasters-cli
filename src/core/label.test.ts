@@ -84,7 +84,7 @@ describe("createLabel", () => {
     });
   });
 
-  it("succeeds without creating when the user already has a label of that name", async () => {
+  it("succeeds without creating when the user already has a label of exactly that name", async () => {
     const { session, requests } = await sessionWith(
       duplicate,
       existingLabel({ name: "Karmine Corp", color: "#818cf8" }),
@@ -101,7 +101,7 @@ describe("createLabel", () => {
     expect(read?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
   });
 
-  it("reports the label the game deems the same name regardless of case", async () => {
+  it("reports the game's duplicate refusal when none of the labels has exactly that name", async () => {
     const { session, requests } = await sessionWith(
       duplicate,
       existingLabel(
@@ -110,23 +110,25 @@ describe("createLabel", () => {
       ),
     );
 
-    await expect(createLabel(session, "karmine corp")).resolves.toEqual({
-      name: "Karmine Corp",
-      color: "#94a3b8",
-      created: false,
-    });
+    await expect(createLabel(session, "karmine corp")).rejects.toThrow(
+      'Creating label "karmine corp" failed (HTTP 409): duplicate key value violates unique constraint',
+    );
     expect(requests.filter(restRequest("POST", "tags"))).toHaveLength(1);
   });
 
-  it("reports a duplicate refusal it cannot match to any of the labels", async () => {
-    const { session } = await sessionWith(
-      duplicate,
-      existingLabel({ name: "E-sport", color: "#5eead4" }),
+  it("sends the name to the API as given", async () => {
+    const { session, requests } = await sessionWith(
+      restRoute("POST", "tags", {
+        status: 201,
+        body: { name: " montagne*", color: "#94a3b8" },
+      }),
     );
 
-    await expect(createLabel(session, "Karmine Corp")).rejects.toThrow(
-      'The game refused label "Karmine Corp" as a duplicate, yet none of your labels has that name regardless of case; nothing was created',
-    );
+    await createLabel(session, " montagne*");
+    const insert = requests.find(restRequest("POST", "tags"));
+    expect(JSON.parse(insert?.body ?? "null")).toMatchObject({
+      name: " montagne*",
+    });
   });
 
   it("reports the game's refusal with its reason", async () => {

@@ -1,4 +1,4 @@
-import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
+import { apiFailure, isUniqueViolation } from "./errors.js";
 import type { Session } from "./session.js";
 
 export interface Label {
@@ -24,21 +24,6 @@ export async function readLabels(session: Session): Promise<Label[]> {
   return data;
 }
 
-async function findExistingLabel(
-  session: Session,
-  name: string,
-): Promise<Label> {
-  const label = (await readLabels(session)).find(
-    (row) => row.name.toLowerCase() === name.toLowerCase(),
-  );
-  if (!label) {
-    throw new WikiMastersError(
-      `The game refused label ${JSON.stringify(name)} as a duplicate, yet none of your labels has that name regardless of case; nothing was created`,
-    );
-  }
-  return label;
-}
-
 export async function createLabel(
   session: Session,
   name: string,
@@ -54,8 +39,12 @@ export async function createLabel(
     .select("name, color")
     .single<Pick<Label, "name" | "color">>();
   if (isUniqueViolation(error)) {
-    const existing = await findExistingLabel(session, name);
-    return { name: existing.name, color: existing.color, created: false };
+    const existing = (await readLabels(session)).find(
+      (label) => label.name === name,
+    );
+    if (existing) {
+      return { name: existing.name, color: existing.color, created: false };
+    }
   }
   if (error) {
     throw apiFailure(

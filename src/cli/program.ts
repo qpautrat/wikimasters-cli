@@ -333,7 +333,7 @@ const labels = program.command("labels").description("Manage your labels");
 labels
   .command("create")
   .description(
-    "Create a label; succeeds without creating if you already have a label of that name regardless of case",
+    "Create a label; succeeds without creating if the game refuses it as a duplicate of your label of exactly that name",
   )
   .argument("<name>", "label name")
   .option("--color <colour>", "label colour, sent to the game as given")
