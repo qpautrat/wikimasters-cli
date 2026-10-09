@@ -87,6 +87,13 @@ export {
   type GlobalCollectionSearch,
 } from "./global-collection.js";
 export {
+  PROFILE_COLLECTION_PAGE_SIZE,
+  readProfileCollection,
+  type ProfileCollectionEntry,
+  type ProfileCollectionPage,
+  type ProfileCollectionQuery,
+} from "./profile-collection.js";
+export {
   resumeSession,
   type ResumeSessionOptions,
   type Session,

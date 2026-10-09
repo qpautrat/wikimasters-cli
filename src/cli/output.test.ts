@@ -18,6 +18,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatProfileCollection,
   formatRemoval,
   formatRunningBids,
   formatTag,
@@ -115,6 +116,19 @@ const emptyGlobalSearch = {
   rarityCounts: null,
   pendingOfferKeys: [],
   hasMore: false,
+};
+
+const entryId = "3d2a29bf-b8a9-4519-924a-67f0daacc644";
+const playerEntry = {
+  entryId,
+  id: cardId,
+  title: "Pointe de la Sambuy",
+  rarity: "SR",
+  count: 1,
+  starred: false,
+  shiny: false,
+  labels: [],
+  pendingTrade: false,
 };
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
@@ -253,6 +267,38 @@ describe("JSON output", () => {
         obtainedAt: "2026-09-18T23:42:15.692426+00:00",
       },
     ]);
+  });
+
+  it("reports a player's collection page as its entries and whether it is full", () => {
+    expect(
+      JSON.parse(
+        formatProfileCollection(
+          { entries: [playerEntry], full: false },
+          "json",
+        ),
+      ),
+    ).toEqual({
+      entries: [
+        {
+          entryId,
+          id: cardId,
+          title: "Pointe de la Sambuy",
+          rarity: "SR",
+          count: 1,
+          starred: false,
+          shiny: false,
+          labels: [],
+          pendingTrade: false,
+        },
+      ],
+      full: false,
+    });
+  });
+
+  it("gives no entry for an empty page of a player's collection", () => {
+    expect(
+      JSON.parse(formatProfileCollection({ entries: [], full: false }, "json")),
+    ).toEqual({ entries: [], full: false });
   });
 
   it("gives an empty array for an empty collection", () => {
@@ -599,6 +645,50 @@ describe("text output", () => {
       ),
     ).toBe(
       `${cardId}  Pointe de la Sambuy (C)  x2  obtained 2026-09-18T23:42:15.692426+00:00  [favourite]  [shiny]  [labels: "Lieux", "Montagnes"]`,
+    );
+  });
+
+  it("prints one line per entry of a player's collection, entry id first", () => {
+    expect(
+      formatProfileCollection({ entries: [playerEntry], full: false }, "text"),
+    ).toBe(`${entryId}  ${cardId}  Pointe de la Sambuy (SR)  x1`);
+  });
+
+  it("marks the favourite, shiny, labelled and pending trade entries of a player's collection", () => {
+    expect(
+      formatProfileCollection(
+        {
+          entries: [
+            {
+              ...playerEntry,
+              count: 2,
+              starred: true,
+              shiny: true,
+              labels: ["Métro"],
+              pendingTrade: true,
+            },
+          ],
+          full: false,
+        },
+        "text",
+      ),
+    ).toBe(
+      `${entryId}  ${cardId}  Pointe de la Sambuy (SR)  x2  [favourite]  [shiny]  [labels: "Métro"]  [pending trade]`,
+    );
+  });
+
+  it("says when a page of a player's collection is full", () => {
+    const entries = Array.from({ length: 50 }, () => playerEntry);
+    expect(
+      formatProfileCollection({ entries, full: true }, "text")
+        .split("\n")
+        .at(-1),
+    ).toBe("The page is full (50 entries); more may follow.");
+  });
+
+  it("says when a page of a player's collection is empty", () => {
+    expect(formatProfileCollection({ entries: [], full: false }, "text")).toBe(
+      "This page of the collection is empty.",
     );
   });
 

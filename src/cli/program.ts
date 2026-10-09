@@ -24,6 +24,7 @@ import {
   parseStartingPrice,
   placeBid,
   readCardValues,
+  readProfileCollection,
   removeFromWishlist,
   searchAuctions,
   searchCards,
@@ -55,6 +56,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatProfileCollection,
   formatRemoval,
   formatRunningBids,
   formatTag,
@@ -510,6 +512,65 @@ labels
       formatLabelDeletion(await deleteLabel(session, name), format()),
     );
   });
+
+const profile = program
+  .command("profile")
+  .description("Look at other players' profiles");
+
+interface ProfileCollectionOptions {
+  page: string;
+  sort?: string;
+  search?: string;
+  rarity: string[];
+  wishlisted?: boolean;
+}
+
+profile
+  .command("collection")
+  .description(
+    "Read a page of a player's collection, at most 50 entries, in the game's order, with each entry's id, card id, title, owned rarity, copies, favourite and shiny state, labels and whether a pending trade holds the card",
+  )
+  .argument("<pseudo>", "the player's pseudo, as the game shows it")
+  .option(
+    "--page <n>",
+    "page to read, sent to the game as given; the game numbers pages from 0",
+    "0",
+  )
+  .option(
+    "--sort <field>",
+    "order sent to the game as given, e.g. rarity, name or added",
+  )
+  .option("--search <text>", "text the game searches for, sent as given")
+  .option(
+    "--rarity <code>",
+    "keep this owned rarity, sent as given, e.g. SR; repeat to keep several",
+    repeated,
+    [],
+  )
+  .option("--wishlisted", "keep only the cards of your wishlist")
+  .addHelpText(
+    "after",
+    examples(
+      "wikimasters profile collection LucasPerso",
+      "wikimasters profile collection LucasPerso --rarity UR --rarity L --page 1",
+      "wikimasters profile collection LucasPerso --sort name",
+      'wikimasters profile collection LucasPerso --search "Half Dome" --wishlisted',
+    ),
+  )
+  .action(
+    async (
+      pseudo: string,
+      { rarity, wishlisted, ...query }: ProfileCollectionOptions,
+    ) => {
+      const session = await openSession();
+      const result = await readProfileCollection(session, pseudo, {
+        ...query,
+        rarities: rarity,
+        wishlisted: wishlisted === true,
+      });
+      console.log(formatProfileCollection(result, format()));
+    },
+  );
 
 const wishlist = program
   .command("wishlist")

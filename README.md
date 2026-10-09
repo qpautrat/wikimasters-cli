@@ -52,6 +52,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `labels list` | Lists your labels, ordered by name, with their id, name and colour | `mise run wikimasters -- labels list` |
 | `labels create <name> [--color <colour>]` | Creates a label under the name as given, or reports the one you already have under exactly that name when the game refuses it as a duplicate; `--color` is sent to the game as given, a hex colour such as `#facc15` | `mise run wikimasters -- labels create "Karmine Corp" --color "#facc15"` |
 | `labels delete <name>` | Deletes your label named `<name>`, matched by the API on the name as given, which removes it from your cards, or says you have none | `mise run wikimasters -- labels delete "Karmine Corp"` |
+| `profile collection <pseudo> [--page <n>] [--sort <field>] [--search <text>] [--rarity <code>]... [--wishlisted]` | Reads a page of a player's collection, at most 50 entries, with each entry's id, card id, title, owned rarity, copies, favourite and shiny state, labels and whether a pending trade holds the card, and says when the page is full; the options are sent to the game as given: `--page` from 0, the first page by default, `--sort` left out by default, `--rarity` repeated for several rarities, `--wishlisted` keeps the cards of your wishlist | `mise run wikimasters -- profile collection LucasPerso --rarity UR` |
 | `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `mise run wikimasters -- wishlist list` |
 | `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `mise run wikimasters -- wishlist add <card-uuid>` |
 | `wishlist remove <card-id>` | Removes a card from your wishlist | `mise run wikimasters -- wishlist remove <card-uuid>` |
@@ -63,7 +64,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `auction cancel <auction-id>` | Cancels one of your auctions so its card returns to your collection, under a new id, and prints the auction id; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction cancel <auction-uuid>` |
 | `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction bid <auction-uuid> 25` |
 
-A card id is the `id` that `cards search`, `cards global`, `collection list` and `wishlist list` print. An auction id is the `id` that `auction list`, `auction search` and `auction bids` print, the `auctionId` that `auction create` prints, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
+A card id is the `id` that `cards search`, `cards global`, `collection list`, `profile collection` and `wishlist list` print. An entry id is the `entryId` that `profile collection` prints. An auction id is the `id` that `auction list`, `auction search` and `auction bids` print, the `auctionId` that `auction create` prints, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
 
 ### Output and exit codes
 

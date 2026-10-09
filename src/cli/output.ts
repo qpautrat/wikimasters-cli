@@ -18,6 +18,7 @@ import type {
   LabelCreation,
   LabelDeletion,
   PlacedBid,
+  ProfileCollectionPage,
   TagChange,
   WishlistAddition,
   WishlistCard,
@@ -161,6 +162,12 @@ export function formatGlobalCollection(
   ].join("\n");
 }
 
+function labelsMark(labels: readonly string[]): string[] {
+  return labels.length > 0
+    ? [`[labels: ${labels.map((label) => JSON.stringify(label)).join(", ")}]`]
+    : [];
+}
+
 export function formatCollection(
   cards: readonly CollectionCard[],
   format: Format,
@@ -178,14 +185,43 @@ export function formatCollection(
         `${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
         ...(starred ? ["[favourite]"] : []),
         ...(shiny ? ["[shiny]"] : []),
-        ...(labels.length > 0
-          ? [
-              `[labels: ${labels.map((label) => JSON.stringify(label)).join(", ")}]`,
-            ]
-          : []),
+        ...labelsMark(labels),
       ].join("  "),
     )
     .join("\n");
+}
+
+export function formatProfileCollection(
+  { entries, full }: ProfileCollectionPage,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ entries, full });
+  if (entries.length === 0) return "This page of the collection is empty.";
+  return [
+    ...entries.map(
+      ({
+        entryId,
+        id,
+        title,
+        rarity,
+        count,
+        starred,
+        shiny,
+        labels,
+        pendingTrade,
+      }) =>
+        [
+          `${entryId}  ${id}  ${title} (${rarity})  x${count}`,
+          ...(starred ? ["[favourite]"] : []),
+          ...(shiny ? ["[shiny]"] : []),
+          ...labelsMark(labels),
+          ...(pendingTrade ? ["[pending trade]"] : []),
+        ].join("  "),
+    ),
+    ...(full
+      ? [`The page is full (${entries.length} entries); more may follow.`]
+      : []),
+  ].join("\n");
 }
 
 function cards(count: number, noun: string): string {

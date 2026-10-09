@@ -4,7 +4,7 @@
 
 Quand un ami possède une carte qui me manque, je lui propose un échange. Le formulaire d'échange du jeu envoie `POST /api/trades` avec `{"recipient_id": <identifiant du joueur>, "items": [{"user_card_id": <entrée de collection>, "card_id": <carte>, "offered_by": <identifiant de celui qui la donne>}…], "initiator_wikibidous": <wikibidous que je donne>, "recipient_wikibidous": <wikibidous que je demande>}`, plus `"parent_trade_id": <échange>` pour une contre-offre. L'interface n'ouvre le formulaire qu'avec un ami, limite un échange à 100 cartes et à 10 000 wikibidous par joueur, refuse une carte en favori et un solde insuffisant ; on ne sait pas encore lesquelles de ces règles l'API impose. Le jeu peut demander une vérification humaine (`human_verification_required`). L'échange proposé apparaît dans `GET /api/trades` avec le statut `pending`.
 
-Dépend de : [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md), [Lire la collection d'un joueur](profile-collection.md), [Chercher dans la Collection Globale](cards-global.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md), [Lire la collection d'un joueur](../profile-collection.md), [Chercher dans la Collection Globale](cards-global.md), [Sortie JSON des commandes](../json-output.md).
 
 ## User story
 
