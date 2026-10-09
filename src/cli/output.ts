@@ -6,6 +6,7 @@ import type {
   CardSearch,
   CatalogueCard,
   CollectionCard,
+  CreatedAuction,
   Discard,
   FavouriteChange,
   LabelCreation,
@@ -150,6 +151,14 @@ export function formatBid(
   if (format === "json")
     return JSON.stringify({ id: auctionId, amount, balance });
   return `Bid ${wikibidous(amount)} on auction ${auctionId}; balance ${wikibidous(balance)}.`;
+}
+
+export function formatCreatedAuction(
+  { auctionId }: CreatedAuction,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ auctionId });
+  return `Auction ${auctionId} created.`;
 }
 
 function currentBidState(currentBid: number | null, leading: boolean): string {

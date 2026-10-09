@@ -3,6 +3,7 @@ import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
   addToWishlist,
+  createAuction,
   createLabel,
   deleteLabel,
   discardCards,
@@ -11,12 +12,14 @@ import {
   listRunningBids,
   listWishlist,
   loginInBrowser,
+  parseAuctionDuration,
   parseAuctionId,
   parseAuctionLimit,
   parseAuctionSearchPage,
   parseBidAmount,
   parseCardId,
   parseCardSearchField,
+  parseStartingPrice,
   placeBid,
   removeFromWishlist,
   searchAuctions,
@@ -38,6 +41,7 @@ import {
   formatBid,
   formatCardSearch,
   formatCollection,
+  formatCreatedAuction,
   formatDiscard,
   formatFavourite,
   formatLabelCreation,
@@ -129,6 +133,43 @@ auction
     const auctions = await listRunningBids(await openSession());
     console.log(formatRunningBids(auctions, format()));
   });
+
+auction
+  .command("create")
+  .description(
+    "Put a card of your collection up for auction at a starting price for a duration; the game accepts or refuses it and gives its reason",
+  )
+  .argument("<card-id>", "card UUID")
+  .argument(
+    "<starting-price>",
+    "wikibidous the bidding starts at, a strictly positive integer",
+  )
+  .argument(
+    "<duration>",
+    "minutes the auction lasts, a strictly positive integer",
+  )
+  .addHelpText(
+    "after",
+    examples(`wikimasters auction create ${EXAMPLE_CARD_ID} 50 60`),
+  )
+  .action(
+    async (
+      rawCardId: string,
+      rawStartingPrice: string,
+      rawDuration: string,
+    ) => {
+      const cardId = parseCardId(rawCardId);
+      const startingPrice = parseStartingPrice(rawStartingPrice);
+      const duration = parseAuctionDuration(rawDuration);
+      const session = await openSession();
+      console.log(
+        formatCreatedAuction(
+          await createAuction(session, cardId, startingPrice, duration),
+          format(),
+        ),
+      );
+    },
+  );
 
 auction
   .command("list")

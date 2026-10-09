@@ -2,9 +2,9 @@
 
 ## Contexte
 
-Les wikibidous qui financent mes enchères viennent de la vente des cartes de ma collection. Le formulaire de mise aux enchères du jeu envoie `POST /api/marketplace` avec `{"card_id": <user_cards.id>, "base_amount": <prix de départ>, "duration_minutes": <durée>}`, et le jeu répond l'identifiant de l'enchère créée (`auction_id`). La route attend l'identifiant de l'entrée de ma collection, pas celui de la carte. L'interface propose les durées 10, 30, 60, 180, 360 et 720 minutes et limite le nombre d'enchères simultanées ; ce que l'API impose n'est pas encore établi.
+Les wikibidous qui financent mes enchères viennent de la vente des cartes de ma collection. Le formulaire de mise aux enchères du jeu envoie `POST /api/marketplace` avec `{"card_id": <user_cards.id>, "base_amount": <prix de départ>, "duration_minutes": <durée>}`, et le jeu répond l'identifiant de l'enchère créée (`auction_id`). La route attend l'identifiant de l'entrée de ma collection, pas celui de la carte. L'interface propose les durées 10, 30, 60, 180, 360 et 720 minutes et limite le nombre d'enchères simultanées ; l'API refuse une durée hors de 10 minutes à 12 heures.
 
-Dépend de : [Lister ma collection](../collection-list.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Lister ma collection](collection-list.md), [Sortie JSON des commandes](json-output.md).
 
 ## User story
 

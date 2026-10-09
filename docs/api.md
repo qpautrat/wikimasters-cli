@@ -51,7 +51,7 @@ Source: read-only query, 2026-10-02.
 
 | Column | Meaning |
 |---|---|
-| `id` | collection entry UUID, what `bulk-discard` takes |
+| `id` | collection entry UUID, what `bulk-discard` and `POST /api/marketplace` take |
 | `user_id` | owner |
 | `card_id` | the owned card, relation to `cards.id` |
 | `count` | number of copies owned, at least `1` in every row seen |
@@ -68,6 +68,7 @@ Source: read-only query, 2026-10-02.
 - Row-level security returns only the user's own rows.
 - `listCollection`: `GET` of `card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, paged by 1000.
 - `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` and `count=gt.0`, to find the entry of each card to discard.
+- `createAuction`: `GET` of `id`, filtered on `user_id`, `card_id` and `count=gt.0`, to find the entry of the card to put up for auction.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
 - `starCard` / `unstarCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when `starred` differs, `PATCH user_cards?id=eq.<entry id>&starred=eq.<previous state>` with `{"starred":true}` / `{"starred":false}` and `Prefer: count=exact`; PostgREST answers `204`. Source: captures `star-card.har` and `unstar-card.har`, the interface filters the same `PATCH` on `id` only.
 
@@ -165,6 +166,16 @@ Source: capture `place-bid.har`, the auction page's JavaScript for the error cod
 - Observed refusals: an ended auction gets HTTP 409 `{"error":"Cette enchère est terminée"}`, without `code`; a bid below the minimum gets HTTP 409 `{"error":"Mise trop basse (minimum 28 wikibidous)","code":"bid_too_low","min":28}`.
 - The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
 - `placeBid`: sends the amount given, reports `current_bid` and `bidder_balance`, and reports a refusal with its body.
+
+## `POST /api/marketplace`: put a collection entry up for auction
+
+Source: the auction form's JavaScript, reached from `/collection`, and auctions created on the account (2026-10-09).
+
+- Body `{"card_id": <user_cards.id>, "base_amount": <starting price>, "duration_minutes": <minutes>}`: the collection entry id, not `cards.id`. Response `{"auction_id": <auctions.id>}`, HTTP 200; the auction's `end_at` is `duration_minutes` after its creation.
+- Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The form handles `human_verification_required` (it then shows a captcha) and shows `error` otherwise.
+- Observed refusal: a duration of 7 minutes gets HTTP 400 `{"error":"Durée invalide (entre 10 minutes et 12 heures)"}`.
+- The form offers 10, 30, 60, 180, 360 and 720 minutes, refuses a starting price below 1, and disables itself once the user's active auctions reach `maxConcurrentAuctions` from `GET /api/marketplace/mine` (`{"sellingCount", "maxConcurrentAuctions"}`, 5 for a regular account).
+- `createAuction`: sends the entry id, the starting price and the duration given, reports `auction_id`, and reports a refusal with its body.
 
 ## `GET /api/marketplace`: search the auctions
 

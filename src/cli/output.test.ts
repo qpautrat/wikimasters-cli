@@ -8,6 +8,7 @@ import {
   formatBid,
   formatCardSearch,
   formatCollection,
+  formatCreatedAuction,
   formatDiscard,
   formatFavourite,
   formatLabelCreation,
@@ -27,6 +28,9 @@ const card = {
   owned: false,
 };
 const cards = [card];
+const createdAuction = {
+  auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
+};
 const bid = {
   auctionId: parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f"),
   amount: 359,
@@ -100,6 +104,12 @@ describe("JSON output", () => {
     expect(JSON.parse(formatAuction(shownAuction, "json"))).toEqual({
       id: auctionId,
       ...state,
+    });
+  });
+
+  it("reports the created auction's id as auctionId", () => {
+    expect(JSON.parse(formatCreatedAuction(createdAuction, "json"))).toEqual({
+      auctionId: createdAuction.auctionId,
     });
   });
 
@@ -290,6 +300,12 @@ describe("text output", () => {
         "text",
       ).split("\n"),
     ).toContain("Starting price 200 wikibidous; no bid yet");
+  });
+
+  it("prints the created auction's id", () => {
+    expect(formatCreatedAuction(createdAuction, "text")).toBe(
+      `Auction ${createdAuction.auctionId} created.`,
+    );
   });
 
   it("prints the amount bid and the balance", () => {

@@ -39,6 +39,8 @@ For an auction named by its card title, resolve the id with `auction bids`, then
 
 `auction bid` takes the amount to bid. When the user names no amount, take it from the player rules in `CLAUDE.local.md`; without a rule giving it, ask the user.
 
+`auction create` takes the starting price and the duration in minutes. When the user names no starting price or no duration, ask the user.
+
 ## Limits
 
 - Change the account only when the user asks for it.
