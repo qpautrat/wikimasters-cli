@@ -27,6 +27,7 @@ import {
   removeFromWishlist,
   searchAuctions,
   searchCards,
+  searchGlobalCollection,
   showAuction,
   starCard,
   tagCard,
@@ -49,6 +50,7 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatFavourite,
+  formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
   formatLabels,
@@ -319,6 +321,62 @@ cards
     const values = await readCardValues(await openSession(), cardIds);
     console.log(formatCardValues(values, format()));
   });
+
+interface GlobalCollectionOptions {
+  page?: string;
+  sort?: string;
+  rarity?: string[];
+  wishlist?: boolean;
+}
+
+function repeated(value: string, previous: string[] = []): string[] {
+  return [...previous, value];
+}
+
+cards
+  .command("global")
+  .description(
+    "Search the Global Collection page of the game, with or without text, and print one page of the cards it finds, whether you own or wish each one, and the friends who own it with their rarities",
+  )
+  .argument("[text]", "text the game searches in the card title and category")
+  .option(
+    "--page <n>",
+    "page of results, sent to the game as given; the game counts pages from 0",
+  )
+  .option(
+    "--sort <field>",
+    "sort field, sent to the game as given; the page offers rarity, name, atk and def",
+  )
+  .option(
+    "--rarity <code>",
+    "keep this rarity, sent to the game as given, e.g. R; repeat it for several",
+    repeated,
+  )
+  .option("--wishlist", "keep only the cards of your wishlist")
+  .addHelpText(
+    "after",
+    examples(
+      'wikimasters cards global "Mont Blanc"',
+      "wikimasters cards global --wishlist",
+      "wikimasters cards global Castaldi --rarity L --rarity UR --sort name --page 1",
+    ),
+  )
+  .action(
+    async (
+      text: string | undefined,
+      { page, sort, rarity, wishlist }: GlobalCollectionOptions,
+    ) => {
+      const session = await openSession();
+      const result = await searchGlobalCollection(session, {
+        text,
+        page,
+        sort,
+        rarities: rarity,
+        wishlist,
+      });
+      console.log(formatGlobalCollection(result, format()));
+    },
+  );
 
 const collection = program
   .command("collection")

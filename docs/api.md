@@ -204,3 +204,14 @@ Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-0
 - A `limit` above 50 gets HTTP 403 `{"code":"automation_limit","error":"Trop de requêtes automatisées. L'automatisation n'est pas autorisée — voir le règlement."}`; `limit=0` answers 50 auctions at most (observed 2026-10-08).
 - `page` starts at 1 and gives the next `limit` auctions; a page beyond the matches answers `"auctions": []` and `"hasMore": false` (observed 2026-10-08).
 - `searchAuctions`: sends the `page` given, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, `card` standing for `cards`, reports `hasMore`, and reports a refusal with its body.
+
+## `GET /api/cards`: search the global collection
+
+Source: the `/global-collection` page's JavaScript and reads on the account (2026-10-09).
+
+- Query `page`, `q`, one `rarity` per rarity filter, `sort` and `wishlist=1`, as the page sends them. The page starts at `page=0`, `sort=rarity`, and offers the sorts `rarity`, `name`, `atk` and `def`; without `page` or `sort`, the route answers as with `page=0`. `page` counts from 0: `q=karmine&page=1` answers no card where `page=0` answers 3.
+- `q` matches the card title and category, not the summary.
+- Response `{"cards": [...], "total", "searchHasMore", "rarityCounts", "friendOwners", "ownedCardIds", "wishlistCardIds", "friendPendingOfferKeys"}`, at most 50 cards per page. Each card holds the `cards` columns, `wikipedia_title` and `rarity` included. `friendOwners` maps a found card id that at least one friend owns to those friends, `[{"id", "username", "rarities"}]`. `ownedCardIds` and `wishlistCardIds` list the found cards the user owns and wishes. `friendPendingOfferKeys` lists `<player id>:<card id>` keys, the card being one of the found cards; the page's JavaScript reads the player as the friend the offer is pending with.
+- `total` and `rarityCounts` come without text (`2776906` cards, `{"C": …, "PC": …}`) and with `wishlist=1`; with a text, `total` is `null` and `rarityCounts` `{}`. The page's JavaScript also accepts `total` as a string. `searchHasMore` tells whether another page matches a text; without a text it is `false` whatever `total`.
+- Observed answers to unusual parameters: `page=abc&sort=foo&rarity=XX` answers HTTP 200 with no card and `total` 0; `page=-1` answers the first page; `page=99999999999` answers no card, `rarityCounts` `null` and `"pageCapped": true`; `q=%'"(` gets HTTP 500 `{"error":"canceling statement due to statement timeout"}`.
+- `searchGlobalCollection`: sends the text, page, rarities, sort and wishlist filter given, each left out when not given, reads `owned`, `wishlisted` and `friends` of each card from `ownedCardIds`, `wishlistCardIds` and `friendOwners`, reports `total`, `rarityCounts`, `friendPendingOfferKeys` and `searchHasMore`, and reports a refusal with its body.

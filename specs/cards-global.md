@@ -6,7 +6,7 @@ Pour compléter un ensemble de cartes, je cherche celles qui me manquent chez me
 
 Cette route est distincte de la lecture de la table `cards` que fait `wikimasters cards search`, qui reste inchangée.
 
-Dépend de : [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Sortie JSON des commandes](json-output.md).
 
 ## User story
 

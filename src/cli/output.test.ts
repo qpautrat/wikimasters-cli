@@ -13,6 +13,7 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatFavourite,
+  formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
   formatLabels,
@@ -84,6 +85,37 @@ const soldCard = {
   averages: { R: 19, PC: 56 },
 };
 const unsoldCard = { id: cardId, title: "Pointe de la Sambuy", averages: {} };
+
+const friendId = "37fe4f31-003f-40c1-9eb6-1f39e0947037";
+const globalCard = {
+  id: cardId,
+  title: "Pointe de la Sambuy",
+  rarity: "PC",
+  owned: true,
+  wishlisted: true,
+  friends: [
+    { id: friendId, username: "LucasPerso", rarities: ["R"] },
+    {
+      id: "de78c800-d3b9-4942-a26d-e7942441aa72",
+      username: "Marie",
+      rarities: ["C", "SR"],
+    },
+  ],
+};
+const globalSearch = {
+  cards: [globalCard],
+  total: 6,
+  rarityCounts: { PC: 5, UR: 1 },
+  pendingOfferKeys: [`${friendId}:${cardId}`],
+  hasMore: true,
+};
+const emptyGlobalSearch = {
+  cards: [],
+  total: null,
+  rarityCounts: null,
+  pendingOfferKeys: [],
+  hasMore: false,
+};
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
@@ -115,6 +147,37 @@ describe("JSON output", () => {
         ),
       ),
     ).toEqual({ auctions: [{ id: auctionId, ...state }], truncated: true });
+  });
+
+  it("reports each card found in the global collection with the friends who own it, and the page's totals", () => {
+    expect(JSON.parse(formatGlobalCollection(globalSearch, "json"))).toEqual({
+      cards: [
+        {
+          id: cardId,
+          title: "Pointe de la Sambuy",
+          rarity: "PC",
+          owned: true,
+          wishlisted: true,
+          friends: globalCard.friends,
+        },
+      ],
+      total: 6,
+      rarityCounts: { PC: 5, UR: 1 },
+      pendingOfferKeys: [`${friendId}:${cardId}`],
+      hasMore: true,
+    });
+  });
+
+  it("reports a global collection search without result with empty fields", () => {
+    expect(
+      JSON.parse(formatGlobalCollection(emptyGlobalSearch, "json")),
+    ).toEqual({
+      cards: [],
+      total: null,
+      rarityCounts: null,
+      pendingOfferKeys: [],
+      hasMore: false,
+    });
   });
 
   it("reports each piece of the auction state in its own field", () => {
@@ -310,6 +373,36 @@ describe("text output", () => {
       "d6669009-683d-44b6-b6e7-2c0960c37f2f  Musique celtique (R) [shiny]: active, ends 2026-10-05T18:36:38.07319+00:00, starting price 200 wikibidous, current bid 326 wikibidous by you, sold by another player",
       "d6669009-683d-44b6-b6e7-2c0960c37f2f  Musique celtique (R): active, ends 2026-10-05T18:36:38.07319+00:00, starting price 200 wikibidous, no bid yet, sold by you",
     ]);
+  });
+
+  it("prints one line per card of the global collection, then the totals the game gives", () => {
+    expect(formatGlobalCollection(globalSearch, "text").split("\n")).toEqual([
+      `${cardId}  Pointe de la Sambuy (PC)  [owned]  [wishlisted]  [friends: ${friendId} LucasPerso (R); de78c800-d3b9-4942-a26d-e7942441aa72 Marie (C, SR)]`,
+      "Total: 6 cards.",
+      "By rarity: PC 5, UR 1.",
+      `Pending offers (player id:card id): ${friendId}:${cardId}.`,
+      "More cards match beyond this page.",
+    ]);
+  });
+
+  it("prints a card of the global collection that nobody holds without marks", () => {
+    expect(
+      formatGlobalCollection(
+        {
+          ...emptyGlobalSearch,
+          cards: [
+            { ...globalCard, owned: false, wishlisted: false, friends: [] },
+          ],
+        },
+        "text",
+      ),
+    ).toBe(`${cardId}  Pointe de la Sambuy (PC)`);
+  });
+
+  it("says when no card of the global collection matches", () => {
+    expect(formatGlobalCollection(emptyGlobalSearch, "text")).toBe(
+      "No card of the global collection matches.",
+    );
   });
 
   it("says when there is no auction to list", () => {

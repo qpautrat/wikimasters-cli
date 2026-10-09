@@ -11,6 +11,9 @@ import type {
   CreatedAuction,
   Discard,
   FavouriteChange,
+  FriendOwner,
+  GlobalCollectionCard,
+  GlobalCollectionSearch,
   Label,
   LabelCreation,
   LabelDeletion,
@@ -104,6 +107,58 @@ export function formatCardValues(
       }`;
     })
     .join("\n");
+}
+
+function friendOwner({ id, username, rarities }: FriendOwner): string {
+  return `${id} ${username} (${rarities.join(", ")})`;
+}
+
+function globalCardLine(card: GlobalCollectionCard): string {
+  return [
+    cardLine(card),
+    ...(card.owned ? ["[owned]"] : []),
+    ...(card.wishlisted ? ["[wishlisted]"] : []),
+    ...(card.friends.length > 0
+      ? [`[friends: ${card.friends.map(friendOwner).join("; ")}]`]
+      : []),
+  ].join("  ");
+}
+
+export function formatGlobalCollection(
+  {
+    cards: found,
+    total,
+    rarityCounts,
+    pendingOfferKeys,
+    hasMore,
+  }: GlobalCollectionSearch,
+  format: Format,
+): string {
+  if (format === "json") {
+    return JSON.stringify({
+      cards: found,
+      total,
+      rarityCounts,
+      pendingOfferKeys,
+      hasMore,
+    });
+  }
+  const counts = Object.entries(rarityCounts ?? {});
+  return [
+    ...(found.length === 0
+      ? ["No card of the global collection matches."]
+      : found.map(globalCardLine)),
+    ...(total === null ? [] : [`Total: ${cards(total, "card")}.`]),
+    ...(counts.length > 0
+      ? [
+          `By rarity: ${counts.map(([rarity, count]) => `${rarity} ${count}`).join(", ")}.`,
+        ]
+      : []),
+    ...(pendingOfferKeys.length > 0
+      ? [`Pending offers (player id:card id): ${pendingOfferKeys.join(", ")}.`]
+      : []),
+    ...(hasMore ? ["More cards match beyond this page."] : []),
+  ].join("\n");
 }
 
 export function formatCollection(

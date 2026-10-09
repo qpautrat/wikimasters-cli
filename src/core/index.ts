@@ -80,6 +80,13 @@ export {
   type FavouriteChange,
 } from "./favourite.js";
 export {
+  searchGlobalCollection,
+  type FriendOwner,
+  type GlobalCollectionCard,
+  type GlobalCollectionQuery,
+  type GlobalCollectionSearch,
+} from "./global-collection.js";
+export {
   resumeSession,
   type ResumeSessionOptions,
   type Session,

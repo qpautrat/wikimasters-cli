@@ -42,6 +42,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `.env` | `mise run wikimasters -- login` |
 | `cards search <text...> [--in <field>]` | Finds the catalogue cards whose title contains the text, regardless of case, exact title first, at most 50; `--in category` or `--in summary` searches the card's Wikipedia category or summary instead, ordered by title | `mise run wikimasters -- cards search half dome` |
 | `cards value <card-id...>` | Shows the average sale price in wikibidous of each card, owned or not, for each rarity it sold under, or that it never sold; stops at the first card the game refuses | `mise run wikimasters -- cards value <card-uuid> <card-uuid>` |
+| `cards global [text] [--page <n>] [--sort <field>] [--rarity <code>]... [--wishlist]` | Searches the game's Global Collection, in the card title and category, and prints one page of cards with whether you own or wish each one and the friends who own it with their rarities, then the total, the count by rarity, the pending offers and whether more cards match; options go to the game as given, pages counting from 0, `--rarity` repeated for several rarities, `--wishlist` keeping your wishlist's cards | `mise run wikimasters -- cards global "Mont Blanc"` |
 | `collection list [--rarity <code>]` | Lists your collection, earliest obtained first, with owned rarity, copies, favourite and shiny state, labels and obtention date; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L` | `mise run wikimasters -- collection list --rarity L` |
 | `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
 | `collection star <card-id>` | Marks a card of your collection as favourite | `mise run wikimasters -- collection star <card-uuid>` |
@@ -62,7 +63,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `auction cancel <auction-id>` | Cancels one of your auctions so its card returns to your collection, under a new id, and prints the auction id; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction cancel <auction-uuid>` |
 | `auction bid <auction-id> <amount>` | Bids an exact amount of wikibidous on an auction; the game accepts or refuses it and gives its reason | `mise run wikimasters -- auction bid <auction-uuid> 25` |
 
-A card id is the `id` that `cards search`, `collection list` and `wishlist list` print. An auction id is the `id` that `auction list`, `auction search` and `auction bids` print, the `auctionId` that `auction create` prints, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
+A card id is the `id` that `cards search`, `cards global`, `collection list` and `wishlist list` print. An auction id is the `id` that `auction list`, `auction search` and `auction bids` print, the `auctionId` that `auction create` prints, or the last part of the auction page URL, `https://www.wiki-masters.com/marketplace/<auction-id>`.
 
 ### Output and exit codes
 
