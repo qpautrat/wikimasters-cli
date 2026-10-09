@@ -126,24 +126,17 @@ function globalCardLine(card: GlobalCollectionCard): string {
 }
 
 export function formatGlobalCollection(
-  {
+  search: GlobalCollectionSearch,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify(search);
+  const {
     cards: found,
     total,
     rarityCounts,
     pendingOfferKeys,
     hasMore,
-  }: GlobalCollectionSearch,
-  format: Format,
-): string {
-  if (format === "json") {
-    return JSON.stringify({
-      cards: found,
-      total,
-      rarityCounts,
-      pendingOfferKeys,
-      hasMore,
-    });
-  }
+  } = search;
   const counts = Object.entries(rarityCounts ?? {});
   return [
     ...(found.length === 0
@@ -162,10 +155,22 @@ export function formatGlobalCollection(
   ].join("\n");
 }
 
-function labelsMark(labels: readonly string[]): string[] {
-  return labels.length > 0
-    ? [`[labels: ${labels.map((label) => JSON.stringify(label)).join(", ")}]`]
-    : [];
+function collectionMarks({
+  starred,
+  shiny,
+  labels,
+}: {
+  starred: boolean;
+  shiny: boolean;
+  labels: readonly string[];
+}): string[] {
+  return [
+    ...(starred ? ["[favourite]"] : []),
+    ...(shiny ? ["[shiny]"] : []),
+    ...(labels.length > 0
+      ? [`[labels: ${labels.map((label) => JSON.stringify(label)).join(", ")}]`]
+      : []),
+  ];
 }
 
 export function formatCollection(
@@ -183,19 +188,18 @@ export function formatCollection(
     .map(({ id, title, rarity, copies, starred, shiny, labels, obtainedAt }) =>
       [
         `${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
-        ...(starred ? ["[favourite]"] : []),
-        ...(shiny ? ["[shiny]"] : []),
-        ...labelsMark(labels),
+        ...collectionMarks({ starred, shiny, labels }),
       ].join("  "),
     )
     .join("\n");
 }
 
 export function formatProfileCollection(
-  { entries, full }: ProfileCollectionPage,
+  page: ProfileCollectionPage,
   format: Format,
 ): string {
-  if (format === "json") return JSON.stringify({ entries, full });
+  if (format === "json") return JSON.stringify(page);
+  const { entries, full } = page;
   if (entries.length === 0) return "This page of the collection is empty.";
   return [
     ...entries.map(
@@ -212,9 +216,7 @@ export function formatProfileCollection(
       }) =>
         [
           `${entryId}  ${id}  ${title} (${rarity})  x${count}`,
-          ...(starred ? ["[favourite]"] : []),
-          ...(shiny ? ["[shiny]"] : []),
-          ...labelsMark(labels),
+          ...collectionMarks({ starred, shiny, labels }),
           ...(pendingTrade ? ["[pending trade]"] : []),
         ].join("  "),
     ),
