@@ -4,7 +4,7 @@
 
 `wikimasters auction create` met une carte de ma collection aux enchères, et aucune commande ne l'annule. La page d'une enchère (`/marketplace/<id>`) l'annule par `DELETE /api/marketplace/<id>`. Le 2026-10-09, sur une de mes enchères en cours sans mise, la route a répondu HTTP 200 `{"status":"cancelled"}` ; l'enchère est ensuite passée au statut `cancelled` et la carte est revenue dans ma collection, sous un nouvel identifiant d'entrée et avec `obtained_at` à l'heure de l'annulation. La réponse du jeu pour une enchère avec mises, l'enchère d'un autre joueur ou une enchère terminée n'est pas établie.
 
-Dépend de : [Mettre une carte aux enchères](../auction-create.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Mettre une carte aux enchères](auction-create.md), [Sortie JSON des commandes](json-output.md).
 
 ## User story
 
