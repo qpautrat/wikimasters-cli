@@ -12,7 +12,9 @@ Run every command from the repo root as `mise run wikimasters -- <command> --jso
 On a non-zero exit, mise adds the line `[wikimasters] ERROR task failed` to stderr after the CLI's message: never report that line as the CLI's message.
 
 - `0`: success. Read the JSON on stdout.
-- `4`: the user must log in, whatever the stderr message says to run. When the player rules in `CLAUDE.local.md` give a login method, tell the user a Firefox window is about to open for them to sign in if that method is `--firefox`, run that login with a tool timeout above the 5 minutes it waits for the sign-in, then retry the original command once. If the login fails, report its stderr message and do not retry. Otherwise, do not run `wikimasters login`: ask the user to run `mise -C '<repo root>' run wikimasters -- login` in a terminal, with the absolute path `git rev-parse --show-toplevel` prints, single-quoted, and retry the original command once when they say they are logged in. Never ask the user to share the session or its cookie in the conversation.
+- `4`: the user must log in, whatever the stderr message says to run. Use the login method the user's instructions name; when they name none, ask the user which one to use. Never ask the user to share the session or its cookie in the conversation.
+  - `login --firefox`, on macOS: tell the user a Firefox window is about to open for them to sign in, run `mise run wikimasters -- login --firefox` with a tool timeout above the 5 minutes it waits for the sign-in, then retry the original command once. If the login fails, report its stderr message and do not retry.
+  - `login`: it needs the user to paste the session in a terminal, so do not run it. Ask the user to run `mise -C '<repo root>' run wikimasters -- login` in a terminal, with the absolute path `git rev-parse --show-toplevel` prints, single-quoted, and retry the original command once when they say they are logged in.
 - `75`: the API stayed unavailable after the CLI's own retries. Report the stderr message in one sentence and tell the user to retry later; do not rerun the command on your own. If the message says the request may have taken effect, tell the user to check its outcome first.
 - `1` with JSON on stdout: the command partly succeeded. Report its result, naming each card it lists as refused with the reason given.
 - Any other code: report the stderr message in one sentence.
@@ -37,9 +39,9 @@ Take the auction id from the auction page URL the user gives, `https://www.wiki-
 
 For an auction named by its card title, resolve the id with `auction bids`, then `auction search <title>`, matching the title as for cards. Without a match from either, ask the user for the auction page URL.
 
-`auction bid` takes the amount to bid. When the user names no amount, take it from the player rules in `CLAUDE.local.md`; without a rule giving it, ask the user.
+`auction bid` takes the amount to bid. When the user names no amount, take it from the user's instructions; when they give none, ask the user.
 
-`auction create` takes the starting price and the duration in minutes. When the user names no starting price or no duration, ask the user.
+`auction create` takes the starting price and the duration in minutes. When the user names no starting price or no duration, take it from the user's instructions; when they give none, ask the user.
 
 ## Limits
 

@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wikimasters login` ouvre Firefox sur macOS. La connexion par collage ([Se connecter en collant la session](login-paste-session.md)) demande qu'un humain colle la session dans un terminal, ce que l'agent ne peut pas faire à sa place. Chaque joueur peut préférer une méthode de connexion, qu'il écrit dans son `CLAUDE.local.md`.
+`wikimasters login --firefox` ouvre Firefox sur macOS. La connexion par collage ([Se connecter en collant la session](login-paste-session.md)) demande qu'un humain colle la session dans un terminal, ce que l'agent ne peut pas faire à sa place. Chaque joueur peut préférer une méthode de connexion, qu'il donne à l'agent dans ses instructions.
 
 Une commande lancée par le préfixe `!` de Claude Code n'a probablement pas de terminal interactif (non mesuré) : la connexion se lance dans un terminal du joueur.
 
@@ -10,11 +10,11 @@ Dépend de : [Connexion](login.md).
 
 ## User story
 
-En tant que joueur qui passe par un agent, quand une commande demande de me reconnecter, l'agent se connecte par la méthode que mes règles indiquent, ou me dit quoi lancer.
+En tant que joueur qui passe par un agent, quand une commande demande de me reconnecter, l'agent se connecte par la méthode que mes instructions indiquent, ou me demande laquelle utiliser.
 
 ## Critères d'acceptation
 
-1. Sur le code 4, quand les règles du joueur indiquent une méthode de connexion, le skill la suit, puis relance une fois la commande d'origine.
-2. Sinon, le skill ne lance pas `wikimasters login` : il demande au joueur de lancer dans un terminal `mise -C <racine du dépôt> run wikimasters -- login`, avec le chemin absolu de la racine, qui fonctionne depuis n'importe quel dossier, même quand le shell du joueur n'active pas mise, puis relance une fois la commande d'origine quand le joueur indique s'être connecté.
-3. Le skill ne demande jamais au joueur de lui transmettre la session ou son cookie dans la conversation.
-4. Le commit qui implémente cette spec met à jour `specs/login.md`, dont le contexte dit que l'agent lance lui-même `wikimasters login`, et `CLAUDE.md`, pour que `CLAUDE.local.md` puisse aussi indiquer la méthode de connexion du joueur.
+1. Sur le code 4, quand les instructions de l'utilisateur indiquent une méthode de connexion, le skill la suit ; sinon, il demande à l'utilisateur laquelle utiliser.
+2. Avec `wikimasters login --firefox`, le skill prévient le joueur qu'une fenêtre Firefox va s'ouvrir, lance la connexion avec un délai d'outil supérieur aux 5 minutes qu'elle attend, puis relance une fois la commande d'origine. Si la connexion échoue, il rapporte son message d'erreur et ne relance pas.
+3. Avec `wikimasters login`, le skill ne lance pas la commande : il demande au joueur de lancer dans un terminal `mise -C <racine du dépôt> run wikimasters -- login`, avec le chemin absolu de la racine, qui fonctionne depuis n'importe quel dossier, même quand le shell du joueur n'active pas mise, puis relance une fois la commande d'origine quand le joueur indique s'être connecté.
+4. Le skill ne demande jamais au joueur de lui transmettre la session ou son cookie dans la conversation.
