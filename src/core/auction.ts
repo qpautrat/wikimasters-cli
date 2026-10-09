@@ -1,6 +1,6 @@
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
-import { isStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./positive-integer.js";
 import { siteCookie, siteRequest } from "./site.js";
 import { parseUuid } from "./uuid.js";
 
@@ -56,21 +56,18 @@ export function parseAuctionId(raw: string): AuctionId {
 }
 
 export function parseAuctionLimit(raw: string): AuctionLimit {
-  if (!isStrictlyPositiveInteger(raw)) {
-    throw new WikiMastersError(
-      `Invalid limit: ${JSON.stringify(raw)} is not a strictly positive integer; nothing was read`,
-    );
-  }
-  return Number(raw) as AuctionLimit;
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "limit",
+    untouched: "nothing was read",
+  }) as AuctionLimit;
 }
 
 export function parseBidAmount(raw: string): BidAmount {
-  if (!isStrictlyPositiveInteger(raw)) {
-    throw new WikiMastersError(
-      `Invalid bid amount: ${JSON.stringify(raw)} is not a strictly positive integer of wikibidous; nothing was bid`,
-    );
-  }
-  return Number(raw) as BidAmount;
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "bid amount",
+    unit: "wikibidous",
+    untouched: "nothing was bid",
+  }) as BidAmount;
 }
 
 export function auctionedTitle(

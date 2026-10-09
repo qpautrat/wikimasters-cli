@@ -6,7 +6,7 @@ import {
   type AuctionRow,
 } from "./auction.js";
 import { WikiMastersError } from "./errors.js";
-import { isStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./positive-integer.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -15,12 +15,10 @@ export type AuctionSearchPage = number & {
 };
 
 export function parseAuctionSearchPage(raw: string): AuctionSearchPage {
-  if (!isStrictlyPositiveInteger(raw)) {
-    throw new WikiMastersError(
-      `Invalid page: ${JSON.stringify(raw)} is not a strictly positive integer; nothing was read`,
-    );
-  }
-  return Number(raw) as AuctionSearchPage;
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "page",
+    untouched: "nothing was read",
+  }) as AuctionSearchPage;
 }
 
 export interface AuctionSearch {

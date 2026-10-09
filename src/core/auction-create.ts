@@ -2,7 +2,7 @@ import type { AuctionId } from "./auction.js";
 import type { CardId } from "./card-id.js";
 import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError } from "./errors.js";
-import { isStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./positive-integer.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -23,21 +23,19 @@ interface CreatedAuctionResponse {
 }
 
 export function parseStartingPrice(raw: string): StartingPrice {
-  if (!isStrictlyPositiveInteger(raw)) {
-    throw new WikiMastersError(
-      `Invalid starting price: ${JSON.stringify(raw)} is not a strictly positive integer of wikibidous; nothing was put up for auction`,
-    );
-  }
-  return Number(raw) as StartingPrice;
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "starting price",
+    unit: "wikibidous",
+    untouched: "nothing was put up for auction",
+  }) as StartingPrice;
 }
 
 export function parseAuctionDuration(raw: string): AuctionDuration {
-  if (!isStrictlyPositiveInteger(raw)) {
-    throw new WikiMastersError(
-      `Invalid duration: ${JSON.stringify(raw)} is not a strictly positive integer of minutes; nothing was put up for auction`,
-    );
-  }
-  return Number(raw) as AuctionDuration;
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "duration",
+    unit: "minutes",
+    untouched: "nothing was put up for auction",
+  }) as AuctionDuration;
 }
 
 function isCreatedAuctionResponse(
