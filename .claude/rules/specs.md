@@ -9,7 +9,7 @@ List the specs by title with `head -n1 specs/*.md specs/backlog/*.md`, then read
 Present a backlog listing in three tables, an empty one included:
 
 1. **API features**: a CLI command that exposes a call of the WikiMasters API.
-2. **Player rules**: a choice of how the player plays, meant for `CLAUDE.local.md`.
+2. **Player rules**: a choice of how the player plays, which stays out of the repo, with the player.
 3. **Technical**: tooling, rules and infrastructure of the repo.
 
 Each table has a `Dépend de` column naming the backlog specs that row depends on, read with `grep -H "Dépend de" specs/backlog/*.md`.
@@ -24,7 +24,7 @@ Each table has a `Dépend de` column naming the backlog specs that row depends o
 
 ## Command scope
 
-A command exposes an API call and nothing more. A command takes every parameter its API call takes and never checks beforehand what the API checks: it sends the request and reports the API's refusal. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec goes into the player's own untracked `CLAUDE.local.md`.
+A command exposes an API call and nothing more. A command takes every parameter its API call takes and never checks beforehand what the API checks: it sends the request and reports the API's refusal. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec stays out of the repo, with the player.
 
 ## Spec before code
 
