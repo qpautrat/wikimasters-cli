@@ -4,7 +4,7 @@
 
 `wikimasters labels delete` prend le nom de l'étiquette, lit mes étiquettes pour trouver celle qui le porte, puis appelle `POST rpc/delete_tag` avec son identifiant : la commande compose deux appels. La fonction prend directement l'identifiant (`{"p_tag_id": <tags.id>}`) et refuse elle-même un identifiant inconnu ou qui n'est pas à moi (HTTP 400 `P0001` `Tag not found or not owned by caller`).
 
-Dépend de : [Supprimer une étiquette](../label-delete.md), [Lister mes étiquettes](label-list.md).
+Dépend de : [Supprimer une étiquette](../label-delete.md), [Lister mes étiquettes](../label-list.md).
 
 ## User story
 
