@@ -10,6 +10,7 @@ import {
   discardCards,
   listAuctions,
   listCollection,
+  listLabels,
   listRunningBids,
   listWishlist,
   loginInBrowser,
@@ -48,6 +49,7 @@ import {
   formatFavourite,
   formatLabelCreation,
   formatLabelDeletion,
+  formatLabels,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -390,6 +392,14 @@ for (const [name, description, change, example] of [
 }
 
 const labels = program.command("labels").description("Manage your labels");
+
+labels
+  .command("list")
+  .description("List your labels, ordered by name, with their id and colour")
+  .addHelpText("after", examples("wikimasters labels list"))
+  .action(async () => {
+    console.log(formatLabels(await listLabels(await openSession()), format()));
+  });
 
 labels
   .command("create")

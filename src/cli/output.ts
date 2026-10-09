@@ -10,6 +10,7 @@ import type {
   CreatedAuction,
   Discard,
   FavouriteChange,
+  Label,
   LabelCreation,
   LabelDeletion,
   PlacedBid,
@@ -265,6 +266,18 @@ export function formatFavourite(
   return changed
     ? `Card ${cardId} removed from the favourites.`
     : `Card ${cardId} was not a favourite.`;
+}
+
+export function formatLabels(labels: readonly Label[], format: Format): string {
+  if (format === "json") {
+    return JSON.stringify(
+      labels.map(({ id, name, color }) => ({ id, name, color })),
+    );
+  }
+  if (labels.length === 0) return "You have no label.";
+  return labels
+    .map(({ id, name, color }) => `${id}  ${JSON.stringify(name)} (${color})`)
+    .join("\n");
 }
 
 export function formatLabelCreation(

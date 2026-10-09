@@ -13,7 +13,7 @@ export interface LabelCreation {
   created: boolean;
 }
 
-export async function readLabels(session: Session): Promise<Label[]> {
+export async function listLabels(session: Session): Promise<Label[]> {
   const { data, error, status } = await session.client
     .from("tags")
     .select("id, name, color")
@@ -39,7 +39,7 @@ export async function createLabel(
     .select("name, color")
     .single<Pick<Label, "name" | "color">>();
   if (isUniqueViolation(error)) {
-    const existing = (await readLabels(session)).find(
+    const existing = (await listLabels(session)).find(
       (label) => label.name === name,
     );
     if (existing) {

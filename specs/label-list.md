@@ -4,7 +4,7 @@
 
 Le jeu pose et retire une étiquette par son identifiant (`tags.id`). Aucune commande ne le donne : `collection list` et `labels create` ne donnent que le nom. Le jeu lit mes étiquettes avec `GET tags`, filtrée sur mon identifiant de joueur.
 
-Dépend de : [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Sortie JSON des commandes](json-output.md).
 
 ## User story
 

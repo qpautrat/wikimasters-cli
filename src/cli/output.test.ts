@@ -14,6 +14,7 @@ import {
   formatFavourite,
   formatLabelCreation,
   formatLabelDeletion,
+  formatLabels,
   formatLogin,
   formatRemoval,
   formatRunningBids,
@@ -29,6 +30,11 @@ const card = {
   owned: false,
 };
 const cards = [card];
+const label = {
+  id: "a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64",
+  name: "KC LOL 2026",
+  color: "#1e40af",
+};
 const createdAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
 };
@@ -217,6 +223,20 @@ describe("JSON output", () => {
         ),
       ),
     ).toEqual({ id: cardId, label: "Histoire", tagged: true, changed: false });
+  });
+
+  it("lists the labels as an array of id, name and colour", () => {
+    expect(JSON.parse(formatLabels([label], "json"))).toEqual([
+      {
+        id: "a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64",
+        name: "KC LOL 2026",
+        color: "#1e40af",
+      },
+    ]);
+  });
+
+  it("gives an empty array when the user has no label", () => {
+    expect(formatLabels([], "json")).toBe("[]");
   });
 
   it("reports a label with its name, colour and whether it was just created", () => {
@@ -469,6 +489,16 @@ describe("text output", () => {
     expect(formatCollection([], "text", "UR")).toBe(
       "The collection holds no card of rarity UR.",
     );
+  });
+
+  it("prints one line per label with its id, name and colour", () => {
+    expect(formatLabels([label], "text")).toBe(
+      'a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64  "KC LOL 2026" (#1e40af)',
+    );
+  });
+
+  it("says when the user has no label", () => {
+    expect(formatLabels([], "text")).toBe("You have no label.");
   });
 
   it("says when the wishlist is empty", () => {

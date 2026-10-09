@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AuthRequiredError } from "./errors.js";
-import { createLabel, deleteLabel } from "./label.js";
+import { createLabel, deleteLabel, listLabels } from "./label.js";
 import { resumeSession } from "./session.js";
 import {
   ACCESS_TOKEN,
@@ -36,6 +36,66 @@ async function sessionWith(...routes: Route[]) {
   });
   return { session, requests };
 }
+
+describe("listLabels", () => {
+  it("lists the labels of the signed-in user with their id, name and colour in one request", async () => {
+    const labels = [
+      {
+        id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+        name: "Bauges 2000",
+        color: "#16a34a",
+      },
+      {
+        id: "a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64",
+        name: "KC LOL 2026",
+        color: "#1e40af",
+      },
+    ];
+    const { session, requests } = await sessionWith(
+      restRoute("GET", "tags", { status: 200, body: labels }),
+    );
+
+    await expect(listLabels(session)).resolves.toEqual(labels);
+    const reads = requests.filter(restRequest("GET", "tags"));
+    expect(reads).toHaveLength(1);
+    expect(
+      requests.filter(({ url }) => url.pathname.startsWith("/rest/")),
+    ).toHaveLength(1);
+    expect(reads[0]?.url.searchParams.get("select")).toBe("id,name,color");
+    expect(reads[0]?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
+    expect(reads[0]?.url.searchParams.get("order")).toBe("name.asc");
+  });
+
+  it("returns an empty list when the user has no label", async () => {
+    const { session } = await sessionWith(existingLabel());
+
+    await expect(listLabels(session)).resolves.toEqual([]);
+  });
+
+  it("reports the game's refusal with its reason", async () => {
+    const { session } = await sessionWith(
+      restRoute("GET", "tags", {
+        status: 400,
+        body: { code: "PGRST100", message: "failed to parse filter" },
+      }),
+    );
+
+    await expect(listLabels(session)).rejects.toThrow(
+      "Reading your labels failed (HTTP 400): failed to parse filter",
+    );
+  });
+
+  it("requires a new login when the API rejects the session", async () => {
+    const { session } = await sessionWith(
+      restRoute("GET", "tags", {
+        status: 401,
+        body: { code: "PGRST303", message: "JWT expired" },
+      }),
+    );
+
+    await expect(listLabels(session)).rejects.toThrow(AuthRequiredError);
+  });
+});
 
 describe("createLabel", () => {
   it("creates a label of the signed-in user with the given colour", async () => {

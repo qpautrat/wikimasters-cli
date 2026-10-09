@@ -1,7 +1,7 @@
 import type { CardId } from "./card-id.js";
 import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
-import { readLabels, type Label } from "./label.js";
+import { listLabels, type Label } from "./label.js";
 import type { Session } from "./session.js";
 
 export interface TagChange {
@@ -21,7 +21,7 @@ function hasTag(entry: TaggedEntry, tag: Label): boolean {
 }
 
 async function findTag(session: Session, label: string): Promise<Label> {
-  const data = await readLabels(session);
+  const data = await listLabels(session);
   const tag = data.find(({ name }) => name === label);
   if (tag) return tag;
   const labels =
