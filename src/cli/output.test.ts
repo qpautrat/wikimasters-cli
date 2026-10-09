@@ -8,6 +8,7 @@ import {
   formatBid,
   formatCancelledAuction,
   formatCardSearch,
+  formatCardValues,
   formatCollection,
   formatCreatedAuction,
   formatDiscard,
@@ -77,6 +78,12 @@ const owned = {
   labels: [],
   obtainedAt: "2026-09-18T23:42:15.692426+00:00",
 };
+const soldCard = {
+  id: cardId,
+  title: "Pointe de la Sambuy",
+  averages: { R: 19, PC: 56 },
+};
+const unsoldCard = { id: cardId, title: "Pointe de la Sambuy", averages: {} };
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
@@ -153,6 +160,15 @@ describe("JSON output", () => {
       cards: [{ id: cardId, title: "Pointe de la Sambuy", rarity: "PC" }],
       truncated: true,
     });
+  });
+
+  it("lists each card with its id, title and average sale price per rarity, empty when never sold", () => {
+    expect(
+      JSON.parse(formatCardValues([soldCard, unsoldCard], "json")),
+    ).toEqual([
+      { id: cardId, title: "Pointe de la Sambuy", averages: { R: 19, PC: 56 } },
+      { id: cardId, title: "Pointe de la Sambuy", averages: {} },
+    ]);
   });
 
   it("lists the wishlist as an array of id, title, rarity and ownership", () => {
@@ -441,6 +457,18 @@ describe("text output", () => {
   it("says when no card matches", () => {
     expect(formatCardSearch({ cards: [], truncated: false }, "text")).toBe(
       "No card of the catalogue matches.",
+    );
+  });
+
+  it("prints one line per card with its average sale price per rarity, in the game's order", () => {
+    expect(formatCardValues([soldCard], "text")).toBe(
+      `${cardId}  Pointe de la Sambuy: average sale price R 19 wikibidous, PC 56 wikibidous`,
+    );
+  });
+
+  it("says when a card was never sold", () => {
+    expect(formatCardValues([unsoldCard], "text")).toBe(
+      `${cardId}  Pointe de la Sambuy: never sold`,
     );
   });
 

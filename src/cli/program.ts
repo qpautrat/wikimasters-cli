@@ -23,6 +23,7 @@ import {
   parseCardSearchField,
   parseStartingPrice,
   placeBid,
+  readCardValues,
   removeFromWishlist,
   searchAuctions,
   searchCards,
@@ -43,6 +44,7 @@ import {
   formatBid,
   formatCancelledAuction,
   formatCardSearch,
+  formatCardValues,
   formatCollection,
   formatCreatedAuction,
   formatDiscard,
@@ -298,6 +300,24 @@ cards
     const session = await openSession();
     const result = await searchCards(session, words.join(" "), field);
     console.log(formatCardSearch(result, format()));
+  });
+
+cards
+  .command("value")
+  .description(
+    "Show the average sale price of each given card for each rarity it sold under, whether you own it or not; stops at the first card the game refuses",
+  )
+  .argument("<card-id...>", "card UUIDs")
+  .addHelpText(
+    "after",
+    examples(
+      `wikimasters cards value ${EXAMPLE_CARD_ID} ${OTHER_EXAMPLE_CARD_ID}`,
+    ),
+  )
+  .action(async (rawCardIds: string[]) => {
+    const cardIds = rawCardIds.map(parseCardId);
+    const values = await readCardValues(await openSession(), cardIds);
+    console.log(formatCardValues(values, format()));
   });
 
 const collection = program

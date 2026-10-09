@@ -41,6 +41,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 |---|---|---|
 | `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `.env` | `mise run wikimasters -- login` |
 | `cards search <text...> [--in <field>]` | Finds the catalogue cards whose title contains the text, regardless of case, exact title first, at most 50; `--in category` or `--in summary` searches the card's Wikipedia category or summary instead, ordered by title | `mise run wikimasters -- cards search half dome` |
+| `cards value <card-id...>` | Shows the average sale price in wikibidous of each card, owned or not, for each rarity it sold under, or that it never sold; stops at the first card the game refuses | `mise run wikimasters -- cards value <card-uuid> <card-uuid>` |
 | `collection list [--rarity <code>]` | Lists your collection, earliest obtained first, with owned rarity, copies, favourite and shiny state, labels and obtention date; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L` | `mise run wikimasters -- collection list --rarity L` |
 | `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
 | `collection star <card-id>` | Marks a card of your collection as favourite | `mise run wikimasters -- collection star <card-uuid>` |

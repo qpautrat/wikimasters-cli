@@ -186,6 +186,14 @@ Source: the auction page `/marketplace/<id>` and a cancellation on the account (
 - Refusal: a non-2xx status with `{"error": <message>}`. Observed: an already cancelled auction gets HTTP 409 `{"error":"Cette enchère n'est plus active"}`.
 - `cancelAuction`: sends the auction id given, reports `status`, and reports a refusal with its body.
 
+## `GET /api/marketplace/cards/<card id>/sales?scope=summary`: a card's average sale price
+
+Source: the auction form, reached from `/collection`, and reads on the account (2026-10-09).
+
+- `<card id>` is `cards.id`, owned or not. Response HTTP 200 `{"wikipedia_title", "summary", "isPro"}`; for an account that is not PRO, `summary` maps each rarity the card sold under to `{"average": <wikibidous>}`, e.g. `{"R":{"average":19},"PC":{"average":56}}`, and is `{}` for a card never sold. The route does not say over which period the average runs.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown card gets HTTP 404 `{"error":"Carte introuvable"}`.
+- `readCardValues`: sends one request per card id given, in order, reports `wikipedia_title` and each rarity's `average`, and stops at the first refusal, reported with its body.
+
 ## `GET /api/marketplace`: search the auctions
 
 Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-05 and 2026-10-08).

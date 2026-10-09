@@ -5,6 +5,7 @@ import type {
   BidAuction,
   CancelledAuction,
   CardSearch,
+  CardValue,
   CatalogueCard,
   CollectionCard,
   CreatedAuction,
@@ -84,6 +85,25 @@ export function formatCardSearch(
       ? [`Only the first ${cards.length} matches are shown; refine the name.`]
       : []),
   ].join("\n");
+}
+
+export function formatCardValues(
+  values: readonly CardValue[],
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify(values);
+  return values
+    .map(({ id, title, averages }) => {
+      const prices = Object.entries(averages).map(
+        ([rarity, average]) => `${rarity} ${wikibidous(average)}`,
+      );
+      return `${id}  ${title}: ${
+        prices.length === 0
+          ? "never sold"
+          : `average sale price ${prices.join(", ")}`
+      }`;
+    })
+    .join("\n");
 }
 
 export function formatCollection(

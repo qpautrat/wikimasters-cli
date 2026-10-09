@@ -4,7 +4,7 @@
 
 Pour financer mes enchères, je vends les cartes qui ne m'intéressent pas, en commençant par celles qui valent le plus. Le jeu ne montre la valeur d'une carte que dans le formulaire de mise aux enchères, carte par carte : il appelle `GET /api/marketplace/cards/<card id>/sales?scope=summary`. Pour un compte non PRO, la route donne le prix de vente moyen de la carte pour chaque rareté sous laquelle elle a été vendue, par exemple `{"summary":{"R":{"average":16}}}`, et `{}` quand la carte ne s'est jamais vendue. Elle ne dit pas sur quelle période porte la moyenne. Une carte inconnue reçoit HTTP 404 `{"error":"Carte introuvable"}`.
 
-Dépend de : [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Sortie JSON des commandes](json-output.md).
 
 ## User story
 
