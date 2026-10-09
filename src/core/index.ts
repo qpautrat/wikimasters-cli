@@ -34,8 +34,11 @@ export {
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
 export {
+  CARD_SEARCH_FIELDS,
+  parseCardSearchField,
   searchCards,
   type CardSearch,
+  type CardSearchField,
   type CatalogueCard,
 } from "./card-search.js";
 export {

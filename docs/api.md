@@ -35,10 +35,12 @@ Source: read-only query.
 | `id` | card UUID |
 | `wikipedia_title` | title of the Wikipedia article the card is built from |
 | `rarity` | current rarity code; seen: `C`, `PC`, `R`, `SR`, `UR` |
+| `category` | category taken from the Wikipedia article, `null` on some cards |
+| `summary` | summary of the Wikipedia article |
 
 - The whole catalogue is readable, owned or not: more than 100,000 cards.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
-- `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first.
+- `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. Only then, a second read anchors both filters (`ilike.<text>`, `imatch.^<text>$`), limited to 50, to put the exact titles first. With a field other than the title, both filters apply to `category` or `summary` instead, still ordered by `wikipedia_title` then `id`, and the exact-title read is skipped (observed 2026-10-09: `summary` and `category` answer in seconds).
 - `showAuction` and `listAuctions` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
 - `listRunningBids` embeds it the same way through `auction_bids` → `auctions`.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.

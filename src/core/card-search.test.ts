@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { CARD_SEARCH_LIMIT, searchCards } from "./card-search.js";
+import {
+  CARD_SEARCH_LIMIT,
+  parseCardSearchField,
+  searchCards,
+} from "./card-search.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -57,7 +61,7 @@ describe("searchCards", () => {
       catalogue([], [dome, trail]),
     );
 
-    await expect(searchCards(session, "half dom")).resolves.toEqual({
+    await expect(searchCards(session, "half dom", "title")).resolves.toEqual({
       cards: [
         { id: dome.id, title: "Half Dome", rarity: "C" },
         { id: trail.id, title: "Half Dome Trail", rarity: "C" },
@@ -89,7 +93,7 @@ describe("searchCards", () => {
       catalogue([], [halfDome, dome]),
     );
 
-    const { cards } = await searchCards(session, "DOME");
+    const { cards } = await searchCards(session, "DOME", "title");
 
     expect(cards.map(({ title }) => title)).toEqual(["Dome", "Half Dome"]);
     expect(requests.filter(isCardRead)).toHaveLength(1);
@@ -102,7 +106,7 @@ describe("searchCards", () => {
     const dome = row(99, "Dome");
     const { session, requests } = await sessionWith(catalogue([dome], others));
 
-    const { cards, truncated } = await searchCards(session, "dome");
+    const { cards, truncated } = await searchCards(session, "dome", "title");
 
     expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
     expect(cards[0]?.title).toBe("Dome");
@@ -121,7 +125,7 @@ describe("searchCards", () => {
   it("matches the text literally, wildcards and regex characters included", async () => {
     const { session, requests } = await sessionWith(catalogue([], []));
 
-    await searchCards(session, "100% EL*KE_(a.b)\\");
+    await searchCards(session, "100% EL*KE_(a.b)\\", "title");
 
     const containing = requests.find(
       (request) => isCardRead(request) && !isExactRead(request),
@@ -138,7 +142,7 @@ describe("searchCards", () => {
     );
     const { session } = await sessionWith(catalogue([], rows));
 
-    const { cards, truncated } = await searchCards(session, "card");
+    const { cards, truncated } = await searchCards(session, "card", "title");
 
     expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
     expect(truncated).toBe(true);
@@ -150,7 +154,7 @@ describe("searchCards", () => {
     );
     const { session } = await sessionWith(catalogue([], rows));
 
-    await expect(searchCards(session, "card")).resolves.toMatchObject({
+    await expect(searchCards(session, "card", "title")).resolves.toMatchObject({
       truncated: false,
     });
   });
@@ -158,10 +162,50 @@ describe("searchCards", () => {
   it("succeeds with no card when nothing matches", async () => {
     const { session } = await sessionWith(catalogue([], []));
 
-    await expect(searchCards(session, "zqxjw")).resolves.toEqual({
+    await expect(searchCards(session, "zqxjw", "title")).resolves.toEqual({
       cards: [],
       truncated: false,
     });
+  });
+
+  it.each([
+    ["category", "category"],
+    ["summary", "summary"],
+  ] as const)(
+    "searches the %s instead of the title, ordered by title",
+    async (field, column) => {
+      const caliste = row(1, "Caliste (esport)");
+      const { session, requests } = await sessionWith(catalogue([], [caliste]));
+
+      await expect(searchCards(session, "Esport", field)).resolves.toEqual({
+        cards: [{ id: caliste.id, title: "Caliste (esport)", rarity: "C" }],
+        truncated: false,
+      });
+      const [read] = requests.filter(isCardRead);
+      expect(read?.url.searchParams.getAll(column)).toEqual([
+        "ilike.%Esport%",
+        "imatch.Esport",
+      ]);
+      expect(read?.url.searchParams.has("wikipedia_title")).toBe(false);
+      expect(read?.url.searchParams.get("order")).toBe(
+        "wikipedia_title.asc,id.asc",
+      );
+    },
+  );
+
+  it("keeps the title order and reads once when more cards match another field", async () => {
+    const rows = Array.from({ length: CARD_SEARCH_LIMIT + 1 }, (_, index) =>
+      row(index, `Card ${index}`),
+    );
+    const dome = row(99, "Dome");
+    const { session, requests } = await sessionWith(catalogue([dome], rows));
+
+    const { cards, truncated } = await searchCards(session, "dome", "summary");
+
+    expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
+    expect(cards[0]?.title).toBe("Card 0");
+    expect(truncated).toBe(true);
+    expect(requests.filter(isCardRead)).toHaveLength(1);
   });
 
   it("reports an API failure", async () => {
@@ -171,7 +215,7 @@ describe("searchCards", () => {
         : undefined,
     );
 
-    const failure = searchCards(session, "dome");
+    const failure = searchCards(session, "dome", "title");
     await expect(failure).rejects.toThrow(WikiMastersError);
     await expect(failure).rejects.toThrow(/statement timeout/);
   });
@@ -183,8 +227,20 @@ describe("searchCards", () => {
         : undefined,
     );
 
-    await expect(searchCards(session, "dome")).rejects.toThrow(
+    await expect(searchCards(session, "dome", "title")).rejects.toThrow(
       AuthRequiredError,
+    );
+  });
+});
+
+describe("parseCardSearchField", () => {
+  it.each(["title", "category", "summary"])("accepts %s", (field) => {
+    expect(parseCardSearchField(field)).toBe(field);
+  });
+
+  it("refuses any other field, naming the accepted ones", () => {
+    expect(() => parseCardSearchField("rarity")).toThrow(
+      'Invalid field: "rarity" is not one of title, category, summary; nothing was read',
     );
   });
 });

@@ -27,6 +27,8 @@ The user names cards in natural language. Resolve each name to its id with the l
 
 When `cards search` finds nothing, search again with a shorter part of the name, free of accented letters, before concluding there is no match.
 
+For cards named by a theme rather than a title, such as a team or a kind of place, search it with `cards search <text> --in category` or `--in summary`.
+
 Report results by card title, never by id alone.
 
 ## Auctions named by the user

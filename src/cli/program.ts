@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import {
   AUCTION_LIMIT,
+  CARD_SEARCH_FIELDS,
   addToWishlist,
   createLabel,
   deleteLabel,
@@ -15,6 +16,7 @@ import {
   parseAuctionSearchPage,
   parseBidAmount,
   parseCardId,
+  parseCardSearchField,
   placeBid,
   removeFromWishlist,
   searchAuctions,
@@ -213,12 +215,25 @@ const cards = program.command("cards").description("Browse the card catalogue");
 cards
   .command("search")
   .description(
-    "Find the cards of the catalogue whose title contains the given text, regardless of case, exact title first, at most 50",
+    "Find the cards of the catalogue whose title, category or summary contains the given text, regardless of case, at most 50; ordered by title, a card titled exactly as the text first when searching titles",
   )
-  .argument("<name...>", "all or part of the card title")
-  .addHelpText("after", examples("wikimasters cards search Half Dome"))
-  .action(async (words: string[]) => {
-    const result = await searchCards(await openSession(), words.join(" "));
+  .argument("<text...>", "text to search for, e.g. all or part of the title")
+  .option(
+    "--in <field>",
+    `where to search the text: ${CARD_SEARCH_FIELDS.join(", ")}`,
+    "title",
+  )
+  .addHelpText(
+    "after",
+    examples(
+      "wikimasters cards search Half Dome",
+      "wikimasters cards search Karmine --in summary",
+    ),
+  )
+  .action(async (words: string[], { in: rawField }: { in: string }) => {
+    const field = parseCardSearchField(rawField);
+    const session = await openSession();
+    const result = await searchCards(session, words.join(" "), field);
     console.log(formatCardSearch(result, format()));
   });
 
