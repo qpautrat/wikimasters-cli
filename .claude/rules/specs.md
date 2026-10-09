@@ -12,7 +12,11 @@ Present a backlog listing in three tables, an empty one included:
 2. **Player rules**: a choice of how the player plays, which stays out of the repo, with the player.
 3. **Technical**: tooling, rules and infrastructure of the repo.
 
-Each table has a `Dépend de` column naming the backlog specs that row depends on, read with `grep -H "Dépend de" specs/backlog/*.md`.
+Each table has three columns:
+
+1. `Spec`: the spec's file name without `.md`.
+2. `Titre`: its title.
+3. `Dépend de`: the backlog specs that row depends on, each named by its link target's file name without `.md`, read with `grep -H "Dépend de" specs/backlog/*.md`.
 
 ## One subject per spec
 
