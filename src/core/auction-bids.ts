@@ -5,7 +5,7 @@ import {
   type AuctionRow,
 } from "./auction.js";
 import { apiFailure } from "./errors.js";
-import { pageRange, type PageRequest } from "./page.js";
+import { isFullPage, pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
 
 export interface RunningBid {
@@ -62,6 +62,6 @@ export async function listRunningBids(
       leading: leads(session, auction),
       endsAt: auction.end_at,
     })),
-    full: data.length === request.limit,
+    full: isFullPage(data, request.limit),
   };
 }

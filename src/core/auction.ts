@@ -1,6 +1,6 @@
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
-import { parseStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./integer.js";
 import { siteCookie, siteRequest } from "./site.js";
 import { parseUuid } from "./uuid.js";
 

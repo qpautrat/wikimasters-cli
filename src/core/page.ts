@@ -1,4 +1,4 @@
-import { parseStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./integer.js";
 
 export const PAGE_LIMIT = 1000;
 
@@ -27,4 +27,8 @@ export function parsePageLimit(raw: string): PageLimit {
 export function pageRange({ page, limit }: PageRequest): [number, number] {
   const from = (page - 1) * limit;
   return [from, from + limit - 1];
+}
+
+export function isFullPage(rows: readonly unknown[], limit: number): boolean {
+  return rows.length === limit;
 }

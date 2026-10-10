@@ -6,7 +6,7 @@ import {
   type AuctionRow,
 } from "./auction.js";
 import { WikiMastersError } from "./errors.js";
-import { parseStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseStrictlyPositiveInteger } from "./integer.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 

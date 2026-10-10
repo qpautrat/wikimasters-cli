@@ -1,5 +1,6 @@
 import type { CardId } from "./card-id.js";
 import { WikiMastersError } from "./errors.js";
+import { isFullPage } from "./page.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -95,6 +96,6 @@ export async function readProfileCollection(
       labels: row.tags.map(({ name }) => name),
       pendingTrade: pending.has(row.card.id),
     })),
-    full: body.collection.length === PROFILE_COLLECTION_PAGE_SIZE,
+    full: isFullPage(body.collection, PROFILE_COLLECTION_PAGE_SIZE),
   };
 }

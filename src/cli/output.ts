@@ -203,11 +203,7 @@ export function formatCollection(
           ...collectionMarks({ starred, shiny, labels }),
         ].join("  "),
     ),
-    ...(full
-      ? [
-          `The page is full (${cards(pageCards.length, "card")}); more may follow.`,
-        ]
-      : []),
+    ...fullPageNote(full, cards(pageCards.length, "card")),
   ].join("\n");
 }
 
@@ -237,14 +233,16 @@ export function formatProfileCollection(
           ...(pendingTrade ? ["[pending trade]"] : []),
         ].join("  "),
     ),
-    ...(full
-      ? [`The page is full (${entries.length} entries); more may follow.`]
-      : []),
+    ...fullPageNote(full, `${entries.length} entries`),
   ].join("\n");
 }
 
 function cards(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
+function fullPageNote(full: boolean, count: string): string[] {
+  return full ? [`The page is full (${count}); more may follow.`] : [];
 }
 
 function wikibidous(count: number): string {
@@ -322,9 +320,7 @@ export function formatRunningBids(
       ({ auctionId, title, amount, placedAt, currentBid, leading, endsAt }) =>
         `${auctionId}  ${title}: your bid ${wikibidous(amount)} placed ${placedAt}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
     ),
-    ...(full
-      ? [`The page is full (${cards(bids.length, "bid")}); more may follow.`]
-      : []),
+    ...fullPageNote(full, cards(bids.length, "bid")),
   ].join("\n");
 }
 

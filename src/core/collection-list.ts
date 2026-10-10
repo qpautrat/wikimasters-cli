@@ -1,6 +1,6 @@
 import type { CardId } from "./card-id.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
-import { pageRange, type PageRequest } from "./page.js";
+import { isFullPage, pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
 
 export interface CollectionCard {
@@ -82,6 +82,6 @@ export async function listCollection(
       labels: labelsOf(row),
       obtainedAt: row.obtained_at,
     })),
-    full: data.length === request.limit,
+    full: isFullPage(data, request.limit),
   };
 }
