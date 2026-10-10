@@ -14,6 +14,7 @@ import {
   formatDiscard,
   formatEntryFavourite,
   formatEntryTag,
+  formatEntryUntag,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -22,7 +23,6 @@ import {
   formatProfileCollection,
   formatRemoval,
   formatRunningBids,
-  formatTag,
   formatWishlist,
 } from "./output.js";
 
@@ -354,15 +354,15 @@ describe("JSON output", () => {
     ).toEqual({ entryId, labelId: label.id });
   });
 
-  it("reports a label change with the card id, the label, the state and whether it changed", () => {
+  it("reports a label removal with the entry id, the label id and whether it was removed", () => {
     expect(
       JSON.parse(
-        formatTag(
-          { cardId, label: "Histoire", tagged: false, changed: false },
+        formatEntryUntag(
+          { entryId, labelId: label.id, removed: false },
           "json",
         ),
       ),
-    ).toEqual({ id: cardId, label: "Histoire", tagged: false, changed: false });
+    ).toEqual({ entryId, labelId: label.id, removed: false });
   });
 
   it("lists the labels as an array of id, name and colour", () => {
@@ -808,21 +808,15 @@ describe("text output", () => {
     );
   });
 
-  it("says when a label is removed from a card", () => {
+  it("says when a label is removed from an entry", () => {
     expect(
-      formatTag(
-        { cardId, label: "Histoire", tagged: false, changed: true },
-        "text",
-      ),
-    ).toBe(`Label "Histoire" removed from card ${cardId}.`);
+      formatEntryUntag({ entryId, labelId: label.id, removed: true }, "text"),
+    ).toBe(`Label ${label.id} removed from entry ${entryId}.`);
   });
 
-  it("says when a card did not have the label", () => {
+  it("says when an entry did not have the label", () => {
     expect(
-      formatTag(
-        { cardId, label: "Histoire", tagged: false, changed: false },
-        "text",
-      ),
-    ).toBe(`Card ${cardId} did not have the label "Histoire".`);
+      formatEntryUntag({ entryId, labelId: label.id, removed: false }, "text"),
+    ).toBe(`Entry ${entryId} did not have the label ${label.id}.`);
   });
 });

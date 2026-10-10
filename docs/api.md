@@ -85,7 +85,7 @@ Source: read-only query, 2026-10-02.
 - Row-level security returns only the user's own rows.
 - `listCollection` embeds it in `user_cards` as `user_card_tags(tags(name))` to give each entry's label names.
 - `tagEntry`: `POST user_card_tags` with `{"user_card_id":"<entry id>","tag_id":"<label id>"}` as given, in a single request; PostgREST answers `201` with no body. A label already on the entry gets HTTP 409 `23505` from `user_card_tags_pkey`; an unknown entry or label gets HTTP 403 `new row violates row-level security policy for table "user_card_tags"`; an id that is not a UUID gets HTTP 400 `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `tag-card.har`.
-- `untagCard`: `GET user_cards` of `id, user_card_tags(tag_id)`, filtered on `user_id`, `card_id` and `count=gt.0`, then `GET tags` of `id, name` filtered on `user_id`, then, when the entry has the label, `DELETE user_card_tags?user_card_id=eq.<entry id>&tag_id=eq.<label id>` with `Prefer: count=exact`; PostgREST answers `204`, and a count of `0` means the label was removed meanwhile. Source: capture `untag-card.har`.
+- `untagEntry`: `DELETE user_card_tags?user_card_id=eq.<entry id>&tag_id=eq.<label id>` with the ids as given and `Prefer: count=exact`, in a single request; PostgREST answers `204`. The row count is 0 when the entry does not carry the label, including for an unknown entry or label; an id that is not a UUID gets HTTP 400 `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `untag-card.har`.
 
 ## `tags`: the labels the user created
 
@@ -102,7 +102,6 @@ Source: read-only query, 2026-10-05.
 - Row-level security returns only the user's own rows.
 - `listCollection`: reads `name` through the `user_card_tags(tags(name))` embed in `user_cards`.
 - `listLabels`: `GET` of `id, name, color` filtered on `user_id` and ordered by `name`, in a single request.
-- `untagCard`: the `listLabels` read, to find the label by its exact name or list the user's labels.
 - `createLabel`: `POST tags?select=id,name,color` with `{"user_id":"<user id>","name":"<name>"}`, plus `"color"` when given, and `Prefer: return=representation`; PostgREST answers `201` with the created row. Without a colour the game stores `#94a3b8`. A colour that is not hex gets HTTP 400 `23514` from the check constraint `tags_color_hex_check`. A name the user already has, regardless of case, gets HTTP 409 `23505` from the unique index `tags_user_name_lower_unique`, which `createLabel` reports. Source: the site's JavaScript for the request, runs on the account (2026-10-08, 2026-10-09, 2026-10-10) for the answers.
 
 ## `POST rpc/delete_tag`: delete a label

@@ -111,9 +111,9 @@ export {
 } from "./session.js";
 export {
   tagEntry,
-  untagCard,
+  untagEntry,
   type EntryTag,
-  type TagChange,
+  type EntryUntag,
 } from "./tag.js";
 export {
   addToWishlist,

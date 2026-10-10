@@ -1,48 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { parseCardId } from "./card-id.js";
 import { AuthRequiredError } from "./errors.js";
 import { resumeSession } from "./session.js";
-import { tagEntry, untagCard } from "./tag.js";
+import { tagEntry, untagEntry } from "./tag.js";
 import {
   ACCESS_TOKEN,
-  USER_ID,
   fakeFetch,
-  restRequest,
   restRoute,
   tokenRefresh,
-  type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
 
-const cardId = parseCardId("3fc9a132-31db-4b14-832c-04823e02113d");
 const entryId = "944d72cb-9118-41ff-ba3b-026c47ec27fc";
 const history = {
   id: "37a20595-c848-4755-8c80-df2fefde56e6",
   name: "Histoire",
 };
-const films = {
-  id: "8d41679f-9344-4c39-afe4-f1089320d2bd",
-  name: "Films & Séries",
-};
-
-function collectionEntry(tagIds: string[] | null): Route {
-  return restRoute("GET", "user_cards", {
-    status: 200,
-    body:
-      tagIds === null
-        ? []
-        : [
-            {
-              id: entryId,
-              user_card_tags: tagIds.map((tag_id) => ({ tag_id })),
-            },
-          ],
-  });
-}
-
-function labels(...tags: { id: string; name: string }[]): Route {
-  return restRoute("GET", "tags", { status: 200, body: tags });
-}
 
 const tagInsert = restRoute("POST", "user_card_tags", { status: 201 });
 
@@ -54,13 +26,6 @@ async function sessionWith(...routes: Route[]) {
     fetch,
   });
   return { session, requests };
-}
-
-function writes(requests: RecordedRequest[]) {
-  return requests.filter(
-    ({ method, url }) =>
-      method !== "GET" && url.pathname.startsWith("/rest/v1/"),
-  );
 }
 
 describe("tagEntry", () => {
@@ -123,23 +88,22 @@ function tagDeletion(deletedRows: number): Route {
   });
 }
 
-describe("untagCard", () => {
-  it("unlinks the label of the signed-in user from their collection entry for that card", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([history.id]),
-      labels(films, history),
-      tagDeletion(1),
-    );
+describe("untagEntry", () => {
+  it("unlinks the given label from the given entry in a single request", async () => {
+    const { session, requests } = await sessionWith(tagDeletion(1));
 
-    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: false,
-      changed: true,
+    await expect(untagEntry(session, entryId, history.id)).resolves.toEqual({
+      entryId,
+      labelId: history.id,
+      removed: true,
     });
-    const labelRead = requests.find(restRequest("GET", "tags"));
-    expect(labelRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-    const deletion = requests.find(({ method }) => method === "DELETE");
+    const restRequests = requests.filter(({ url }) =>
+      url.pathname.startsWith("/rest/v1/"),
+    );
+    expect(restRequests).toHaveLength(1);
+    const deletion = restRequests[0];
+    expect(deletion?.method).toBe("DELETE");
+    expect(deletion?.url.pathname).toBe("/rest/v1/user_card_tags");
     expect(deletion?.url.searchParams.get("user_card_id")).toBe(
       `eq.${entryId}`,
     );
@@ -150,57 +114,42 @@ describe("untagCard", () => {
     );
   });
 
-  it("succeeds without change when the card does not have the label", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([films.id]),
-      labels(films, history),
-    );
+  it("succeeds without change when the entry does not carry the label", async () => {
+    const { session } = await sessionWith(tagDeletion(0));
 
-    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: false,
-      changed: false,
+    await expect(untagEntry(session, entryId, history.id)).resolves.toEqual({
+      entryId,
+      labelId: history.id,
+      removed: false,
     });
-    expect(writes(requests)).toEqual([]);
   });
 
-  it("succeeds without change when the label was removed meanwhile", async () => {
+  it("fails with the game's reason when it refuses the removal", async () => {
     const { session } = await sessionWith(
-      collectionEntry([history.id]),
-      labels(history),
-      tagDeletion(0),
+      restRoute("DELETE", "user_card_tags", {
+        status: 400,
+        body: {
+          code: "22P02",
+          message: 'invalid input syntax for type uuid: "abc"',
+        },
+      }),
     );
 
-    await expect(untagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: false,
-      changed: false,
-    });
+    await expect(untagEntry(session, "abc", history.id)).rejects.toThrow(
+      /invalid input syntax for type uuid/,
+    );
   });
 
-  it("refuses a card absent from the collection without change", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry(null),
-      labels(history),
+  it("requires a new login when the API rejects the session", async () => {
+    const { session } = await sessionWith(
+      restRoute("DELETE", "user_card_tags", {
+        status: 401,
+        body: { code: "PGRST303", message: "JWT expired" },
+      }),
     );
 
-    await expect(untagCard(session, cardId, "Histoire")).rejects.toThrow(
-      /not in your collection; nothing was changed/,
+    await expect(untagEntry(session, entryId, history.id)).rejects.toThrow(
+      AuthRequiredError,
     );
-    expect(writes(requests)).toEqual([]);
-  });
-
-  it("refuses an unknown label without change, listing the user's labels", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([history.id]),
-      labels(films, history),
-    );
-
-    await expect(untagCard(session, cardId, "Sport")).rejects.toThrow(
-      'No label named "Sport"; your labels: "Films & Séries", "Histoire"; nothing was changed',
-    );
-    expect(writes(requests)).toEqual([]);
   });
 });

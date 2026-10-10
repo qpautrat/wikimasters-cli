@@ -36,7 +36,7 @@ import {
   starEntry,
   tagEntry,
   unstarEntry,
-  untagCard,
+  untagEntry,
   type AuctionFilter,
   type CollectionFilter,
 } from "../core/index.js";
@@ -55,6 +55,7 @@ import {
   formatDiscard,
   formatEntryFavourite,
   formatEntryTag,
+  formatEntryUntag,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -63,7 +64,6 @@ import {
   formatProfileCollection,
   formatRemoval,
   formatRunningBids,
-  formatTag,
   formatWishlist,
   type Format,
 } from "./output.js";
@@ -511,18 +511,21 @@ collection
 collection
   .command("untag")
   .description(
-    "Remove one of your labels from a card of your collection; succeeds if the card does not have it",
+    "Remove one of your labels from an entry of your collection; succeeds if the entry does not have it",
   )
-  .argument("<card-id>", "card UUID")
-  .argument("<label>", "name of one of your labels")
+  .argument("<entry-id>", "entry id, as given by collection list")
+  .argument("<label-id>", "label id, as given by labels list")
   .addHelpText(
     "after",
-    examples(`wikimasters collection untag ${EXAMPLE_CARD_ID} "Karmine Corp"`),
+    examples(
+      `wikimasters collection untag ${EXAMPLE_ENTRY_ID} ${EXAMPLE_LABEL_ID}`,
+    ),
   )
-  .action(async (rawCardId: string, label: string) => {
-    const cardId = parseCardId(rawCardId);
+  .action(async (entryId: string, labelId: string) => {
     const session = await openSession();
-    console.log(formatTag(await untagCard(session, cardId, label), format()));
+    console.log(
+      formatEntryUntag(await untagEntry(session, entryId, labelId), format()),
+    );
   });
 
 const labels = program.command("labels").description("Manage your labels");

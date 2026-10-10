@@ -11,6 +11,7 @@ import type {
   Discard,
   EntryFavourite,
   EntryTag,
+  EntryUntag,
   FriendOwner,
   GlobalCollectionCard,
   GlobalCollectionSearch,
@@ -19,7 +20,6 @@ import type {
   PlacedBid,
   ProfileCollectionPage,
   RunningBidPage,
-  TagChange,
   WishlistAddition,
   WishlistCard,
   WishlistRemoval,
@@ -433,14 +433,12 @@ export function formatEntryTag(
   return `Entry ${entryId} labelled with label ${labelId}.`;
 }
 
-export function formatTag(
-  { cardId, label, tagged, changed }: TagChange,
+export function formatEntryUntag(
+  { entryId, labelId, removed }: EntryUntag,
   format: Format,
 ): string {
-  if (format === "json")
-    return JSON.stringify({ id: cardId, label, tagged, changed });
-  const name = JSON.stringify(label);
-  return changed
-    ? `Label ${name} removed from card ${cardId}.`
-    : `Card ${cardId} did not have the label ${name}.`;
+  if (format === "json") return JSON.stringify({ entryId, labelId, removed });
+  return removed
+    ? `Label ${labelId} removed from entry ${entryId}.`
+    : `Entry ${entryId} did not have the label ${labelId}.`;
 }

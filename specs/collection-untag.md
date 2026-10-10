@@ -2,21 +2,20 @@
 
 ## Contexte
 
-Je veux pouvoir retirer une étiquette (`user_card_tags`) d'une carte de ma collection depuis le terminal, pour reclasser la carte.
+Je veux pouvoir retirer une étiquette (`user_card_tags`) d'une entrée de ma collection depuis le terminal, pour reclasser la carte. Le jeu retire une étiquette par un seul `DELETE user_card_tags?user_card_id=eq.<user_cards.id>&tag_id=eq.<tags.id>`, dont le nombre de lignes supprimées (`Prefer: count=exact`) vaut 0 quand l'entrée n'avait pas l'étiquette.
 
-Dépend de : [Étiqueter une carte de ma collection](collection-tag.md).
+Dépend de : [Étiqueter une carte de ma collection](collection-tag.md), [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md), [Lister mes étiquettes](label-list.md).
 
 ## User story
 
-En tant que joueur, je retire une de mes étiquettes d'une carte de ma collection, pour la reclasser.
+En tant que joueur, je donne l'entrée de ma collection et l'étiquette à en retirer, et la commande l'envoie telle quelle au jeu.
 
 ## Critères d'acceptation
 
-1. `wikimasters collection untag <card-id> <label>` retire l'étiquette nommée `<label>` de la carte de ma collection qui porte cet identifiant de carte.
-2. Retirer une étiquette absente de la carte réussit sans rien modifier et le signale.
-3. Une carte absente de ma collection est refusée sans rien modifier, avec un message qui le dit.
-4. Un nom qui ne correspond à aucune de mes étiquettes est refusé sans rien modifier, avec un message qui liste mes étiquettes.
-5. Le retrait fait depuis la commande apparaît dans l'interface.
+1. `wikimasters collection untag <entrée-id> <étiquette-id>` prend l'identifiant d'une entrée de ma collection (UUID `user_cards.id`), tel que le donne `collection list`, et celui d'une de mes étiquettes (UUID `tags.id`), tel que le donne `labels list`.
+2. La commande envoie une seule requête, `DELETE user_card_tags`, sans lire au préalable ma collection ni mes étiquettes.
+3. Quand le jeu ne supprime aucune ligne, la commande réussit sans rien modifier et signale que l'entrée n'avait pas cette étiquette.
+4. Le retrait fait depuis la commande apparaît dans l'interface.
 
 ## Hors périmètre
 
