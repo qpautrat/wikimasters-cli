@@ -1,7 +1,5 @@
 import type { AuctionId } from "./auction.js";
-import type { CardId } from "./card-id.js";
 import { COLLECTION_PAGE } from "./collection.js";
-import { readCollectionEntry } from "./collection-entry.js";
 import { WikiMastersError } from "./errors.js";
 import { parseStrictlyPositiveInteger } from "./positive-integer.js";
 import type { Session } from "./session.js";
@@ -13,10 +11,6 @@ export type AuctionDuration = number & { readonly __brand: "AuctionDuration" };
 
 export interface CreatedAuction {
   auctionId: AuctionId;
-}
-
-interface AuctionedEntry {
-  id: string;
 }
 
 interface CreatedAuctionResponse {
@@ -52,16 +46,11 @@ function isCreatedAuctionResponse(
 
 export async function createAuction(
   session: Session,
-  cardId: CardId,
+  entryId: string,
   startingPrice: StartingPrice,
   duration: AuctionDuration,
 ): Promise<CreatedAuction> {
-  const entry = await readCollectionEntry<AuctionedEntry>(
-    session,
-    cardId,
-    "id",
-  );
-  const action = `Putting card ${cardId} up for auction`;
+  const action = `Putting entry ${entryId} up for auction`;
   const body = await siteRequest(
     session,
     await siteCookie(session),
@@ -71,7 +60,7 @@ export async function createAuction(
     {
       method: "POST",
       body: {
-        card_id: entry.id,
+        card_id: entryId,
         base_amount: startingPrice,
         duration_minutes: duration,
       },

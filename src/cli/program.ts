@@ -171,9 +171,9 @@ auction
 auction
   .command("create")
   .description(
-    "Put a card of your collection up for auction at a starting price for a duration; the game accepts or refuses it and gives its reason",
+    "Put an entry of your collection up for auction at a starting price for a duration; the game accepts or refuses it and gives its reason",
   )
-  .argument("<card-id>", "card UUID")
+  .argument("<entry-id>", "entry id, as given by collection list")
   .argument(
     "<starting-price>",
     "wikibidous the bidding starts at, a strictly positive integer",
@@ -184,21 +184,16 @@ auction
   )
   .addHelpText(
     "after",
-    examples(`wikimasters auction create ${EXAMPLE_CARD_ID} 50 60`),
+    examples(`wikimasters auction create ${EXAMPLE_ENTRY_ID} 50 60`),
   )
   .action(
-    async (
-      rawCardId: string,
-      rawStartingPrice: string,
-      rawDuration: string,
-    ) => {
-      const cardId = parseCardId(rawCardId);
+    async (entryId: string, rawStartingPrice: string, rawDuration: string) => {
       const startingPrice = parseStartingPrice(rawStartingPrice);
       const duration = parseAuctionDuration(rawDuration);
       const session = await openSession();
       console.log(
         formatCreatedAuction(
-          await createAuction(session, cardId, startingPrice, duration),
+          await createAuction(session, entryId, startingPrice, duration),
           format(),
         ),
       );

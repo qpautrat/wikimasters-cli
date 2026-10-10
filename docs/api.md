@@ -68,7 +68,6 @@ Source: read-only query, 2026-10-02.
 - Row-level security returns only the user's own rows.
 - `listCollection`: `GET` of `id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; a `limit` of 2000 answers 2000 rows (observed 2026-10-10).
 - `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` and `count=gt.0`, to find the entry of each card to discard.
-- `createAuction`: `GET` of `id`, filtered on `user_id`, `card_id` and `count=gt.0`, to find the entry of the card to put up for auction.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
 - `starEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`. The row count is 0 for an unknown entry and for another player's entry, which row-level security hides; an id that is not a UUID answers `400` `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `star-card.har`.
 - `unstarEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":false}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`, with the same row counts and refusals as `starEntry`. Source: capture `unstar-card.har`.
@@ -173,9 +172,9 @@ Source: the auction form's JavaScript, reached from `/collection`, and auctions 
 
 - Body `{"card_id": <user_cards.id>, "base_amount": <starting price>, "duration_minutes": <minutes>}`: the collection entry id, not `cards.id`. Response `{"auction_id": <auctions.id>}`, HTTP 200; the auction's `end_at` is `duration_minutes` after its creation.
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The form handles `human_verification_required` (it then shows a captcha) and shows `error` otherwise.
-- Observed refusal: a duration of 7 minutes gets HTTP 400 `{"error":"Durée invalide (entre 10 minutes et 12 heures)"}`.
+- Observed refusals: a duration of 7 minutes gets HTTP 400 `{"error":"Durée invalide (entre 10 minutes et 12 heures)"}`; an unknown entry id gets HTTP 409 `{"error":"Vous ne possédez pas cette carte"}`, and an id that is not a UUID HTTP 500 `{"error":"Impossible de créer l'enchère"}` (observed 2026-10-10).
 - The form offers 10, 30, 60, 180, 360 and 720 minutes, refuses a starting price below 1, and disables itself once the user's active auctions reach `maxConcurrentAuctions` from `GET /api/marketplace/mine` (`{"sellingCount", "maxConcurrentAuctions"}`, 5 for a regular account).
-- `createAuction`: sends the entry id, the starting price and the duration given, reports `auction_id`, and reports a refusal with its body.
+- `createAuction`: sends the entry id, the starting price and the duration given in a single request, without reading the collection first, reports `auction_id`, and reports a refusal with its body.
 
 ## `DELETE /api/marketplace/<auction id>`: cancel an auction
 
