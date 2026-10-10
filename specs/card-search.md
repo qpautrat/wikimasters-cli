@@ -18,14 +18,14 @@ Dépend de : [Sortie JSON des commandes](json-output.md).
 1. `wikimasters cards search <texte>` cherche dans le catalogue de toutes les cartes du jeu, que je les possède ou non.
 2. Avec `--in title`, une carte correspond quand son nom contient le texte donné, sans tenir compte de la casse.
 3. Chaque résultat affiche l'identifiant unique de la carte (UUID `cards.id`), son titre et sa rareté.
-4. Avec `--in title`, une carte dont le nom est exactement le texte donné, à la casse près, apparaît en premier.
+4. La commande envoie une seule requête au jeu, quel que soit le champ cherché.
 5. La commande affiche au plus 50 résultats et signale quand d'autres cartes correspondent.
 6. Une recherche sans résultat réussit et le dit.
 7. Avec `--json`, stdout porte la liste des cartes trouvées, chacune avec ses champs `id`, `title` et `rarity`, et un champ indiquant si la liste est tronquée.
 8. L'option `--in <champ>` choisit où chercher le texte : `title` (par défaut), `category` ou `summary`, la catégorie et le résumé tirés de l'article Wikipédia de la carte.
 9. Une carte correspond quand le champ choisi contient le texte donné, sans tenir compte de la casse.
 10. Une valeur de `--in` hors de cette liste est refusée sans interroger le jeu, avec un message qui donne les valeurs acceptées.
-11. Avec `--in category` ou `--in summary`, les résultats sont triés par titre ; avec `--in title`, la commande se comporte comme décrit aux critères 1 à 7.
+11. Les résultats sont triés par titre, quel que soit le champ cherché.
 12. Avec `--in category` ou `--in summary`, les résultats, leur limite à 50, le signal de troncature et la sortie `--json` restent ceux des critères 3, 5, 6 et 7.
 
 ## Hors périmètre

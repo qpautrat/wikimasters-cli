@@ -10,7 +10,6 @@ import {
   fakeFetch,
   restRequest,
   tokenRefresh,
-  type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
 
@@ -30,17 +29,9 @@ function row(index: number, title: string): Row {
 
 const isCardRead = restRequest("GET", "cards");
 
-function isExactRead(request: RecordedRequest): boolean {
-  return request.url.searchParams
-    .getAll("wikipedia_title")
-    .some((filter) => filter.startsWith("imatch.^"));
-}
-
-function catalogue(exact: Row[], containing: Row[]): Route {
-  return (request) => {
-    if (!isCardRead(request)) return undefined;
-    return { status: 200, body: isExactRead(request) ? exact : containing };
-  };
+function catalogue(rows: Row[]): Route {
+  return (request) =>
+    isCardRead(request) ? { status: 200, body: rows } : undefined;
 }
 
 async function sessionWith(...routes: Route[]) {
@@ -57,9 +48,7 @@ describe("searchCards", () => {
   it("lists the catalogue cards whose title contains the text, case-insensitively", async () => {
     const dome = row(1, "Half Dome");
     const trail = row(2, "Half Dome Trail");
-    const { session, requests } = await sessionWith(
-      catalogue([], [dome, trail]),
-    );
+    const { session, requests } = await sessionWith(catalogue([dome, trail]));
 
     await expect(searchCards(session, "half dom", "title")).resolves.toEqual({
       cards: [
@@ -68,9 +57,7 @@ describe("searchCards", () => {
       ],
       truncated: false,
     });
-    const containing = requests.find(
-      (request) => isCardRead(request) && !isExactRead(request),
-    );
+    const containing = requests.find(isCardRead);
     expect(containing?.url.searchParams.getAll("wikipedia_title")).toEqual([
       "ilike.%half dom%",
       "imatch.half dom",
@@ -86,50 +73,23 @@ describe("searchCards", () => {
     );
   });
 
-  it("puts the cards titled exactly as the text first, from a single read when it holds every match", async () => {
-    const dome = row(1, "Dome");
-    const halfDome = row(2, "Half Dome");
-    const { session, requests } = await sessionWith(
-      catalogue([], [halfDome, dome]),
-    );
+  it("sends a single read and keeps the title order, an exact title included", async () => {
+    const aDome = row(1, "A dome");
+    const dome = row(2, "Dome");
+    const { session, requests } = await sessionWith(catalogue([aDome, dome]));
 
-    const { cards } = await searchCards(session, "DOME", "title");
+    const { cards } = await searchCards(session, "dome", "title");
 
-    expect(cards.map(({ title }) => title)).toEqual(["Dome", "Half Dome"]);
+    expect(cards.map(({ title }) => title)).toEqual(["A dome", "Dome"]);
     expect(requests.filter(isCardRead)).toHaveLength(1);
   });
 
-  it("reads the exact titles apart when more cards match, and puts them first", async () => {
-    const others = Array.from({ length: CARD_SEARCH_LIMIT + 1 }, (_, index) =>
-      row(index, `A dome ${index}`),
-    );
-    const dome = row(99, "Dome");
-    const { session, requests } = await sessionWith(catalogue([dome], others));
-
-    const { cards, truncated } = await searchCards(session, "dome", "title");
-
-    expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
-    expect(cards[0]?.title).toBe("Dome");
-    expect(cards[1]?.title).toBe("A dome 0");
-    expect(truncated).toBe(true);
-    const exact = requests.find(isExactRead);
-    expect(exact?.url.searchParams.getAll("wikipedia_title")).toEqual([
-      "ilike.dome",
-      "imatch.^dome$",
-    ]);
-    expect(exact?.url.searchParams.get("limit")).toBe(
-      String(CARD_SEARCH_LIMIT),
-    );
-  });
-
   it("matches the text literally, wildcards and regex characters included", async () => {
-    const { session, requests } = await sessionWith(catalogue([], []));
+    const { session, requests } = await sessionWith(catalogue([]));
 
     await searchCards(session, "100% EL*KE_(a.b)\\", "title");
 
-    const containing = requests.find(
-      (request) => isCardRead(request) && !isExactRead(request),
-    );
+    const containing = requests.find(isCardRead);
     expect(containing?.url.searchParams.getAll("wikipedia_title")).toEqual([
       "ilike.%100\\% EL_KE\\_(a.b)\\\\%",
       "imatch.100% EL\\*KE_\\(a\\.b\\)\\\\",
@@ -140,7 +100,7 @@ describe("searchCards", () => {
     const rows = Array.from({ length: CARD_SEARCH_LIMIT + 1 }, (_, index) =>
       row(index, `Card ${index}`),
     );
-    const { session } = await sessionWith(catalogue([], rows));
+    const { session } = await sessionWith(catalogue(rows));
 
     const { cards, truncated } = await searchCards(session, "card", "title");
 
@@ -152,7 +112,7 @@ describe("searchCards", () => {
     const rows = Array.from({ length: CARD_SEARCH_LIMIT }, (_, index) =>
       row(index, `Card ${index}`),
     );
-    const { session } = await sessionWith(catalogue([], rows));
+    const { session } = await sessionWith(catalogue(rows));
 
     await expect(searchCards(session, "card", "title")).resolves.toMatchObject({
       truncated: false,
@@ -160,7 +120,7 @@ describe("searchCards", () => {
   });
 
   it("succeeds with no card when nothing matches", async () => {
-    const { session } = await sessionWith(catalogue([], []));
+    const { session } = await sessionWith(catalogue([]));
 
     await expect(searchCards(session, "zqxjw", "title")).resolves.toEqual({
       cards: [],
@@ -175,7 +135,7 @@ describe("searchCards", () => {
     "searches the %s instead of the title, ordered by title",
     async (field, column) => {
       const caliste = row(1, "Caliste (esport)");
-      const { session, requests } = await sessionWith(catalogue([], [caliste]));
+      const { session, requests } = await sessionWith(catalogue([caliste]));
 
       await expect(searchCards(session, "Esport", field)).resolves.toEqual({
         cards: [{ id: caliste.id, title: "Caliste (esport)", rarity: "C" }],
@@ -192,21 +152,6 @@ describe("searchCards", () => {
       );
     },
   );
-
-  it("keeps the title order and reads once when more cards match another field", async () => {
-    const rows = Array.from({ length: CARD_SEARCH_LIMIT + 1 }, (_, index) =>
-      row(index, `Card ${index}`),
-    );
-    const dome = row(99, "Dome");
-    const { session, requests } = await sessionWith(catalogue([dome], rows));
-
-    const { cards, truncated } = await searchCards(session, "dome", "summary");
-
-    expect(cards).toHaveLength(CARD_SEARCH_LIMIT);
-    expect(cards[0]?.title).toBe("Card 0");
-    expect(truncated).toBe(true);
-    expect(requests.filter(isCardRead)).toHaveLength(1);
-  });
 
   it("reports an API failure", async () => {
     const { session } = await sessionWith((request) =>

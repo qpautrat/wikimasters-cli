@@ -285,7 +285,7 @@ const cards = program.command("cards").description("Browse the card catalogue");
 cards
   .command("search")
   .description(
-    "Find the cards of the catalogue whose title, category or summary contains the given text, regardless of case, at most 50; ordered by title, a card titled exactly as the text first when searching titles",
+    "Find the cards of the catalogue whose title, category or summary contains the given text, regardless of case, at most 50, ordered by title",
   )
   .argument("<text...>", "text to search for, e.g. all or part of the title")
   .option(

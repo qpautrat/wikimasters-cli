@@ -14,8 +14,6 @@ const SEARCHED_COLUMNS = {
   summary: "summary",
 } as const satisfies Record<CardSearchField, string>;
 
-type SearchedColumn = (typeof SEARCHED_COLUMNS)[CardSearchField];
-
 function isCardSearchField(raw: string): raw is CardSearchField {
   return (CARD_SEARCH_FIELDS as readonly string[]).includes(raw);
 }
@@ -56,74 +54,32 @@ function regexLiteral(text: string): string {
   return text.replace(/[\\^$.|?*+()[\]{}]/g, "\\$&");
 }
 
-async function readCards(
-  session: Session,
-  column: SearchedColumn,
-  like: string,
-  regex: string,
-  limit: number,
-): Promise<CardRow[]> {
-  const { data, error, status } = await session.client
-    .from("cards")
-    .select("id, wikipedia_title, rarity")
-    .ilike(column, like)
-    .filter(column, "imatch", regex)
-    .order("wikipedia_title")
-    .order("id")
-    .limit(limit)
-    .overrideTypes<CardRow[], { merge: false }>();
-  if (error) {
-    throw apiFailure("Searching the card catalogue", status, error.message);
-  }
-  return data;
-}
-
-async function exactTitles(
-  session: Session,
-  title: string,
-  containing: CardRow[],
-): Promise<CardRow[]> {
-  if (containing.length <= CARD_SEARCH_LIMIT) {
-    return containing.filter(
-      ({ wikipedia_title }) =>
-        wikipedia_title.toLowerCase() === title.toLowerCase(),
-    );
-  }
-  return readCards(
-    session,
-    SEARCHED_COLUMNS.title,
-    likePattern(title),
-    `^${regexLiteral(title)}$`,
-    CARD_SEARCH_LIMIT,
-  );
-}
-
 export async function searchCards(
   session: Session,
   text: string,
   field: CardSearchField,
 ): Promise<CardSearch> {
-  const containing = await readCards(
-    session,
-    SEARCHED_COLUMNS[field],
-    `%${likePattern(text)}%`,
-    regexLiteral(text),
-    CARD_SEARCH_LIMIT + 1,
-  );
-  const truncated = containing.length > CARD_SEARCH_LIMIT;
-  const exact =
-    field === "title" ? await exactTitles(session, text, containing) : [];
-
-  const exactIds = new Set(exact.map(({ id }) => id));
-  const rows = [...exact, ...containing.filter(({ id }) => !exactIds.has(id))];
+  const column = SEARCHED_COLUMNS[field];
+  const { data, error, status } = await session.client
+    .from("cards")
+    .select("id, wikipedia_title, rarity")
+    .ilike(column, `%${likePattern(text)}%`)
+    .filter(column, "imatch", regexLiteral(text))
+    .order("wikipedia_title")
+    .order("id")
+    .limit(CARD_SEARCH_LIMIT + 1)
+    .overrideTypes<CardRow[], { merge: false }>();
+  if (error) {
+    throw apiFailure("Searching the card catalogue", status, error.message);
+  }
   return {
-    cards: rows
+    cards: data
       .slice(0, CARD_SEARCH_LIMIT)
       .map(({ id, wikipedia_title, rarity }) => ({
         id: id as CardId,
         title: wikipedia_title,
         rarity,
       })),
-    truncated,
+    truncated: data.length > CARD_SEARCH_LIMIT,
   };
 }
