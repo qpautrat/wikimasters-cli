@@ -35,7 +35,7 @@ import {
   showAuction,
   starEntry,
   tagCard,
-  unstarCard,
+  unstarEntry,
   untagCard,
   type AuctionFilter,
   type CollectionFilter,
@@ -54,7 +54,6 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatEntryFavourite,
-  formatFavourite,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -477,18 +476,17 @@ collection
 
 collection
   .command("unstar")
-  .description(
-    "Remove a card of your collection from the favourites; succeeds if it is not a favourite",
-  )
-  .argument("<card-id>", "card UUID")
+  .description("Remove an entry of your collection from the favourites")
+  .argument("<entry-id>", "entry id, as given by collection list")
   .addHelpText(
     "after",
-    examples(`wikimasters collection unstar ${EXAMPLE_CARD_ID}`),
+    examples(`wikimasters collection unstar ${EXAMPLE_ENTRY_ID}`),
   )
-  .action(async (rawCardId: string) => {
-    const cardId = parseCardId(rawCardId);
+  .action(async (entryId: string) => {
     const session = await openSession();
-    console.log(formatFavourite(await unstarCard(session, cardId), format()));
+    console.log(
+      formatEntryFavourite(await unstarEntry(session, entryId), format()),
+    );
   });
 
 for (const [name, description, change, example] of [

@@ -10,7 +10,6 @@ import type {
   CreatedAuction,
   Discard,
   EntryFavourite,
-  FavouriteChange,
   FriendOwner,
   GlobalCollectionCard,
   GlobalCollectionSearch,
@@ -395,22 +394,6 @@ export function formatEntryFavourite(
   return starred
     ? `Entry ${entryId} marked as favourite.`
     : `Entry ${entryId} removed from the favourites.`;
-}
-
-export function formatFavourite(
-  { cardId, starred, changed }: FavouriteChange,
-  format: Format,
-): string {
-  if (format === "json")
-    return JSON.stringify({ id: cardId, starred, changed });
-  if (starred) {
-    return changed
-      ? `Card ${cardId} marked as favourite.`
-      : `Card ${cardId} was already a favourite.`;
-  }
-  return changed
-    ? `Card ${cardId} removed from the favourites.`
-    : `Card ${cardId} was not a favourite.`;
 }
 
 export function formatLabels(labels: readonly Label[], format: Format): string {

@@ -88,9 +88,8 @@ export {
 } from "./errors.js";
 export {
   starEntry,
-  unstarCard,
+  unstarEntry,
   type EntryFavourite,
-  type FavouriteChange,
 } from "./favourite.js";
 export {
   searchGlobalCollection,

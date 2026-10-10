@@ -46,7 +46,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `collection list [--rarity <code>] [--page <p>] [--limit <n>]` | Reads a page of your collection, earliest obtained first, with entry id, card id, owned rarity, copies, favourite and shiny state, labels and obtention date, and says when the page is full; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L`; `--page` reads the next pages, from 1 by default; `--limit` sets the cards per page, 1000 by default | `mise run wikimasters -- collection list --rarity L --page 2` |
 | `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
 | `collection star <entry-id>` | Marks an entry of your collection as favourite; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection star <entry-uuid>` |
-| `collection unstar <card-id>` | Removes a card of your collection from the favourites | `mise run wikimasters -- collection unstar <card-uuid>` |
+| `collection unstar <entry-id>` | Removes an entry of your collection from the favourites; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection unstar <entry-uuid>` |
 | `collection tag <card-id> <label>` | Puts one of your labels on a card of your collection | `mise run wikimasters -- collection tag <card-uuid> Favourites` |
 | `collection untag <card-id> <label>` | Removes one of your labels from a card of your collection | `mise run wikimasters -- collection untag <card-uuid> Favourites` |
 | `labels list` | Lists your labels, ordered by name, with their id, name and colour | `mise run wikimasters -- labels list` |

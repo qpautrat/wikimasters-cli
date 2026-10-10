@@ -13,7 +13,6 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatEntryFavourite,
-  formatFavourite,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -346,14 +345,6 @@ describe("JSON output", () => {
     expect(
       JSON.parse(formatEntryFavourite({ entryId, starred: true }, "json")),
     ).toEqual({ entryId, starred: true });
-  });
-
-  it("reports a favourite change with the card id, the state and whether it changed", () => {
-    expect(
-      JSON.parse(
-        formatFavourite({ cardId, starred: true, changed: false }, "json"),
-      ),
-    ).toEqual({ id: cardId, starred: true, changed: false });
   });
 
   it("reports a label change with the card id, the label, the state and whether it changed", () => {
@@ -768,12 +759,6 @@ describe("text output", () => {
     );
   });
 
-  it("says when a card is marked as favourite", () => {
-    expect(
-      formatFavourite({ cardId, starred: true, changed: true }, "text"),
-    ).toBe(`Card ${cardId} marked as favourite.`);
-  });
-
   it("says when a card is added to the wishlist", () => {
     expect(
       formatAddition({ cardId, title: card.title, added: true }, "text"),
@@ -784,24 +769,6 @@ describe("text output", () => {
     expect(
       formatAddition({ cardId, title: card.title, added: false }, "text"),
     ).toBe(`Card ${cardId} (Pointe de la Sambuy) was already in the wishlist.`);
-  });
-
-  it("says when a card already was a favourite", () => {
-    expect(
-      formatFavourite({ cardId, starred: true, changed: false }, "text"),
-    ).toBe(`Card ${cardId} was already a favourite.`);
-  });
-
-  it("says when a card is removed from the favourites", () => {
-    expect(
-      formatFavourite({ cardId, starred: false, changed: true }, "text"),
-    ).toBe(`Card ${cardId} removed from the favourites.`);
-  });
-
-  it("says when a card was not a favourite", () => {
-    expect(
-      formatFavourite({ cardId, starred: false, changed: false }, "text"),
-    ).toBe(`Card ${cardId} was not a favourite.`);
   });
 
   it("says when a label is created, with its colour and id", () => {
