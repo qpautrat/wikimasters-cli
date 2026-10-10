@@ -2,6 +2,7 @@ import { Command } from "commander";
 import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
+  COLLECTION_PAGE_LIMIT,
   addToWishlist,
   cancelAuction,
   createAuction,
@@ -21,6 +22,8 @@ import {
   parseBidAmount,
   parseCardId,
   parseCardSearchField,
+  parseCollectionPageLimit,
+  parseCollectionPageNumber,
   parseStartingPrice,
   placeBid,
   readCardValues,
@@ -385,19 +388,40 @@ const collection = program
   .command("collection")
   .description("Manage your collection");
 
+interface CollectionListOptions extends CollectionFilter {
+  page: string;
+  limit: string;
+}
+
 collection
   .command("list")
   .description(
-    "List the cards of your collection, earliest obtained first, with their entry id, card id, owned rarity, copies, favourite and shiny state, labels and obtention date",
+    "Read a page of your collection, earliest obtained first, with each card's entry id, card id, owned rarity, copies, favourite and shiny state, labels and obtention date; says when the page is full",
   )
   .option(
     "--rarity <code>",
     "list only the cards of this owned rarity: C, PC, R, SR, UR or L",
   )
-  .addHelpText("after", examples("wikimasters collection list --rarity C"))
-  .action(async (filter: CollectionFilter) => {
-    const cards = await listCollection(await openSession(), filter);
-    console.log(formatCollection(cards, format(), filter.rarity));
+  .option("--page <p>", "page to read, a strictly positive integer", "1")
+  .option(
+    "--limit <n>",
+    "number of cards per page, a strictly positive integer",
+    String(COLLECTION_PAGE_LIMIT),
+  )
+  .addHelpText(
+    "after",
+    examples(
+      "wikimasters collection list --rarity C",
+      "wikimasters collection list --page 2",
+    ),
+  )
+  .action(async ({ page, limit, ...filter }: CollectionListOptions) => {
+    const request = {
+      page: parseCollectionPageNumber(page),
+      limit: parseCollectionPageLimit(limit),
+    };
+    const result = await listCollection(await openSession(), request, filter);
+    console.log(formatCollection(result, format(), filter.rarity));
   });
 
 collection

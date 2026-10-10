@@ -255,20 +255,25 @@ describe("JSON output", () => {
     ]);
   });
 
-  it("lists the collection as an array of cards with each attribute in its own field", () => {
-    expect(JSON.parse(formatCollection([owned], "json"))).toEqual([
-      {
-        entryId,
-        id: cardId,
-        title: "Pointe de la Sambuy",
-        rarity: "C",
-        copies: 1,
-        starred: false,
-        shiny: false,
-        labels: [],
-        obtainedAt: "2026-09-18T23:42:15.692426+00:00",
-      },
-    ]);
+  it("reports a collection page as its cards, each attribute in its own field, and whether it is full", () => {
+    expect(
+      JSON.parse(formatCollection({ cards: [owned], full: true }, "json")),
+    ).toEqual({
+      cards: [
+        {
+          entryId,
+          id: cardId,
+          title: "Pointe de la Sambuy",
+          rarity: "C",
+          copies: 1,
+          starred: false,
+          shiny: false,
+          labels: [],
+          obtainedAt: "2026-09-18T23:42:15.692426+00:00",
+        },
+      ],
+      full: true,
+    });
   });
 
   it("reports a player's collection page as its entries and whether it is full", () => {
@@ -303,8 +308,10 @@ describe("JSON output", () => {
     ).toEqual({ entries: [], full: false });
   });
 
-  it("gives an empty array for an empty collection", () => {
-    expect(formatCollection([], "json", "UR")).toBe("[]");
+  it("gives an empty array of cards for an empty collection page", () => {
+    expect(
+      JSON.parse(formatCollection({ cards: [], full: false }, "json", "UR")),
+    ).toEqual({ cards: [], full: false });
   });
 
   it("gives an empty array for an empty wishlist", () => {
@@ -627,7 +634,7 @@ describe("text output", () => {
   });
 
   it("prints one line per collection card, entry id first", () => {
-    expect(formatCollection([owned], "text")).toBe(
+    expect(formatCollection({ cards: [owned], full: false }, "text")).toBe(
       `${entryId}  ${cardId}  Pointe de la Sambuy (C)  x1  obtained 2026-09-18T23:42:15.692426+00:00`,
     );
   });
@@ -635,15 +642,18 @@ describe("text output", () => {
   it("marks the favourite, shiny and labelled collection cards", () => {
     expect(
       formatCollection(
-        [
-          {
-            ...owned,
-            copies: 2,
-            starred: true,
-            shiny: true,
-            labels: ["Lieux", "Montagnes"],
-          },
-        ],
+        {
+          cards: [
+            {
+              ...owned,
+              copies: 2,
+              starred: true,
+              shiny: true,
+              labels: ["Lieux", "Montagnes"],
+            },
+          ],
+          full: false,
+        },
         "text",
       ),
     ).toBe(
@@ -695,13 +705,24 @@ describe("text output", () => {
     );
   });
 
-  it("says when the collection is empty", () => {
-    expect(formatCollection([], "text")).toBe("The collection is empty.");
+  it("says when a full collection page may be followed by others", () => {
+    expect(formatCollection({ cards: [owned], full: true }, "text")).toBe(
+      [
+        `${entryId}  ${cardId}  Pointe de la Sambuy (C)  x1  obtained 2026-09-18T23:42:15.692426+00:00`,
+        "The page is full (1 card); more may follow.",
+      ].join("\n"),
+    );
   });
 
-  it("says when the collection holds no card of the requested rarity", () => {
-    expect(formatCollection([], "text", "UR")).toBe(
-      "The collection holds no card of rarity UR.",
+  it("says when the collection page is empty", () => {
+    expect(formatCollection({ cards: [], full: false }, "text")).toBe(
+      "This page of the collection is empty.",
+    );
+  });
+
+  it("says when the collection page holds no card of the requested rarity", () => {
+    expect(formatCollection({ cards: [], full: false }, "text", "UR")).toBe(
+      "This page of the collection holds no card of rarity UR.",
     );
   });
 

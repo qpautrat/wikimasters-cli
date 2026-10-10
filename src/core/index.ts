@@ -59,9 +59,16 @@ export {
   type LabelDeletion,
 } from "./label.js";
 export {
+  COLLECTION_PAGE_LIMIT,
   listCollection,
+  parseCollectionPageLimit,
+  parseCollectionPageNumber,
   type CollectionCard,
   type CollectionFilter,
+  type CollectionPage,
+  type CollectionPageLimit,
+  type CollectionPageNumber,
+  type CollectionPageRequest,
 } from "./collection-list.js";
 export {
   discardCards,

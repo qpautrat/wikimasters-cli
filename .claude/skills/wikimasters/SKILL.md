@@ -27,6 +27,8 @@ The user names cards in natural language. Resolve each name to its id with the l
 - several matches: show their titles and rarities, and act only after the user picks one;
 - no match: say so and change nothing.
 
+`collection list` reads one page of the collection: while the page is full (`full` true with `--json`), read the next one with `--page`, before concluding a card is not in the collection.
+
 When `cards search` finds nothing, search again with a shorter part of the name, free of accented letters, before concluding there is no match.
 
 For cards named by a theme rather than a title, such as a team or a kind of place, search it with `cards search <text> --in category` or `--in summary`.

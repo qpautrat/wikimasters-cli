@@ -1,7 +1,30 @@
 import type { CardId } from "./card-id.js";
-import { WikiMastersError } from "./errors.js";
-import { readAllPages } from "./paged-read.js";
+import { WikiMastersError, apiFailure } from "./errors.js";
+import { parseStrictlyPositiveInteger } from "./positive-integer.js";
 import type { Session } from "./session.js";
+
+export const COLLECTION_PAGE_LIMIT = 1000;
+
+export type CollectionPageNumber = number & {
+  readonly __brand: "CollectionPageNumber";
+};
+export type CollectionPageLimit = number & {
+  readonly __brand: "CollectionPageLimit";
+};
+
+export function parseCollectionPageNumber(raw: string): CollectionPageNumber {
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "page",
+    untouched: "nothing was read",
+  }) as CollectionPageNumber;
+}
+
+export function parseCollectionPageLimit(raw: string): CollectionPageLimit {
+  return parseStrictlyPositiveInteger(raw, {
+    subject: "limit",
+    untouched: "nothing was read",
+  }) as CollectionPageLimit;
+}
 
 export interface CollectionCard {
   entryId: string;
@@ -17,6 +40,16 @@ export interface CollectionCard {
 
 export interface CollectionFilter {
   rarity?: string;
+}
+
+export interface CollectionPageRequest {
+  page: CollectionPageNumber;
+  limit: CollectionPageLimit;
+}
+
+export interface CollectionPage {
+  cards: CollectionCard[];
+  full: boolean;
 }
 
 interface OwnedCardRow {
@@ -46,33 +79,37 @@ function labelsOf({ card_id, user_card_tags }: OwnedCardRow): string[] {
 
 export async function listCollection(
   session: Session,
+  { page, limit }: CollectionPageRequest,
   { rarity }: CollectionFilter = {},
-): Promise<CollectionCard[]> {
-  const rows = await readAllPages("Listing the collection", (from, to) => {
-    let query = session.client
-      .from("user_cards")
-      .select(
-        "id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))",
-      )
-      .eq("user_id", session.userId)
-      .gt("count", 0);
-    if (rarity !== undefined) query = query.eq("snapshot_rarity", rarity);
-    return query
-      .order("obtained_at")
-      .order("id")
-      .range(from, to)
-      .overrideTypes<OwnedCardRow[], { merge: false }>();
-  });
+): Promise<CollectionPage> {
+  let query = session.client
+    .from("user_cards")
+    .select(
+      "id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))",
+    )
+    .eq("user_id", session.userId)
+    .gt("count", 0);
+  if (rarity !== undefined) query = query.eq("snapshot_rarity", rarity);
+  const from = (page - 1) * limit;
+  const { data, error, status } = await query
+    .order("obtained_at")
+    .order("id")
+    .range(from, from + limit - 1)
+    .overrideTypes<OwnedCardRow[], { merge: false }>();
+  if (error) throw apiFailure("Listing the collection", status, error.message);
 
-  return rows.map((row) => ({
-    entryId: row.id,
-    id: row.card_id as CardId,
-    title: row.snapshot_title,
-    rarity: row.snapshot_rarity,
-    copies: row.count,
-    starred: row.starred,
-    shiny: row.is_shiny,
-    labels: labelsOf(row),
-    obtainedAt: row.obtained_at,
-  }));
+  return {
+    cards: data.map((row) => ({
+      entryId: row.id,
+      id: row.card_id as CardId,
+      title: row.snapshot_title,
+      rarity: row.snapshot_rarity,
+      copies: row.count,
+      starred: row.starred,
+      shiny: row.is_shiny,
+      labels: labelsOf(row),
+      obtainedAt: row.obtained_at,
+    })),
+    full: data.length === limit,
+  };
 }

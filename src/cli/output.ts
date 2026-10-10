@@ -7,7 +7,7 @@ import type {
   CardSearch,
   CardValue,
   CatalogueCard,
-  CollectionCard,
+  CollectionPage,
   CreatedAuction,
   Discard,
   FavouriteChange,
@@ -173,18 +173,19 @@ function collectionMarks({
 }
 
 export function formatCollection(
-  cards: readonly CollectionCard[],
+  page: CollectionPage,
   format: Format,
   requestedRarity?: string,
 ): string {
-  if (format === "json") return JSON.stringify(cards);
-  if (cards.length === 0) {
+  if (format === "json") return JSON.stringify(page);
+  const { cards: pageCards, full } = page;
+  if (pageCards.length === 0) {
     return requestedRarity === undefined
-      ? "The collection is empty."
-      : `The collection holds no card of rarity ${requestedRarity}.`;
+      ? "This page of the collection is empty."
+      : `This page of the collection holds no card of rarity ${requestedRarity}.`;
   }
-  return cards
-    .map(
+  return [
+    ...pageCards.map(
       ({
         entryId,
         id,
@@ -200,8 +201,13 @@ export function formatCollection(
           `${entryId}  ${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
           ...collectionMarks({ starred, shiny, labels }),
         ].join("  "),
-    )
-    .join("\n");
+    ),
+    ...(full
+      ? [
+          `The page is full (${cards(pageCards.length, "card")}); more may follow.`,
+        ]
+      : []),
+  ].join("\n");
 }
 
 export function formatProfileCollection(
