@@ -483,9 +483,7 @@ labels
 
 labels
   .command("create")
-  .description(
-    "Create a label; succeeds without creating if the game refuses it as a duplicate of your label of exactly that name",
-  )
+  .description("Create a label and show its id, name and colour")
   .argument("<name>", "label name")
   .option("--color <colour>", "label colour, sent to the game as given")
   .addHelpText(

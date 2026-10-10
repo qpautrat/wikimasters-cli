@@ -15,7 +15,6 @@ import type {
   GlobalCollectionCard,
   GlobalCollectionSearch,
   Label,
-  LabelCreation,
   LabelDeletion,
   PlacedBid,
   ProfileCollectionPage,
@@ -405,12 +404,11 @@ export function formatLabels(labels: readonly Label[], format: Format): string {
 }
 
 export function formatLabelCreation(
-  { name, color, created }: LabelCreation,
+  { id, name, color }: Label,
   format: Format,
 ): string {
-  if (format === "json") return JSON.stringify({ name, color, created });
-  const label = `Label ${JSON.stringify(name)} (${color})`;
-  return created ? `${label} created.` : `${label} already existed.`;
+  if (format === "json") return JSON.stringify({ id, name, color });
+  return `Label ${JSON.stringify(name)} (${color}) created with id ${id}.`;
 }
 
 export function formatLabelDeletion(

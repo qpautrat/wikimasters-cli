@@ -366,15 +366,13 @@ describe("JSON output", () => {
     expect(formatLabels([], "json")).toBe("[]");
   });
 
-  it("reports a label with its name, colour and whether it was just created", () => {
-    expect(
-      JSON.parse(
-        formatLabelCreation(
-          { name: "Karmine Corp", color: "#94a3b8", created: true },
-          "json",
-        ),
-      ),
-    ).toEqual({ name: "Karmine Corp", color: "#94a3b8", created: true });
+  it("reports a created label with its id, name and colour", () => {
+    const label = {
+      id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+      name: "Karmine Corp",
+      color: "#94a3b8",
+    };
+    expect(JSON.parse(formatLabelCreation(label, "json"))).toEqual(label);
   });
 
   it("reports a label deletion with its name and whether it was just deleted", () => {
@@ -754,22 +752,19 @@ describe("text output", () => {
     ).toBe(`Card ${cardId} was not a favourite.`);
   });
 
-  it("says when a label is created, with its colour", () => {
+  it("says when a label is created, with its colour and id", () => {
     expect(
       formatLabelCreation(
-        { name: "Karmine Corp", color: "#facc15", created: true },
+        {
+          id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+          name: "Karmine Corp",
+          color: "#facc15",
+        },
         "text",
       ),
-    ).toBe('Label "Karmine Corp" (#facc15) created.');
-  });
-
-  it("says when a label already existed, with its colour", () => {
-    expect(
-      formatLabelCreation(
-        { name: "Karmine Corp", color: "#94a3b8", created: false },
-        "text",
-      ),
-    ).toBe('Label "Karmine Corp" (#94a3b8) already existed.');
+    ).toBe(
+      'Label "Karmine Corp" (#facc15) created with id 5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35.',
+    );
   });
 
   it("says when a label is deleted", () => {

@@ -12,13 +12,13 @@ En tant que joueur, je crée une étiquette depuis le terminal, pour la poser en
 
 ## Critères d'acceptation
 
-1. `wikimasters labels create <name>` crée une étiquette nommée `<name>` parmi les miennes.
+1. `wikimasters labels create <name>` crée une étiquette nommée `<name>` parmi les miennes, en une seule requête, `POST tags`, sans lire mes étiquettes avant ni après.
 2. L'option `--color <couleur>` transmet au jeu la couleur de l'étiquette, telle quelle ; sans elle, la commande n'en transmet aucune.
-3. Quand le jeu refuse la création comme un doublon et qu'une de mes étiquettes porte exactement le nom donné, la commande réussit sans rien créer et signale cette étiquette.
-4. Un refus du jeu est rapporté avec sa raison, sans rien créer, y compris un refus pour doublon quand aucune de mes étiquettes ne porte exactement le nom donné.
+3. La commande affiche l'étiquette créée avec son identifiant (UUID `tags.id`), son nom et sa couleur.
+4. Quand le jeu refuse la création, doublon compris, la commande échoue en affichant le motif donné par le jeu, sans rien créer.
 5. La commande transmet le nom au jeu tel que donné, sans le modifier.
 6. L'étiquette créée apparaît dans l'interface et `wikimasters collection tag <card-id> <name>` la pose.
-7. Avec `--json`, stdout porte l'étiquette avec ses champs `name` et `color`, et un champ indiquant si elle vient d'être créée.
+7. Avec `--json`, stdout porte l'étiquette créée avec ses champs `id`, `name` et `color`.
 
 ## Hors périmètre
 

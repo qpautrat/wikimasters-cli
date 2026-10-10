@@ -1,16 +1,10 @@
-import { apiFailure, isUniqueViolation } from "./errors.js";
+import { apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 
 export interface Label {
   id: string;
   name: string;
   color: string;
-}
-
-export interface LabelCreation {
-  name: string;
-  color: string;
-  created: boolean;
 }
 
 export async function listLabels(session: Session): Promise<Label[]> {
@@ -28,7 +22,7 @@ export async function createLabel(
   session: Session,
   name: string,
   color?: string,
-): Promise<LabelCreation> {
+): Promise<Label> {
   const { data, error, status } = await session.client
     .from("tags")
     .insert({
@@ -36,16 +30,8 @@ export async function createLabel(
       name,
       ...(color === undefined ? {} : { color }),
     })
-    .select("name, color")
-    .single<Pick<Label, "name" | "color">>();
-  if (isUniqueViolation(error)) {
-    const existing = (await listLabels(session)).find(
-      (label) => label.name === name,
-    );
-    if (existing) {
-      return { name: existing.name, color: existing.color, created: false };
-    }
-  }
+    .select("id, name, color")
+    .single<Label>();
   if (error) {
     throw apiFailure(
       `Creating label ${JSON.stringify(name)}`,
@@ -53,7 +39,7 @@ export async function createLabel(
       error.message,
     );
   }
-  return { ...data, created: true };
+  return data;
 }
 
 export interface LabelDeletion {

@@ -56,7 +56,6 @@ export {
   deleteLabel,
   listLabels,
   type Label,
-  type LabelCreation,
   type LabelDeletion,
 } from "./label.js";
 export {

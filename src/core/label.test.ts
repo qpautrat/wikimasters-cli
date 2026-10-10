@@ -12,14 +12,6 @@ import {
   type Route,
 } from "./testing/fake-supabase.js";
 
-const duplicate = restRoute("POST", "tags", {
-  status: 409,
-  body: {
-    code: "23505",
-    message: "duplicate key value violates unique constraint",
-  },
-});
-
 function existingLabel(...rows: { name: string; color: string }[]): Route {
   return restRoute("GET", "tags", {
     status: 200,
@@ -98,44 +90,45 @@ describe("listLabels", () => {
 });
 
 describe("createLabel", () => {
-  it("creates a label of the signed-in user with the given colour", async () => {
+  const created = {
+    id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+    name: "Karmine Corp",
+    color: "#facc15",
+  };
+
+  it("creates a label of the signed-in user with the given colour in one request and returns it with its id", async () => {
     const { session, requests } = await sessionWith(
-      restRoute("POST", "tags", {
-        status: 201,
-        body: { name: "Karmine Corp", color: "#facc15" },
-      }),
+      restRoute("POST", "tags", { status: 201, body: created }),
     );
 
     await expect(
       createLabel(session, "Karmine Corp", "#facc15"),
-    ).resolves.toEqual({
-      name: "Karmine Corp",
-      color: "#facc15",
-      created: true,
-    });
+    ).resolves.toEqual(created);
     const insert = requests.find(restRequest("POST", "tags"));
     expect(JSON.parse(insert?.body ?? "null")).toEqual({
       user_id: USER_ID,
       name: "Karmine Corp",
       color: "#facc15",
     });
-    expect(insert?.url.searchParams.get("select")).toBe("name,color");
+    expect(insert?.url.searchParams.get("select")).toBe("id,name,color");
     expect(insert?.headers.get("prefer")).toContain("return=representation");
     expect(insert?.headers.get("authorization")).toBe(`Bearer ${ACCESS_TOKEN}`);
+    expect(
+      requests.filter(({ url }) => url.pathname.startsWith("/rest/")),
+    ).toHaveLength(1);
   });
 
   it("sends no colour without one", async () => {
     const { session, requests } = await sessionWith(
       restRoute("POST", "tags", {
         status: 201,
-        body: { name: "Karmine Corp", color: "#94a3b8" },
+        body: { ...created, color: "#94a3b8" },
       }),
     );
 
     await expect(createLabel(session, "Karmine Corp")).resolves.toEqual({
-      name: "Karmine Corp",
+      ...created,
       color: "#94a3b8",
-      created: true,
     });
     const insert = requests.find(restRequest("POST", "tags"));
     expect(JSON.parse(insert?.body ?? "null")).toEqual({
@@ -144,43 +137,31 @@ describe("createLabel", () => {
     });
   });
 
-  it("succeeds without creating when the user already has a label of exactly that name", async () => {
+  it("reports the game's duplicate refusal without reading the labels", async () => {
     const { session, requests } = await sessionWith(
-      duplicate,
-      existingLabel({ name: "Karmine Corp", color: "#818cf8" }),
+      restRoute("POST", "tags", {
+        status: 409,
+        body: {
+          code: "23505",
+          message:
+            'duplicate key value violates unique constraint "tags_user_name_lower_unique"',
+        },
+      }),
     );
 
-    await expect(
-      createLabel(session, "Karmine Corp", "#facc15"),
-    ).resolves.toEqual({
-      name: "Karmine Corp",
-      color: "#818cf8",
-      created: false,
-    });
-    const read = requests.find(restRequest("GET", "tags"));
-    expect(read?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-  });
-
-  it("reports the game's duplicate refusal when none of the labels has exactly that name", async () => {
-    const { session, requests } = await sessionWith(
-      duplicate,
-      existingLabel(
-        { name: "E-sport", color: "#5eead4" },
-        { name: "Karmine Corp", color: "#94a3b8" },
-      ),
+    await expect(createLabel(session, "Karmine Corp")).rejects.toThrow(
+      'Creating label "Karmine Corp" failed (HTTP 409): duplicate key value violates unique constraint "tags_user_name_lower_unique"',
     );
-
-    await expect(createLabel(session, "karmine corp")).rejects.toThrow(
-      'Creating label "karmine corp" failed (HTTP 409): duplicate key value violates unique constraint',
-    );
-    expect(requests.filter(restRequest("POST", "tags"))).toHaveLength(1);
+    expect(
+      requests.filter(({ url }) => url.pathname.startsWith("/rest/")),
+    ).toHaveLength(1);
   });
 
   it("sends the name to the API as given", async () => {
     const { session, requests } = await sessionWith(
       restRoute("POST", "tags", {
         status: 201,
-        body: { name: " montagne*", color: "#94a3b8" },
+        body: { ...created, name: " montagne*" },
       }),
     );
 
