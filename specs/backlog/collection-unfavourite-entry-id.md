@@ -4,7 +4,7 @@
 
 `wikimasters collection unstar` prend l'identifiant de la carte (`cards.id`), lit ma collection pour trouver l'entrée et son état, puis ne modifie l'entrée que si elle est en favori. Or le jeu retire le favori par un seul `PATCH user_cards?id=eq.<user_cards.id>` avec `{"starred":false}` : la commande compose deux appels.
 
-Dépend de : [Retirer une carte de ma collection de mes favoris](../collection-unfavourite.md), [Marquer en favori une entrée de ma collection sans la rechercher](collection-favourite-entry-id.md).
+Dépend de : [Retirer une carte de ma collection de mes favoris](../collection-unfavourite.md), [Marquer une carte de ma collection en favori](../collection-favourite.md).
 
 ## User story
 

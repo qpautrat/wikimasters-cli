@@ -33,7 +33,7 @@ import {
   searchCards,
   searchGlobalCollection,
   showAuction,
-  starCard,
+  starEntry,
   tagCard,
   unstarCard,
   untagCard,
@@ -53,6 +53,7 @@ import {
   formatCollection,
   formatCreatedAuction,
   formatDiscard,
+  formatEntryFavourite,
   formatFavourite,
   formatGlobalCollection,
   formatLabelCreation,
@@ -77,6 +78,7 @@ export const program = new Command("wikimasters")
 const EXAMPLE_AUCTION_ID = "6f1c2d3e-4b5a-4c7d-8e9f-0a1b2c3d4e5f";
 const EXAMPLE_CARD_ID = "9b2e4f6a-1c3d-4e5f-8a7b-2c4d6e8f0a1b";
 const OTHER_EXAMPLE_CARD_ID = "0d4f6b8a-3e5c-4a7b-9c1d-5e7f9a1b3c5d";
+const EXAMPLE_ENTRY_ID = "4a7c9e1b-6d2f-4b8a-9e3c-1f5a7b9d2e4c";
 const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
 
 function examples(...calls: string[]): string {
@@ -458,31 +460,36 @@ collection
     if (result.failed.length > 0) process.exitCode = 1;
   });
 
-for (const [name, description, change, example] of [
-  [
-    "star",
-    "Mark a card of your collection as favourite; succeeds if it already is",
-    starCard,
-    `wikimasters collection star ${EXAMPLE_CARD_ID}`,
-  ],
-  [
-    "unstar",
+collection
+  .command("star")
+  .description("Mark an entry of your collection as favourite")
+  .argument("<entry-id>", "entry id, as given by collection list")
+  .addHelpText(
+    "after",
+    examples(`wikimasters collection star ${EXAMPLE_ENTRY_ID}`),
+  )
+  .action(async (entryId: string) => {
+    const session = await openSession();
+    console.log(
+      formatEntryFavourite(await starEntry(session, entryId), format()),
+    );
+  });
+
+collection
+  .command("unstar")
+  .description(
     "Remove a card of your collection from the favourites; succeeds if it is not a favourite",
-    unstarCard,
-    `wikimasters collection unstar ${EXAMPLE_CARD_ID}`,
-  ],
-] as const) {
-  collection
-    .command(name)
-    .description(description)
-    .argument("<card-id>", "card UUID")
-    .addHelpText("after", examples(example))
-    .action(async (rawCardId: string) => {
-      const cardId = parseCardId(rawCardId);
-      const session = await openSession();
-      console.log(formatFavourite(await change(session, cardId), format()));
-    });
-}
+  )
+  .argument("<card-id>", "card UUID")
+  .addHelpText(
+    "after",
+    examples(`wikimasters collection unstar ${EXAMPLE_CARD_ID}`),
+  )
+  .action(async (rawCardId: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatFavourite(await unstarCard(session, cardId), format()));
+  });
 
 for (const [name, description, change, example] of [
   [

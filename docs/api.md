@@ -70,7 +70,8 @@ Source: read-only query, 2026-10-02.
 - `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` and `count=gt.0`, to find the entry of each card to discard.
 - `createAuction`: `GET` of `id`, filtered on `user_id`, `card_id` and `count=gt.0`, to find the entry of the card to put up for auction.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
-- `starCard` / `unstarCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when `starred` differs, `PATCH user_cards?id=eq.<entry id>&starred=eq.<previous state>` with `{"starred":true}` / `{"starred":false}` and `Prefer: count=exact`; PostgREST answers `204`. Source: captures `star-card.har` and `unstar-card.har`, the interface filters the same `PATCH` on `id` only.
+- `starEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`. The row count is 0 for an unknown entry and for another player's entry, which row-level security hides; an id that is not a UUID answers `400` `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `star-card.har`.
+- `unstarCard`: `GET` of `id, starred`, filtered on `user_id`, `card_id` and `count=gt.0`, then, when `starred` is true, `PATCH user_cards?id=eq.<entry id>&starred=eq.true` with `{"starred":false}` and `Prefer: count=exact`; PostgREST answers `204`. Source: capture `unstar-card.har`, the interface filters the same `PATCH` on `id` only.
 
 ## `user_card_tags`: the labels put on collection entries
 

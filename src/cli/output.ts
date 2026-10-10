@@ -9,6 +9,7 @@ import type {
   CollectionPage,
   CreatedAuction,
   Discard,
+  EntryFavourite,
   FavouriteChange,
   FriendOwner,
   GlobalCollectionCard,
@@ -384,6 +385,16 @@ export function formatAuction(auction: Auction, format: Format): string {
     `Starting price ${wikibidous(startingPrice)}; ${currentBidState(currentBid, leading)}`,
     `Sold by ${seller(auction.selling)}`,
   ].join("\n");
+}
+
+export function formatEntryFavourite(
+  { entryId, starred }: EntryFavourite,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ entryId, starred });
+  return starred
+    ? `Entry ${entryId} marked as favourite.`
+    : `Entry ${entryId} removed from the favourites.`;
 }
 
 export function formatFavourite(

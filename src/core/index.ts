@@ -87,8 +87,9 @@ export {
   WikiMastersError,
 } from "./errors.js";
 export {
-  starCard,
+  starEntry,
   unstarCard,
+  type EntryFavourite,
   type FavouriteChange,
 } from "./favourite.js";
 export {

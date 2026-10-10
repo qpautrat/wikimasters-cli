@@ -12,6 +12,7 @@ import {
   formatCollection,
   formatCreatedAuction,
   formatDiscard,
+  formatEntryFavourite,
   formatFavourite,
   formatGlobalCollection,
   formatLabelCreation,
@@ -339,6 +340,12 @@ describe("JSON output", () => {
     expect(
       JSON.parse(formatRemoval({ cardId, removed: false }, "json")),
     ).toEqual({ id: cardId, removed: false });
+  });
+
+  it("reports a favourite entry with its id and state", () => {
+    expect(
+      JSON.parse(formatEntryFavourite({ entryId, starred: true }, "json")),
+    ).toEqual({ entryId, starred: true });
   });
 
   it("reports a favourite change with the card id, the state and whether it changed", () => {
@@ -747,6 +754,18 @@ describe("text output", () => {
 
   it("says when the wishlist is empty", () => {
     expect(formatWishlist([], "text")).toBe("The wishlist is empty.");
+  });
+
+  it("says when an entry is marked as favourite", () => {
+    expect(formatEntryFavourite({ entryId, starred: true }, "text")).toBe(
+      `Entry ${entryId} marked as favourite.`,
+    );
+  });
+
+  it("says when an entry is removed from the favourites", () => {
+    expect(formatEntryFavourite({ entryId, starred: false }, "text")).toBe(
+      `Entry ${entryId} removed from the favourites.`,
+    );
   });
 
   it("says when a card is marked as favourite", () => {

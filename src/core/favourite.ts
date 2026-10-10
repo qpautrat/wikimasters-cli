@@ -50,11 +50,34 @@ async function setStarred(
   return { cardId, starred, changed: true };
 }
 
-export function starCard(
+export interface EntryFavourite {
+  entryId: string;
+  starred: boolean;
+}
+
+export async function starEntry(
   session: Session,
-  cardId: CardId,
-): Promise<FavouriteChange> {
-  return setStarred(session, cardId, true);
+  entryId: string,
+): Promise<EntryFavourite> {
+  const action = `Marking entry ${entryId} as favourite`;
+  const update = await session.client
+    .from("user_cards")
+    .update({ starred: true }, { count: "exact" })
+    .eq("id", entryId);
+  if (update.error) {
+    throw apiFailure(action, update.status, update.error.message);
+  }
+  if (update.count === null) {
+    throw new WikiMastersError(
+      `${action} returned no row count (HTTP ${update.status})`,
+    );
+  }
+  if (update.count === 0) {
+    throw new WikiMastersError(
+      `${action} changed no entry: the entry is unknown or not yours; nothing was changed`,
+    );
+  }
+  return { entryId, starred: true };
 }
 
 export function unstarCard(
