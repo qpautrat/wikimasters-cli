@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { asEntryId } from "./entry-id.js";
 import { AuthRequiredError } from "./errors.js";
+import { asLabelId } from "./label.js";
 import { resumeSession } from "./session.js";
 import { tagEntry, untagEntry } from "./tag.js";
 import {
@@ -10,9 +12,9 @@ import {
   type Route,
 } from "./testing/fake-supabase.js";
 
-const entryId = "944d72cb-9118-41ff-ba3b-026c47ec27fc";
+const entryId = asEntryId("944d72cb-9118-41ff-ba3b-026c47ec27fc");
 const history = {
-  id: "37a20595-c848-4755-8c80-df2fefde56e6",
+  id: asLabelId("37a20595-c848-4755-8c80-df2fefde56e6"),
   name: "Histoire",
 };
 
@@ -135,9 +137,9 @@ describe("untagEntry", () => {
       }),
     );
 
-    await expect(untagEntry(session, "abc", history.id)).rejects.toThrow(
-      /invalid input syntax for type uuid/,
-    );
+    await expect(
+      untagEntry(session, asEntryId("abc"), history.id),
+    ).rejects.toThrow(/invalid input syntax for type uuid/);
   });
 
   it("requires a new login when the API rejects the session", async () => {

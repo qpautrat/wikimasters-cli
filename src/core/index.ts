@@ -46,6 +46,7 @@ export {
   type BrowserLoginOptions,
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
+export { asEntryId, type EntryId } from "./entry-id.js";
 export {
   CARD_SEARCH_FIELDS,
   parseCardSearchField,
@@ -56,11 +57,13 @@ export {
 } from "./card-search.js";
 export { readCardValues, type CardValue } from "./card-value.js";
 export {
+  asLabelId,
   createLabel,
   deleteLabel,
   listLabels,
   type Label,
   type LabelDeletion,
+  type LabelId,
 } from "./label.js";
 export {
   PAGE_LIMIT,

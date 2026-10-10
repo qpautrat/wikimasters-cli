@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseAuctionId, parseCardId } from "../core/index.js";
+import {
+  asEntryId,
+  asLabelId,
+  parseAuctionId,
+  parseCardId,
+} from "../core/index.js";
 import {
   formatAddition,
   formatAuction,
@@ -35,7 +40,7 @@ const card = {
 };
 const cards = [card];
 const label = {
-  id: "a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64",
+  id: asLabelId("a3e91d47-2f6b-4c8a-b5d0-7e1c9f3a2b64"),
   name: "KC LOL 2026",
   color: "#1e40af",
 };
@@ -72,7 +77,7 @@ const runningBid = {
   leading: false,
   endsAt: "2026-10-06T08:56:58.649051+00:00",
 };
-const entryId = "3d2a29bf-b8a9-4519-924a-67f0daacc644";
+const entryId = asEntryId("3d2a29bf-b8a9-4519-924a-67f0daacc644");
 const owned = {
   entryId,
   id: cardId,
@@ -381,7 +386,7 @@ describe("JSON output", () => {
 
   it("reports a created label with its id, name and colour", () => {
     const label = {
-      id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+      id: asLabelId("5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35"),
       name: "Karmine Corp",
       color: "#94a3b8",
     };
@@ -392,7 +397,7 @@ describe("JSON output", () => {
     expect(
       JSON.parse(
         formatLabelDeletion(
-          { id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" },
+          { id: asLabelId("5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35") },
           "json",
         ),
       ),
@@ -781,7 +786,7 @@ describe("text output", () => {
     expect(
       formatLabelCreation(
         {
-          id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35",
+          id: asLabelId("5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35"),
           name: "Karmine Corp",
           color: "#facc15",
         },
@@ -795,7 +800,7 @@ describe("text output", () => {
   it("says when a label is deleted", () => {
     expect(
       formatLabelDeletion(
-        { id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" },
+        { id: asLabelId("5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35") },
         "text",
       ),
     ).toBe("Label 5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35 deleted.");

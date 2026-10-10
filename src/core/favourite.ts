@@ -1,14 +1,15 @@
+import type { EntryId } from "./entry-id.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 
 export interface EntryFavourite {
-  entryId: string;
+  entryId: EntryId;
   starred: boolean;
 }
 
 async function setEntryStarred(
   session: Session,
-  entryId: string,
+  entryId: EntryId,
   starred: boolean,
 ): Promise<EntryFavourite> {
   const action = starred
@@ -36,14 +37,14 @@ async function setEntryStarred(
 
 export function starEntry(
   session: Session,
-  entryId: string,
+  entryId: EntryId,
 ): Promise<EntryFavourite> {
   return setEntryStarred(session, entryId, true);
 }
 
 export function unstarEntry(
   session: Session,
-  entryId: string,
+  entryId: EntryId,
 ): Promise<EntryFavourite> {
   return setEntryStarred(session, entryId, false);
 }

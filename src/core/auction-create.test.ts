@@ -5,6 +5,7 @@ import {
   parseStartingPrice,
 } from "./auction-create.js";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
+import { asEntryId } from "./entry-id.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -14,7 +15,7 @@ import {
   type Route,
 } from "./testing/fake-supabase.js";
 
-const entryId = "944d72cb-9118-41ff-ba3b-026c47ec27fc";
+const entryId = asEntryId("944d72cb-9118-41ff-ba3b-026c47ec27fc");
 const createdAuctionId = "d6669009-683d-44b6-b6e7-2c0960c37f2f";
 const startingPrice = parseStartingPrice("250");
 const duration = parseAuctionDuration("45");

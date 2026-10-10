@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import { discardEntries } from "./collection.js";
+import { asEntryId, type EntryId } from "./entry-id.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
@@ -13,11 +14,13 @@ import {
 
 const INITIAL_BALANCE = 7000;
 
-function entryId(index: number): string {
-  return `00000000-0000-4000-8000-${String(index).padStart(12, "0")}`;
+function entryId(index: number): EntryId {
+  return asEntryId(
+    `00000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+  );
 }
 
-function entryIds(count: number): string[] {
+function entryIds(count: number): EntryId[] {
   return Array.from({ length: count }, (_, index) => entryId(index));
 }
 
@@ -97,7 +100,7 @@ describe("discardEntries", () => {
   });
 
   it("names each entry the game refused with the game's reason", async () => {
-    const [refused, accepted] = entryIds(2) as [string, string];
+    const [refused, accepted] = entryIds(2) as [EntryId, EntryId];
     const { session } = await sessionWith(
       bulkDiscard(() => [{ card_id: refused, error: "card_not_owned" }]),
     );

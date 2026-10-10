@@ -1,8 +1,14 @@
 import { apiFailure } from "./errors.js";
 import type { Session } from "./session.js";
 
+export type LabelId = string & { readonly __brand: "LabelId" };
+
+export function asLabelId(raw: string): LabelId {
+  return raw as LabelId;
+}
+
 export interface Label {
-  id: string;
+  id: LabelId;
   name: string;
   color: string;
 }
@@ -43,12 +49,12 @@ export async function createLabel(
 }
 
 export interface LabelDeletion {
-  id: string;
+  id: LabelId;
 }
 
 export async function deleteLabel(
   session: Session,
-  id: string,
+  id: LabelId,
 ): Promise<LabelDeletion> {
   const { error, status } = await session.client.rpc("delete_tag", {
     p_tag_id: id,

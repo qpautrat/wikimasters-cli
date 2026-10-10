@@ -4,6 +4,8 @@ import {
   CARD_SEARCH_FIELDS,
   PAGE_LIMIT,
   addToWishlist,
+  asEntryId,
+  asLabelId,
   cancelAuction,
   createAuction,
   createLabel,
@@ -188,7 +190,12 @@ auction
       const session = await openSession();
       console.log(
         formatCreatedAuction(
-          await createAuction(session, entryId, startingPrice, duration),
+          await createAuction(
+            session,
+            asEntryId(entryId),
+            startingPrice,
+            duration,
+          ),
           format(),
         ),
       );
@@ -444,7 +451,10 @@ collection
     ),
   )
   .action(async (entryIds: string[]) => {
-    const result = await discardEntries(await openSession(), entryIds);
+    const result = await discardEntries(
+      await openSession(),
+      entryIds.map(asEntryId),
+    );
     console.log(formatDiscard(result, format()));
     if (result.failed.length > 0) process.exitCode = 1;
   });
@@ -460,7 +470,10 @@ collection
   .action(async (entryId: string) => {
     const session = await openSession();
     console.log(
-      formatEntryFavourite(await starEntry(session, entryId), format()),
+      formatEntryFavourite(
+        await starEntry(session, asEntryId(entryId)),
+        format(),
+      ),
     );
   });
 
@@ -475,7 +488,10 @@ collection
   .action(async (entryId: string) => {
     const session = await openSession();
     console.log(
-      formatEntryFavourite(await unstarEntry(session, entryId), format()),
+      formatEntryFavourite(
+        await unstarEntry(session, asEntryId(entryId)),
+        format(),
+      ),
     );
   });
 
@@ -493,7 +509,10 @@ collection
   .action(async (entryId: string, labelId: string) => {
     const session = await openSession();
     console.log(
-      formatEntryTag(await tagEntry(session, entryId, labelId), format()),
+      formatEntryTag(
+        await tagEntry(session, asEntryId(entryId), asLabelId(labelId)),
+        format(),
+      ),
     );
   });
 
@@ -513,7 +532,10 @@ collection
   .action(async (entryId: string, labelId: string) => {
     const session = await openSession();
     console.log(
-      formatEntryUntag(await untagEntry(session, entryId, labelId), format()),
+      formatEntryUntag(
+        await untagEntry(session, asEntryId(entryId), asLabelId(labelId)),
+        format(),
+      ),
     );
   });
 
@@ -554,7 +576,10 @@ labels
   .action(async (labelId: string) => {
     const session = await openSession();
     console.log(
-      formatLabelDeletion(await deleteLabel(session, labelId), format()),
+      formatLabelDeletion(
+        await deleteLabel(session, asLabelId(labelId)),
+        format(),
+      ),
     );
   });
 

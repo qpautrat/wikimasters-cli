@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AuthRequiredError } from "./errors.js";
-import { createLabel, deleteLabel, listLabels } from "./label.js";
+import { asLabelId, createLabel, deleteLabel, listLabels } from "./label.js";
 import { resumeSession } from "./session.js";
 import {
   ACCESS_TOKEN,
@@ -209,7 +209,7 @@ describe("deleteLabel", () => {
       restRoute("POST", "rpc/delete_tag", { status: 204 }),
     );
 
-    await expect(deleteLabel(session, "label-id")).resolves.toEqual({
+    await expect(deleteLabel(session, asLabelId("label-id"))).resolves.toEqual({
       id: "label-id",
     });
     expect(
@@ -231,7 +231,7 @@ describe("deleteLabel", () => {
       }),
     );
 
-    await expect(deleteLabel(session, "label-id")).rejects.toThrow(
+    await expect(deleteLabel(session, asLabelId("label-id"))).rejects.toThrow(
       "Deleting label label-id failed (HTTP 400): Tag not found or not owned by caller",
     );
   });
@@ -244,7 +244,7 @@ describe("deleteLabel", () => {
       }),
     );
 
-    await expect(deleteLabel(session, "label-id")).rejects.toThrow(
+    await expect(deleteLabel(session, asLabelId("label-id"))).rejects.toThrow(
       AuthRequiredError,
     );
   });

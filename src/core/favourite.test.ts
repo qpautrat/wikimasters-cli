@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { asEntryId } from "./entry-id.js";
 import { AuthRequiredError } from "./errors.js";
 import { starEntry, unstarEntry } from "./favourite.js";
 import { resumeSession } from "./session.js";
@@ -11,7 +12,7 @@ import {
   type Route,
 } from "./testing/fake-supabase.js";
 
-const entryId = "944d72cb-9118-41ff-ba3b-026c47ec27fc";
+const entryId = asEntryId("944d72cb-9118-41ff-ba3b-026c47ec27fc");
 
 function entryUpdate(updatedRows: number): Route {
   return restRoute("PATCH", "user_cards", {
@@ -72,7 +73,7 @@ describe.each([
       }),
     );
 
-    await expect(change(session, "abc")).rejects.toThrow(
+    await expect(change(session, asEntryId("abc"))).rejects.toThrow(
       /invalid input syntax for type uuid/,
     );
   });

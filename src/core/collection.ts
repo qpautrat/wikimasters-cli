@@ -1,3 +1,4 @@
+import { asEntryId, type EntryId } from "./entry-id.js";
 import { WikiMastersError } from "./errors.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
@@ -7,7 +8,7 @@ export const COLLECTION_PAGE = "/collection";
 const WIKIBIDOUS_PER_DISCARD = 1;
 
 export interface DiscardFailure {
-  entryId: string;
+  entryId: EntryId;
   reason: string;
 }
 
@@ -47,10 +48,10 @@ function isBulkDiscardResponse(body: unknown): body is BulkDiscardResponse {
 }
 
 function accountsForEntriesSent(
-  entryIds: readonly string[],
+  entryIds: readonly EntryId[],
   response: BulkDiscardResponse,
 ): boolean {
-  const sent = new Set(entryIds);
+  const sent = new Set<string>(entryIds);
   return (
     response.discarded_count + response.failed.length === entryIds.length &&
     response.failed.every(({ card_id }) => sent.has(card_id))
@@ -59,7 +60,7 @@ function accountsForEntriesSent(
 
 export async function discardEntries(
   session: Session,
-  entryIds: readonly string[],
+  entryIds: readonly EntryId[],
 ): Promise<Discard> {
   if (entryIds.length === 0) {
     throw new WikiMastersError("No entry to discard was given");
@@ -83,7 +84,7 @@ export async function discardEntries(
     gained: body.discarded_count * WIKIBIDOUS_PER_DISCARD,
     balance: body.balance,
     failed: body.failed.map(({ card_id, error }) => ({
-      entryId: card_id,
+      entryId: asEntryId(card_id),
       reason: error,
     })),
   };

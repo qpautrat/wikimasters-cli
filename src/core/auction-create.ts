@@ -1,5 +1,6 @@
 import type { AuctionId } from "./auction.js";
 import { COLLECTION_PAGE } from "./collection.js";
+import type { EntryId } from "./entry-id.js";
 import { WikiMastersError } from "./errors.js";
 import { parseInteger } from "./integer.js";
 import type { Session } from "./session.js";
@@ -46,7 +47,7 @@ function isCreatedAuctionResponse(
 
 export async function createAuction(
   session: Session,
-  entryId: string,
+  entryId: EntryId,
   startingPrice: StartingPrice,
   duration: AuctionDuration,
 ): Promise<CreatedAuction> {

@@ -1,9 +1,11 @@
+import type { EntryId } from "./entry-id.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
+import type { LabelId } from "./label.js";
 import type { Session } from "./session.js";
 
 export interface EntryTag {
-  entryId: string;
-  labelId: string;
+  entryId: EntryId;
+  labelId: LabelId;
 }
 
 export interface EntryUntag extends EntryTag {
@@ -12,8 +14,8 @@ export interface EntryUntag extends EntryTag {
 
 export async function tagEntry(
   session: Session,
-  entryId: string,
-  labelId: string,
+  entryId: EntryId,
+  labelId: LabelId,
 ): Promise<EntryTag> {
   const { error, status } = await session.client
     .from("user_card_tags")
@@ -30,8 +32,8 @@ export async function tagEntry(
 
 export async function untagEntry(
   session: Session,
-  entryId: string,
-  labelId: string,
+  entryId: EntryId,
+  labelId: LabelId,
 ): Promise<EntryUntag> {
   const action = `Removing label ${labelId} from entry ${entryId}`;
   const { error, status, count } = await session.client
