@@ -16,7 +16,7 @@ On a non-zero exit, mise adds the line `[wikimasters] ERROR task failed` to stde
   - `login --firefox`, on macOS: tell the user a Firefox window is about to open for them to sign in, run `mise run wikimasters -- login --firefox` with a tool timeout above the 5 minutes it waits for the sign-in, then retry the original command once. If the login fails, report its stderr message and do not retry.
   - `login`, where the user pastes the session in a terminal: do not run it. Ask the user to run `mise -C '<repo root>' run wikimasters -- login` in a terminal, with the absolute path `git rev-parse --show-toplevel` prints, single-quoted, and retry the original command once when they say they are logged in.
 - `75`: the API stayed unavailable after the CLI's own retries. Report the stderr message in one sentence and tell the user to retry later; do not rerun the command on your own. If the message says the request may have taken effect, tell the user to check its outcome first.
-- `1` with JSON on stdout: the command partly succeeded. Report its result, naming each card it lists as refused with the reason given.
+- `1` with JSON on stdout: the command partly succeeded. Report its result, naming each entry it lists as refused with the reason given.
 - Any other code: report the stderr message in one sentence.
 
 ## Cards named by the user
@@ -29,7 +29,9 @@ The user names cards in natural language. Resolve each name to its id with the l
 
 `collection list` reads one page of the collection: while the page is full (`full` true with `--json`), read the next one with `--page`, before concluding a card is not in the collection.
 
-`collection discard`, `collection star`, `collection unstar` and `auction create` take the entry id, the `entryId` that `collection list` prints, not the card id.
+`collection discard`, `collection star`, `collection unstar`, `collection tag`, `collection untag` and `auction create` take the entry id, the `entryId` that `collection list` prints, not the card id.
+
+`collection tag`, `collection untag` and `labels delete` take the label id, the `id` that `labels list` or `labels create` prints, not its name.
 
 When `cards search` finds nothing, search again with a shorter part of the name, free of accented letters, before concluding there is no match.
 
