@@ -10,6 +10,7 @@ import type {
   CreatedAuction,
   Discard,
   EntryFavourite,
+  EntryTag,
   FriendOwner,
   GlobalCollectionCard,
   GlobalCollectionSearch,
@@ -424,6 +425,14 @@ export function formatLabelDeletion(
   return `Label ${id} deleted.`;
 }
 
+export function formatEntryTag(
+  { entryId, labelId }: EntryTag,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ entryId, labelId });
+  return `Entry ${entryId} labelled with label ${labelId}.`;
+}
+
 export function formatTag(
   { cardId, label, tagged, changed }: TagChange,
   format: Format,
@@ -431,11 +440,6 @@ export function formatTag(
   if (format === "json")
     return JSON.stringify({ id: cardId, label, tagged, changed });
   const name = JSON.stringify(label);
-  if (tagged) {
-    return changed
-      ? `Card ${cardId} labelled ${name}.`
-      : `Card ${cardId} already had the label ${name}.`;
-  }
   return changed
     ? `Label ${name} removed from card ${cardId}.`
     : `Card ${cardId} did not have the label ${name}.`;

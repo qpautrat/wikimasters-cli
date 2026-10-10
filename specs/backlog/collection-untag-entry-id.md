@@ -4,7 +4,7 @@
 
 `wikimasters collection untag` prend l'identifiant de la carte (`cards.id`) et le nom de l'étiquette, lit ma collection pour trouver l'entrée et ses étiquettes, lit mes étiquettes pour trouver celle qui porte ce nom, puis ne retire l'étiquette que si l'entrée l'a. Or le jeu retire une étiquette par un seul `DELETE user_card_tags?user_card_id=eq.<user_cards.id>&tag_id=eq.<tags.id>`, dont le nombre de lignes supprimées (`Prefer: count=exact`) vaut 0 quand l'entrée n'avait pas l'étiquette : la commande compose trois appels.
 
-Dépend de : [Retirer une étiquette d'une carte de ma collection](../collection-untag.md), [Étiqueter une entrée de ma collection sans la rechercher](collection-tag-entry-id.md).
+Dépend de : [Retirer une étiquette d'une carte de ma collection](../collection-untag.md), [Étiqueter une carte de ma collection](../collection-tag.md).
 
 ## User story
 

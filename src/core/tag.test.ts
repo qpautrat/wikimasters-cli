@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseCardId } from "./card-id.js";
 import { AuthRequiredError } from "./errors.js";
 import { resumeSession } from "./session.js";
-import { tagCard, untagCard } from "./tag.js";
+import { tagEntry, untagCard } from "./tag.js";
 import {
   ACCESS_TOKEN,
   USER_ID,
@@ -63,27 +63,21 @@ function writes(requests: RecordedRequest[]) {
   );
 }
 
-describe("tagCard", () => {
-  it("links the label of the signed-in user to their collection entry for that card", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([films.id]),
-      labels(films, history),
-      tagInsert,
-    );
+describe("tagEntry", () => {
+  it("links the given label to the given entry in a single request", async () => {
+    const { session, requests } = await sessionWith(tagInsert);
 
-    await expect(tagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: true,
-      changed: true,
+    await expect(tagEntry(session, entryId, history.id)).resolves.toEqual({
+      entryId,
+      labelId: history.id,
     });
-    const entryRead = requests.find(restRequest("GET", "user_cards"));
-    expect(entryRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-    expect(entryRead?.url.searchParams.get("card_id")).toBe(`eq.${cardId}`);
-    expect(entryRead?.url.searchParams.get("count")).toBe("gt.0");
-    const labelRead = requests.find(restRequest("GET", "tags"));
-    expect(labelRead?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-    const insert = requests.find(restRequest("POST", "user_card_tags"));
+    const restRequests = requests.filter(({ url }) =>
+      url.pathname.startsWith("/rest/v1/"),
+    );
+    expect(restRequests).toHaveLength(1);
+    const insert = restRequests[0];
+    expect(insert?.method).toBe("POST");
+    expect(insert?.url.pathname).toBe("/rest/v1/user_card_tags");
     expect(JSON.parse(insert?.body ?? "null")).toEqual({
       user_card_id: entryId,
       tag_id: history.id,
@@ -91,86 +85,32 @@ describe("tagCard", () => {
     expect(insert?.headers.get("authorization")).toBe(`Bearer ${ACCESS_TOKEN}`);
   });
 
-  it("succeeds without change when the card already has the label", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([history.id]),
-      labels(films, history),
-    );
-
-    await expect(tagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: true,
-      changed: false,
-    });
-    expect(writes(requests)).toEqual([]);
-  });
-
-  it("succeeds without change when the label was put on the card meanwhile", async () => {
+  it("fails with the game's reason when it refuses the label", async () => {
     const { session } = await sessionWith(
-      collectionEntry([]),
-      labels(history),
-      ({ method }) =>
-        method === "POST"
-          ? {
-              status: 409,
-              body: {
-                code: "23505",
-                message:
-                  'duplicate key value violates unique constraint "user_card_tags_pkey"',
-              },
-            }
-          : undefined,
+      restRoute("POST", "user_card_tags", {
+        status: 409,
+        body: {
+          code: "23505",
+          message:
+            'duplicate key value violates unique constraint "user_card_tags_pkey"',
+        },
+      }),
     );
 
-    await expect(tagCard(session, cardId, "Histoire")).resolves.toEqual({
-      cardId,
-      label: "Histoire",
-      tagged: true,
-      changed: false,
-    });
-  });
-
-  it("refuses a card absent from the collection without change", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry(null),
-      labels(history),
-    );
-
-    await expect(tagCard(session, cardId, "Histoire")).rejects.toThrow(
-      /not in your collection; nothing was changed/,
-    );
-    expect(writes(requests)).toEqual([]);
-  });
-
-  it("refuses an unknown label without change, listing the user's labels", async () => {
-    const { session, requests } = await sessionWith(
-      collectionEntry([]),
-      labels(films, history),
-    );
-
-    await expect(tagCard(session, cardId, "histoire")).rejects.toThrow(
-      'No label named "histoire"; your labels: "Films & Séries", "Histoire"; nothing was changed',
-    );
-    expect(writes(requests)).toEqual([]);
-  });
-
-  it("says the user has no labels when refusing an unknown one", async () => {
-    const { session } = await sessionWith(collectionEntry([]), labels());
-
-    await expect(tagCard(session, cardId, "Histoire")).rejects.toThrow(
-      'No label named "Histoire"; you have no labels; nothing was changed',
+    await expect(tagEntry(session, entryId, history.id)).rejects.toThrow(
+      /user_card_tags_pkey/,
     );
   });
 
   it("requires a new login when the API rejects the session", async () => {
-    const { session } = await sessionWith(({ method }) =>
-      method === "GET"
-        ? { status: 401, body: { code: "PGRST303", message: "JWT expired" } }
-        : undefined,
+    const { session } = await sessionWith(
+      restRoute("POST", "user_card_tags", {
+        status: 401,
+        body: { code: "PGRST303", message: "JWT expired" },
+      }),
     );
 
-    await expect(tagCard(session, cardId, "Histoire")).rejects.toThrow(
+    await expect(tagEntry(session, entryId, history.id)).rejects.toThrow(
       AuthRequiredError,
     );
   });

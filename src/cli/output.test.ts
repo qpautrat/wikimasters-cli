@@ -13,6 +13,7 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatEntryFavourite,
+  formatEntryTag,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -347,15 +348,21 @@ describe("JSON output", () => {
     ).toEqual({ entryId, starred: true });
   });
 
+  it("reports a labelled entry with its id and the label id", () => {
+    expect(
+      JSON.parse(formatEntryTag({ entryId, labelId: label.id }, "json")),
+    ).toEqual({ entryId, labelId: label.id });
+  });
+
   it("reports a label change with the card id, the label, the state and whether it changed", () => {
     expect(
       JSON.parse(
         formatTag(
-          { cardId, label: "Histoire", tagged: true, changed: false },
+          { cardId, label: "Histoire", tagged: false, changed: false },
           "json",
         ),
       ),
-    ).toEqual({ id: cardId, label: "Histoire", tagged: true, changed: false });
+    ).toEqual({ id: cardId, label: "Histoire", tagged: false, changed: false });
   });
 
   it("lists the labels as an array of id, name and colour", () => {
@@ -795,22 +802,10 @@ describe("text output", () => {
     ).toBe("Label 5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35 deleted.");
   });
 
-  it("says when a card is labelled", () => {
-    expect(
-      formatTag(
-        { cardId, label: "Histoire", tagged: true, changed: true },
-        "text",
-      ),
-    ).toBe(`Card ${cardId} labelled "Histoire".`);
-  });
-
-  it("says when a card already had the label", () => {
-    expect(
-      formatTag(
-        { cardId, label: "Histoire", tagged: true, changed: false },
-        "text",
-      ),
-    ).toBe(`Card ${cardId} already had the label "Histoire".`);
+  it("says when an entry is labelled", () => {
+    expect(formatEntryTag({ entryId, labelId: label.id }, "text")).toBe(
+      `Entry ${entryId} labelled with label ${label.id}.`,
+    );
   });
 
   it("says when a label is removed from a card", () => {

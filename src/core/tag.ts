@@ -1,6 +1,6 @@
 import type { CardId } from "./card-id.js";
 import { readCollectionEntry } from "./collection-entry.js";
-import { WikiMastersError, apiFailure, isUniqueViolation } from "./errors.js";
+import { WikiMastersError, apiFailure } from "./errors.js";
 import { listLabels, type Label } from "./label.js";
 import type { Session } from "./session.js";
 
@@ -33,35 +33,27 @@ async function findTag(session: Session, label: string): Promise<Label> {
   );
 }
 
-export async function tagCard(
-  session: Session,
-  cardId: CardId,
-  label: string,
-): Promise<TagChange> {
-  const entry = await readCollectionEntry<TaggedEntry>(
-    session,
-    cardId,
-    "id, user_card_tags(tag_id)",
-  );
-  const tag = await findTag(session, label);
-  if (hasTag(entry, tag)) {
-    return { cardId, label, tagged: true, changed: false };
-  }
+export interface EntryTag {
+  entryId: string;
+  labelId: string;
+}
 
+export async function tagEntry(
+  session: Session,
+  entryId: string,
+  labelId: string,
+): Promise<EntryTag> {
   const { error, status } = await session.client
     .from("user_card_tags")
-    .insert({ user_card_id: entry.id, tag_id: tag.id });
-  if (isUniqueViolation(error)) {
-    return { cardId, label, tagged: true, changed: false };
-  }
+    .insert({ user_card_id: entryId, tag_id: labelId });
   if (error) {
     throw apiFailure(
-      `Labelling card ${cardId} ${JSON.stringify(label)}`,
+      `Labelling entry ${entryId} with label ${labelId}`,
       status,
       error.message,
     );
   }
-  return { cardId, label, tagged: true, changed: true };
+  return { entryId, labelId };
 }
 
 export async function untagCard(

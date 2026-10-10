@@ -47,7 +47,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
 | `collection star <entry-id>` | Marks an entry of your collection as favourite; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection star <entry-uuid>` |
 | `collection unstar <entry-id>` | Removes an entry of your collection from the favourites; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection unstar <entry-uuid>` |
-| `collection tag <card-id> <label>` | Puts one of your labels on a card of your collection | `mise run wikimasters -- collection tag <card-uuid> Favourites` |
+| `collection tag <entry-id> <label-id>` | Puts your label of that id, as given by `labels list`, on the entry of your collection of that id, as given by `collection list` | `mise run wikimasters -- collection tag <entry-uuid> <label-uuid>` |
 | `collection untag <card-id> <label>` | Removes one of your labels from a card of your collection | `mise run wikimasters -- collection untag <card-uuid> Favourites` |
 | `labels list` | Lists your labels, ordered by name, with their id, name and colour | `mise run wikimasters -- labels list` |
 | `labels create <name> [--color <colour>]` | Creates a label under the name as given and shows its id, name and colour; `--color` is sent to the game as given, a hex colour such as `#facc15` | `mise run wikimasters -- labels create "Karmine Corp" --color "#facc15"` |

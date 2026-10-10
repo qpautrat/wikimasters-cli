@@ -109,7 +109,12 @@ export {
   type ResumeSessionOptions,
   type Session,
 } from "./session.js";
-export { tagCard, untagCard, type TagChange } from "./tag.js";
+export {
+  tagEntry,
+  untagCard,
+  type EntryTag,
+  type TagChange,
+} from "./tag.js";
 export {
   addToWishlist,
   listWishlist,

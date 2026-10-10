@@ -34,7 +34,7 @@ import {
   searchGlobalCollection,
   showAuction,
   starEntry,
-  tagCard,
+  tagEntry,
   unstarEntry,
   untagCard,
   type AuctionFilter,
@@ -54,6 +54,7 @@ import {
   formatCreatedAuction,
   formatDiscard,
   formatEntryFavourite,
+  formatEntryTag,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -489,32 +490,40 @@ collection
     );
   });
 
-for (const [name, description, change, example] of [
-  [
-    "tag",
-    "Put one of your labels on a card of your collection; succeeds if the card already has it",
-    tagCard,
-    `wikimasters collection tag ${EXAMPLE_CARD_ID} "Karmine Corp"`,
-  ],
-  [
-    "untag",
+collection
+  .command("tag")
+  .description("Put one of your labels on an entry of your collection")
+  .argument("<entry-id>", "entry id, as given by collection list")
+  .argument("<label-id>", "label id, as given by labels list")
+  .addHelpText(
+    "after",
+    examples(
+      `wikimasters collection tag ${EXAMPLE_ENTRY_ID} ${EXAMPLE_LABEL_ID}`,
+    ),
+  )
+  .action(async (entryId: string, labelId: string) => {
+    const session = await openSession();
+    console.log(
+      formatEntryTag(await tagEntry(session, entryId, labelId), format()),
+    );
+  });
+
+collection
+  .command("untag")
+  .description(
     "Remove one of your labels from a card of your collection; succeeds if the card does not have it",
-    untagCard,
-    `wikimasters collection untag ${EXAMPLE_CARD_ID} "Karmine Corp"`,
-  ],
-] as const) {
-  collection
-    .command(name)
-    .description(description)
-    .argument("<card-id>", "card UUID")
-    .argument("<label>", "name of one of your labels")
-    .addHelpText("after", examples(example))
-    .action(async (rawCardId: string, label: string) => {
-      const cardId = parseCardId(rawCardId);
-      const session = await openSession();
-      console.log(formatTag(await change(session, cardId, label), format()));
-    });
-}
+  )
+  .argument("<card-id>", "card UUID")
+  .argument("<label>", "name of one of your labels")
+  .addHelpText(
+    "after",
+    examples(`wikimasters collection untag ${EXAMPLE_CARD_ID} "Karmine Corp"`),
+  )
+  .action(async (rawCardId: string, label: string) => {
+    const cardId = parseCardId(rawCardId);
+    const session = await openSession();
+    console.log(formatTag(await untagCard(session, cardId, label), format()));
+  });
 
 const labels = program.command("labels").description("Manage your labels");
 
