@@ -8,7 +8,7 @@ import {
   createAuction,
   createLabel,
   deleteLabel,
-  discardCards,
+  discardEntries,
   listAuctions,
   listCollection,
   listLabels,
@@ -79,6 +79,7 @@ const EXAMPLE_AUCTION_ID = "6f1c2d3e-4b5a-4c7d-8e9f-0a1b2c3d4e5f";
 const EXAMPLE_CARD_ID = "9b2e4f6a-1c3d-4e5f-8a7b-2c4d6e8f0a1b";
 const OTHER_EXAMPLE_CARD_ID = "0d4f6b8a-3e5c-4a7b-9c1d-5e7f9a1b3c5d";
 const EXAMPLE_ENTRY_ID = "4a7c9e1b-6d2f-4b8a-9e3c-1f5a7b9d2e4c";
+const OTHER_EXAMPLE_ENTRY_ID = "8e2d5a9c-3b7f-4c1e-a6d4-9f3b1e7c5a28";
 const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
 
 function examples(...calls: string[]): string {
@@ -433,18 +434,17 @@ collection
 collection
   .command("discard")
   .description(
-    "Discard the given cards of your collection for 1 wikibidou each; refuses them all if one is not in your collection, exits 1 if the game refused some",
+    "Discard the given entries of your collection for 1 wikibidou each, in a single request; exits 1 if the game refused some",
   )
-  .argument("<card-id...>", "card UUIDs")
+  .argument("<entry-id...>", "entry ids, as given by collection list")
   .addHelpText(
     "after",
     examples(
-      `wikimasters collection discard ${EXAMPLE_CARD_ID} ${OTHER_EXAMPLE_CARD_ID}`,
+      `wikimasters collection discard ${EXAMPLE_ENTRY_ID} ${OTHER_EXAMPLE_ENTRY_ID}`,
     ),
   )
-  .action(async (rawCardIds: string[]) => {
-    const cardIds = rawCardIds.map(parseCardId);
-    const result = await discardCards(await openSession(), cardIds);
+  .action(async (entryIds: string[]) => {
+    const result = await discardEntries(await openSession(), entryIds);
     console.log(formatDiscard(result, format()));
     if (result.failed.length > 0) process.exitCode = 1;
   });

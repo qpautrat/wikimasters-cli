@@ -29,7 +29,7 @@ The user names cards in natural language. Resolve each name to its id with the l
 
 `collection list` reads one page of the collection: while the page is full (`full` true with `--json`), read the next one with `--page`, before concluding a card is not in the collection.
 
-`collection star`, `collection unstar` and `auction create` take the entry id, the `entryId` that `collection list` prints, not the card id.
+`collection discard`, `collection star`, `collection unstar` and `auction create` take the entry id, the `entryId` that `collection list` prints, not the card id.
 
 When `cards search` finds nothing, search again with a shorter part of the name, free of accented letters, before concluding there is no match.
 

@@ -399,13 +399,12 @@ describe("JSON output", () => {
     ).toEqual({ id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" });
   });
 
-  it("reports a discard with its count, gain, balance and refused cards", () => {
-    const reason = "card_not_owned";
-    expect(
-      JSON.parse(
-        formatDiscard({ ...discard, failed: [{ cardId, reason }] }, "json"),
-      ),
-    ).toEqual({ ...discard, failed: [{ id: cardId, reason }] });
+  it("reports a discard with its count, gain, balance and refused entries", () => {
+    const failed = [{ entryId, reason: "card_not_owned" }];
+    expect(JSON.parse(formatDiscard({ ...discard, failed }, "json"))).toEqual({
+      ...discard,
+      failed,
+    });
   });
 
   it("reports the logged-in user id", () => {
@@ -548,18 +547,18 @@ describe("text output", () => {
     );
   });
 
-  it("names each card the game refused to discard with its reason", () => {
+  it("names each entry the game refused to discard with its reason", () => {
     expect(
       formatDiscard(
         {
           ...discard,
-          failed: [{ cardId, reason: "card_not_owned" }],
+          failed: [{ entryId, reason: "card_not_owned" }],
         },
         "text",
       ).split("\n"),
     ).toEqual([
       "Discarded 3 cards for 3 wikibidous; balance 7430 wikibidous.",
-      `Card ${cardId} could not be discarded: card_not_owned`,
+      `Entry ${entryId} could not be discarded: card_not_owned`,
     ]);
   });
 

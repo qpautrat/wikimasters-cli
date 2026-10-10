@@ -77,7 +77,7 @@ export {
   type CollectionPage,
 } from "./collection-list.js";
 export {
-  discardCards,
+  discardEntries,
   type Discard,
   type DiscardFailure,
 } from "./collection.js";

@@ -260,7 +260,7 @@ export function formatDiscard(
       discarded,
       gained,
       balance,
-      failed: failed.map(({ cardId, reason }) => ({ id: cardId, reason })),
+      failed,
     });
   }
   const summary =
@@ -270,8 +270,8 @@ export function formatDiscard(
   return [
     summary,
     ...failed.map(
-      ({ cardId, reason }) =>
-        `Card ${cardId} could not be discarded: ${reason}`,
+      ({ entryId, reason }) =>
+        `Entry ${entryId} could not be discarded: ${reason}`,
     ),
   ].join("\n");
 }

@@ -67,7 +67,6 @@ Source: read-only query, 2026-10-02.
 - Putting a card up for auction deletes its row; cancelling the auction creates a new one, with a new `id` and `obtained_at` set to the cancellation time (observed 2026-10-05).
 - Row-level security returns only the user's own rows.
 - `listCollection`: `GET` of `id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; a `limit` of 2000 answers 2000 rows (observed 2026-10-10).
-- `discardCards`: `GET` of `id, card_id`, filtered on `user_id`, `card_id=in.(…)` and `count=gt.0`, to find the entry of each card to discard.
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
 - `starEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`. The row count is 0 for an unknown entry and for another player's entry, which row-level security hides; an id that is not a UUID answers `400` `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `star-card.har`.
 - `unstarEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":false}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`, with the same row counts and refusals as `starEntry`. Source: capture `unstar-card.har`.
@@ -112,12 +111,13 @@ Source: the site's JavaScript of `/collection` for the request, runs on the acco
 
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 
-Source: capture `discard-cards.har`, and a discard of an auctioned card's former entry (2026-10-05).
+Source: capture `discard-cards.har`, a discard of an auctioned card's former entry (2026-10-05), and runs on the account (2026-10-10).
 
 - Body `{"card_ids": [<user_cards.id>, …]}`: collection entry ids, not `cards.id`.
-- Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [{"card_id": <user_cards.id>, "error": <code>}, …]}`, HTTP 200 even when every card is refused. An entry that is no longer in the collection gets `card_not_owned`.
-- Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardCards` reports the gain as `discarded_count`.
-- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02). `discardCards` sends batches of 100, reports the last response's `balance` and each `failed` entry as its card and `error` code, and fails on a response whose `discarded_count` and `failed` do not account for exactly the entries sent. `discardCards` reads the entries in batches of 100 card ids, all before the first discard.
+- Response `{"balance": <wikibidous after the discard>, "discarded_count": <n>, "failed": [{"card_id": <user_cards.id>, "error": <code>}, …]}`, HTTP 200 even when every card is refused. An entry that is no longer in the collection, or an unknown UUID, gets `card_not_owned`.
+- Each discarded card yields exactly 1 wikibidou (game rule, stated by the user), so `discardEntries` reports the gain as `discarded_count`.
+- At most 100 ids per call: a larger batch gets HTTP 400 `{"error":"Maximum 100 cartes par requête"}` and discards nothing (observed 2026-10-02 and 2026-10-10). An id that is not a UUID gets HTTP 400 `{"error":"Identifiant de carte invalide"}` for the whole request (observed 2026-10-10).
+- `discardEntries` sends the given entry ids as given in a single request, reports `balance` and each `failed` entry as its entry id and `error` code, and fails on a response whose `discarded_count` and `failed` do not account for exactly the entries sent.
 
 ## `auctions`: the auctions
 

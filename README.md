@@ -44,7 +44,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 | `cards value <card-id...>` | Shows the average sale price in wikibidous of each card, owned or not, for each rarity it sold under, or that it never sold; stops at the first card the game refuses | `mise run wikimasters -- cards value <card-uuid> <card-uuid>` |
 | `cards global [text] [--page <n>] [--sort <field>] [--rarity <code>]... [--wishlist]` | Searches the game's Global Collection, in the card title and category, and prints one page of cards with whether you own or wish each one and the friends who own it with their rarities, then the total, the count by rarity, the pending offers and whether more cards match; options go to the game as given, pages counting from 0, `--rarity` repeated for several rarities, `--wishlist` keeping your wishlist's cards | `mise run wikimasters -- cards global "Mont Blanc"` |
 | `collection list [--rarity <code>] [--page <p>] [--limit <n>]` | Reads a page of your collection, earliest obtained first, with entry id, card id, owned rarity, copies, favourite and shiny state, labels and obtention date, and says when the page is full; `--rarity` keeps one of `C`, `PC`, `R`, `SR`, `UR`, `L`; `--page` reads the next pages, from 1 by default; `--limit` sets the cards per page, 1000 by default | `mise run wikimasters -- collection list --rarity L --page 2` |
-| `collection discard <card-id...>` | Discards cards of your collection for 1 wikibidou each | `mise run wikimasters -- collection discard <card-uuid> <card-uuid>` |
+| `collection discard <entry-id...>` | Discards the entries of your collection of those ids, as given by `collection list`, for 1 wikibidou each, in a single request; the game refuses more than 100 ids | `mise run wikimasters -- collection discard <entry-uuid> <entry-uuid>` |
 | `collection star <entry-id>` | Marks an entry of your collection as favourite; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection star <entry-uuid>` |
 | `collection unstar <entry-id>` | Removes an entry of your collection from the favourites; fails when the game changes no entry, unknown or not yours | `mise run wikimasters -- collection unstar <entry-uuid>` |
 | `collection tag <entry-id> <label-id>` | Puts your label of that id, as given by `labels list`, on the entry of your collection of that id, as given by `collection list` | `mise run wikimasters -- collection tag <entry-uuid> <label-uuid>` |
@@ -73,7 +73,7 @@ Results are text by default. With the global `--json` option, stdout carries onl
 | Code | Meaning |
 |---|---|
 | `0` | Success. |
-| `1` | Failure: invalid argument, refusal by the game, network error. `collection discard` also exits 1 when the game refused some of the cards, after printing which ones and why. |
+| `1` | Failure: invalid argument, refusal by the game, network error. `collection discard` also exits 1 when the game refused some of the entries, after printing which ones and why. |
 | `4` | You must sign in: no stored session, or the session expired, was revoked or was rejected by the API. Run `mise run wikimasters -- login` again. |
 | `75` | The API stayed unavailable after the CLI's own retries. Retry later. |
 
