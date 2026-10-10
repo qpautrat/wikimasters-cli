@@ -115,6 +115,11 @@ program
     console.log(formatLogin(session.userId, format()));
   });
 
+interface PageOptions {
+  page: string;
+  limit: string;
+}
+
 const auction = program.command("auction").description("Take part in auctions");
 
 auction
@@ -140,12 +145,25 @@ auction
 auction
   .command("bids")
   .description(
-    "List the running auctions you bid on, soonest ending first, with your highest bid, the current bid and whether you lead",
+    "Read a page of your bids on running auctions, in the order the game returns them, each with its auction id, card title, amount, date, the current bid, whether you lead and the end time; says when the page is full",
   )
-  .addHelpText("after", examples("wikimasters auction bids"))
-  .action(async () => {
-    const auctions = await listRunningBids(await openSession());
-    console.log(formatRunningBids(auctions, format()));
+  .option("--page <p>", "page to read, a strictly positive integer", "1")
+  .option(
+    "--limit <n>",
+    "number of bids per page, a strictly positive integer",
+    String(PAGE_LIMIT),
+  )
+  .addHelpText(
+    "after",
+    examples("wikimasters auction bids", "wikimasters auction bids --page 2"),
+  )
+  .action(async ({ page, limit }: PageOptions) => {
+    const request = {
+      page: parsePageNumber(page),
+      limit: parsePageLimit(limit),
+    };
+    const result = await listRunningBids(await openSession(), request);
+    console.log(formatRunningBids(result, format()));
   });
 
 auction
@@ -388,10 +406,7 @@ const collection = program
   .command("collection")
   .description("Manage your collection");
 
-interface CollectionListOptions extends CollectionFilter {
-  page: string;
-  limit: string;
-}
+interface CollectionListOptions extends CollectionFilter, PageOptions {}
 
 collection
   .command("list")

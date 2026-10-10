@@ -2,7 +2,6 @@ import type {
   Auction,
   AuctionId,
   AuctionSearch,
-  BidAuction,
   CancelledAuction,
   CardSearch,
   CardValue,
@@ -18,6 +17,7 @@ import type {
   LabelDeletion,
   PlacedBid,
   ProfileCollectionPage,
+  RunningBidPage,
   TagChange,
   WishlistAddition,
   WishlistCard,
@@ -307,19 +307,24 @@ function currentBidState(currentBid: number | null, leading: boolean): string {
 }
 
 export function formatRunningBids(
-  auctions: readonly BidAuction[],
+  { bids, full }: RunningBidPage,
   format: Format,
 ): string {
   if (format === "json") {
-    return JSON.stringify(auctions.map(withId));
+    return JSON.stringify({ bids: bids.map(withId), full });
   }
-  if (auctions.length === 0) return "You have no bid on a running auction.";
-  return auctions
-    .map(
-      ({ auctionId, title, myHighestBid, currentBid, leading, endsAt }) =>
-        `${auctionId}  ${title}: your bid ${wikibidous(myHighestBid)}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
-    )
-    .join("\n");
+  if (bids.length === 0) {
+    return "This page of your bids on running auctions is empty.";
+  }
+  return [
+    ...bids.map(
+      ({ auctionId, title, amount, placedAt, currentBid, leading, endsAt }) =>
+        `${auctionId}  ${title}: your bid ${wikibidous(amount)} placed ${placedAt}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
+    ),
+    ...(full
+      ? [`The page is full (${cards(bids.length, "bid")}); more may follow.`]
+      : []),
+  ].join("\n");
 }
 
 function withId<T extends { auctionId: AuctionId }>({

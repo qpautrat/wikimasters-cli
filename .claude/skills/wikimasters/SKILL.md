@@ -39,7 +39,7 @@ Report results by card title, never by id alone.
 
 Take the auction id from the auction page URL the user gives, `https://www.wiki-masters.com/marketplace/<id>`.
 
-For an auction named by its card title, resolve the id with `auction bids`, then `auction search <title>`, matching the title as for cards. Without a match from either, ask the user for the auction page URL.
+For an auction named by its card title, resolve the id with `auction bids`, reading the next page while the page is full, then `auction search <title>`, matching the title as for cards. Without a match from either, ask the user for the auction page URL.
 
 `auction bid` takes the amount to bid. When the user names no amount, take it from the user's instructions; when they give none, ask the user.
 

@@ -65,7 +65,8 @@ const shownAuction = {
 const runningBid = {
   auctionId: bid.auctionId,
   title: "Pointe de la Sambuy",
-  myHighestBid: 22,
+  amount: 22,
+  placedAt: "2026-10-05T18:00:00.123456+00:00",
   currentBid: 25,
   leading: false,
   endsAt: "2026-10-06T08:56:58.649051+00:00",
@@ -134,11 +135,11 @@ const playerEntry = {
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
 describe("JSON output", () => {
-  it("lists each running auction bid on with its state in its own field", () => {
+  it("lists each bid on a running auction with its state in its own field, and whether the page is full", () => {
     const { auctionId, ...state } = runningBid;
-    expect(JSON.parse(formatRunningBids([runningBid], "json"))).toEqual([
-      { id: auctionId, ...state },
-    ]);
+    expect(
+      JSON.parse(formatRunningBids({ bids: [runningBid], full: true }, "json")),
+    ).toEqual({ bids: [{ id: auctionId, ...state }], full: true });
   });
 
   it("lists each auction with its state in its own field", () => {
@@ -468,15 +469,23 @@ describe("text output", () => {
     );
   });
 
-  it("prints one line per running auction bid on", () => {
-    expect(formatRunningBids([runningBid], "text")).toBe(
-      `${bid.auctionId}  Pointe de la Sambuy: your bid 22 wikibidous, current bid 25 wikibidous by another player, ends 2026-10-06T08:56:58.649051+00:00`,
+  it("prints one line per bid on a running auction", () => {
+    expect(formatRunningBids({ bids: [runningBid], full: false }, "text")).toBe(
+      `${bid.auctionId}  Pointe de la Sambuy: your bid 22 wikibidous placed 2026-10-05T18:00:00.123456+00:00, current bid 25 wikibidous by another player, ends 2026-10-06T08:56:58.649051+00:00`,
     );
   });
 
-  it("says when the user has no bid on a running auction", () => {
-    expect(formatRunningBids([], "text")).toBe(
-      "You have no bid on a running auction.",
+  it("says when the page of bids is full", () => {
+    expect(
+      formatRunningBids({ bids: [runningBid], full: true }, "text").split(
+        "\n",
+      )[1],
+    ).toBe("The page is full (1 bid); more may follow.");
+  });
+
+  it("says when the page of bids is empty", () => {
+    expect(formatRunningBids({ bids: [], full: false }, "text")).toBe(
+      "This page of your bids on running auctions is empty.",
     );
   });
 

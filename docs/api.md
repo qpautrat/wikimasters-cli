@@ -139,7 +139,7 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 
 - `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`.
 - `listAuctions`: `GET` of `id` and the same columns, filtered on `status` when given, limited to `limit`, without `order`. An unknown `status` value returns `[]` (observed 2026-10-08). Without a status filter, a read with `limit=3` answers (observed 2026-10-08); each status holds more than 100,000 auctions, and a read of the whole table times out (observed 2026-10-05).
-- `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
+- `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`; see `auction_bids` for the read. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
 
 ## `auction_bids`: the bids
 
@@ -155,7 +155,7 @@ Source: read-only queries, 2026-10-06.
 
 - Row-level security returns only the user's own bids: none of another bidder's, even on an auction they lead.
 - One row per bid: an auction the user bid on several times appears several times.
-- `listRunningBids`: `GET` of `auction_id, amount` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, paged by 1000; it keeps the highest `amount` per auction and sorts by `end_at`.
+- `listRunningBids`: `GET` of `auction_id, amount, placed_at` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]` (observed 2026-10-10).
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 

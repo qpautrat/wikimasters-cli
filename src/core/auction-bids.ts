@@ -4,63 +4,64 @@ import {
   type AuctionId,
   type AuctionRow,
 } from "./auction.js";
-import { readAllPages } from "./paged-read.js";
+import { apiFailure } from "./errors.js";
+import { pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
 
-export interface BidAuction {
+export interface RunningBid {
   auctionId: AuctionId;
   title: string;
-  myHighestBid: number;
+  amount: number;
+  placedAt: string;
   currentBid: number | null;
   leading: boolean;
   endsAt: string;
 }
 
+export interface RunningBidPage {
+  bids: RunningBid[];
+  full: boolean;
+}
+
 interface BidRow {
   auction_id: string;
   amount: number;
+  placed_at: string;
   auctions: Pick<
     AuctionRow,
     "end_at" | "current_bid" | "current_bidder_id" | "cards"
   >;
 }
 
-export async function listRunningBids(session: Session): Promise<BidAuction[]> {
-  const now = new Date().toISOString();
-  const rows = await readAllPages("Listing your bids", (from, to) =>
-    session.client
-      .from("auction_bids")
-      .select(
-        "auction_id, amount, auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))",
-      )
-      .eq("bidder_id", session.userId)
-      .eq("auctions.status", "active")
-      .gt("auctions.end_at", now)
-      .order("placed_at")
-      .order("id")
-      .range(from, to)
-      .overrideTypes<BidRow[], { merge: false }>(),
-  );
+export async function listRunningBids(
+  session: Session,
+  request: PageRequest,
+): Promise<RunningBidPage> {
+  const [from, to] = pageRange(request);
+  const { data, error, status } = await session.client
+    .from("auction_bids")
+    .select(
+      "auction_id, amount, placed_at, auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))",
+    )
+    .eq("bidder_id", session.userId)
+    .eq("auctions.status", "active")
+    .gt("auctions.end_at", new Date().toISOString())
+    .order("placed_at")
+    .order("id")
+    .range(from, to)
+    .overrideTypes<BidRow[], { merge: false }>();
+  if (error) throw apiFailure("Listing your bids", status, error.message);
 
-  const auctions = new Map<string, BidAuction>();
-  for (const { auction_id, amount, auctions: auction } of rows) {
-    const known = auctions.get(auction_id);
-    if (known) {
-      known.myHighestBid = Math.max(known.myHighestBid, amount);
-      continue;
-    }
-    auctions.set(auction_id, {
+  return {
+    bids: data.map(({ auction_id, amount, placed_at, auctions: auction }) => ({
       auctionId: auction_id as AuctionId,
       title: auctionedTitle(auction_id, auction),
-      myHighestBid: amount,
+      amount,
+      placedAt: placed_at,
       currentBid: auction.current_bid,
       leading: leads(session, auction),
       endsAt: auction.end_at,
-    });
-  }
-  return [...auctions.values()].sort(
-    (a, b) =>
-      Date.parse(a.endsAt) - Date.parse(b.endsAt) ||
-      a.auctionId.localeCompare(b.auctionId),
-  );
+    })),
+    full: data.length === request.limit,
+  };
 }
