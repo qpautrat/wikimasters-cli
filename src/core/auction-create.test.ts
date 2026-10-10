@@ -49,28 +49,32 @@ describe.each([
   { name: "parseStartingPrice", parse: parseStartingPrice },
   { name: "parseAuctionDuration", parse: parseAuctionDuration },
 ])("$name", ({ parse }) => {
-  it("accepts a strictly positive integer", () => {
-    expect(parse("30")).toBe(30);
+  it.each([
+    { raw: "30", expected: 30 },
+    { raw: "0", expected: 0 },
+    { raw: "-5", expected: -5 },
+  ])("accepts the integer $raw as given", ({ raw, expected }) => {
+    expect(parse(raw)).toBe(expected);
   });
 
   it.each([
-    "0",
-    "-5",
     "2.5",
     "1e3",
     "030",
+    "-030",
+    "-",
     " 30",
     "abc",
     "",
     "9007199254740993",
   ])("refuses %j", (raw) => {
     expect(() => parse(raw)).toThrow(
-      `${JSON.stringify(raw)} is not a strictly positive integer`,
+      `${JSON.stringify(raw)} is not an integer`,
     );
   });
 
   it("says nothing was put up for auction", () => {
-    expect(() => parse("0")).toThrow("nothing was put up for auction");
+    expect(() => parse("2.5")).toThrow("nothing was put up for auction");
   });
 });
 
@@ -111,6 +115,12 @@ describe("createAuction", () => {
         code: "human_verification_required",
       },
       expected: /human_verification_required/,
+    },
+    {
+      reason: "a refused starting price",
+      status: 400,
+      body: { error: "Mise de départ invalide (min 1)" },
+      expected: /Mise de départ invalide \(min 1\)/,
     },
     {
       reason: "a refused duration",

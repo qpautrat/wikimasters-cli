@@ -172,9 +172,9 @@ Source: the auction form's JavaScript, reached from `/collection`, and auctions 
 
 - Body `{"card_id": <user_cards.id>, "base_amount": <starting price>, "duration_minutes": <minutes>}`: the collection entry id, not `cards.id`. Response `{"auction_id": <auctions.id>}`, HTTP 200; the auction's `end_at` is `duration_minutes` after its creation.
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The form handles `human_verification_required` (it then shows a captcha) and shows `error` otherwise.
-- Observed refusals: a duration of 7 minutes gets HTTP 400 `{"error":"Durée invalide (entre 10 minutes et 12 heures)"}`; an unknown entry id gets HTTP 409 `{"error":"Vous ne possédez pas cette carte"}`, and an id that is not a UUID HTTP 500 `{"error":"Impossible de créer l'enchère"}` (observed 2026-10-10).
+- Observed refusals: a starting price of 0 or -5 gets HTTP 400 `{"error":"Mise de départ invalide (min 1)"}`; a duration of 7, 0 or -10 minutes gets HTTP 400 `{"error":"Durée invalide (entre 10 minutes et 12 heures)"}`; an unknown entry id gets HTTP 409 `{"error":"Vous ne possédez pas cette carte"}`, and an id that is not a UUID HTTP 500 `{"error":"Impossible de créer l'enchère"}` (observed 2026-10-10).
 - The form offers 10, 30, 60, 180, 360 and 720 minutes, refuses a starting price below 1, and disables itself once the user's active auctions reach `maxConcurrentAuctions` from `GET /api/marketplace/mine` (`{"sellingCount", "maxConcurrentAuctions"}`, 5 for a regular account).
-- `createAuction`: sends the entry id, the starting price and the duration given in a single request, without reading the collection first, reports `auction_id`, and reports a refusal with its body.
+- `createAuction`: sends the entry id, the starting price and the duration given, any integer, zero or negative included, in a single request, without reading the collection first, reports `auction_id`, and reports a refusal with its body.
 
 ## `DELETE /api/marketplace/<auction id>`: cancel an auction
 

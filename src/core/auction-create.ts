@@ -1,7 +1,7 @@
 import type { AuctionId } from "./auction.js";
 import { COLLECTION_PAGE } from "./collection.js";
 import { WikiMastersError } from "./errors.js";
-import { parseStrictlyPositiveInteger } from "./positive-integer.js";
+import { parseInteger } from "./integer.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -18,7 +18,7 @@ interface CreatedAuctionResponse {
 }
 
 export function parseStartingPrice(raw: string): StartingPrice {
-  return parseStrictlyPositiveInteger(raw, {
+  return parseInteger(raw, {
     subject: "starting price",
     unit: "wikibidous",
     untouched: "nothing was put up for auction",
@@ -26,7 +26,7 @@ export function parseStartingPrice(raw: string): StartingPrice {
 }
 
 export function parseAuctionDuration(raw: string): AuctionDuration {
-  return parseStrictlyPositiveInteger(raw, {
+  return parseInteger(raw, {
     subject: "duration",
     unit: "minutes",
     untouched: "nothing was put up for auction",

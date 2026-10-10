@@ -174,14 +174,8 @@ auction
     "Put an entry of your collection up for auction at a starting price for a duration; the game accepts or refuses it and gives its reason",
   )
   .argument("<entry-id>", "entry id, as given by collection list")
-  .argument(
-    "<starting-price>",
-    "wikibidous the bidding starts at, a strictly positive integer",
-  )
-  .argument(
-    "<duration>",
-    "minutes the auction lasts, a strictly positive integer",
-  )
+  .argument("<starting-price>", "wikibidous the bidding starts at, an integer")
+  .argument("<duration>", "minutes the auction lasts, an integer")
   .addHelpText(
     "after",
     examples(`wikimasters auction create ${EXAMPLE_ENTRY_ID} 50 60`),
