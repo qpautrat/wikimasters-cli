@@ -4,7 +4,7 @@
 
 `wikimasters auction create` prend l'identifiant de la carte (`cards.id`), lit ma collection pour trouver l'entrée correspondante et refuse sans rien envoyer une carte que je ne possède pas. Or `POST /api/marketplace` attend directement l'identifiant de l'entrée (`user_cards.id`) : cette lecture préalable compose deux appels et vérifie ce que le jeu vérifie déjà.
 
-Dépend de : [Mettre une carte aux enchères](../auction-create.md), [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md).
+Dépend de : [Mettre une carte aux enchères](../auction-create.md), [Afficher l'identifiant d'entrée des cartes de ma collection](../collection-list-entry-id.md).
 
 ## User story
 

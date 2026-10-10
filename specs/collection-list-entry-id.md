@@ -4,7 +4,7 @@
 
 Les routes du jeu qui agissent sur une carte de ma collection, comme la mise aux enchères (`POST /api/marketplace`) ou la proposition d'échange (`POST /api/trades`), attendent l'identifiant de l'entrée de ma collection (`user_cards.id`), pas celui de la carte (`cards.id`). `collection list` ne donne aujourd'hui que l'identifiant de la carte.
 
-Dépend de : [Lister ma collection](../collection-list.md).
+Dépend de : [Lister ma collection](collection-list.md).
 
 ## User story
 

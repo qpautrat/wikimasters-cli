@@ -15,6 +15,7 @@ import {
 function ownedCard(index: number) {
   const suffix = String(index).padStart(12, "0");
   return {
+    id: `22222222-2222-4222-8222-${suffix}`,
     card_id: `11111111-1111-4111-8111-${suffix}`,
     snapshot_title: `Card ${index}`,
     snapshot_rarity: "C",
@@ -66,10 +67,11 @@ describe("listCollection", () => {
     expect(params?.has("snapshot_rarity")).toBe(false);
   });
 
-  it("gives each card its id, owned rarity, copies, favourite, shiny, labels and obtention date", async () => {
+  it("gives each card its entry id, card id, owned rarity, copies, favourite, shiny, labels and obtention date", async () => {
     const { session } = await sessionWith(
       collectionSelect([
         {
+          id: "3d2a29bf-b8a9-4519-924a-67f0daacc644",
           card_id: "037975c2-7d8d-432c-9315-3b51087e6d50",
           snapshot_title: "Juste Cause (film, 1995)",
           snapshot_rarity: "SR",
@@ -87,6 +89,7 @@ describe("listCollection", () => {
 
     await expect(listCollection(session)).resolves.toEqual([
       {
+        entryId: "3d2a29bf-b8a9-4519-924a-67f0daacc644",
         id: "037975c2-7d8d-432c-9315-3b51087e6d50",
         title: "Juste Cause (film, 1995)",
         rarity: "SR",

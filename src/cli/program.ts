@@ -387,7 +387,7 @@ const collection = program
 collection
   .command("list")
   .description(
-    "List the cards of your collection, earliest obtained first, with their owned rarity, copies, favourite and shiny state, labels and obtention date",
+    "List the cards of your collection, earliest obtained first, with their entry id, card id, owned rarity, copies, favourite and shiny state, labels and obtention date",
   )
   .option(
     "--rarity <code>",

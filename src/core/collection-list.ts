@@ -4,6 +4,7 @@ import { readAllPages } from "./paged-read.js";
 import type { Session } from "./session.js";
 
 export interface CollectionCard {
+  entryId: string;
   id: CardId;
   title: string;
   rarity: string;
@@ -19,6 +20,7 @@ export interface CollectionFilter {
 }
 
 interface OwnedCardRow {
+  id: string;
   card_id: string;
   snapshot_title: string;
   snapshot_rarity: string;
@@ -50,7 +52,7 @@ export async function listCollection(
     let query = session.client
       .from("user_cards")
       .select(
-        "card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))",
+        "id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))",
       )
       .eq("user_id", session.userId)
       .gt("count", 0);
@@ -63,6 +65,7 @@ export async function listCollection(
   });
 
   return rows.map((row) => ({
+    entryId: row.id,
     id: row.card_id as CardId,
     title: row.snapshot_title,
     rarity: row.snapshot_rarity,

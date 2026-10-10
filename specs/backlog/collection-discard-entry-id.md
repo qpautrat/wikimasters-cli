@@ -4,7 +4,7 @@
 
 `wikimasters collection discard` prend des identifiants de carte (`cards.id`), lit ma collection pour trouver les entrées correspondantes, refuse sans rien envoyer une carte que je ne possède pas et découpe l'envoi en lots de 100. Or `POST /api/user-cards/bulk-discard` attend directement les identifiants d'entrée (`{"card_ids": [<user_cards.id>, …]}`), refuse lui-même une entrée que je ne possède pas (`card_not_owned`) et refuse plus de 100 identifiants par appel (`{"error":"Maximum 100 cartes par requête"}`) : la commande compose plusieurs appels et vérifie ce que le jeu vérifie déjà.
 
-Dépend de : [Défausser des cartes choisies de ma collection](../collection-discard.md), [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md).
+Dépend de : [Défausser des cartes choisies de ma collection](../collection-discard.md), [Afficher l'identifiant d'entrée des cartes de ma collection](../collection-list-entry-id.md).
 
 ## User story
 

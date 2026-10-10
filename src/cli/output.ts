@@ -185,11 +185,22 @@ export function formatCollection(
       : `The collection holds no card of rarity ${requestedRarity}.`;
   }
   return cards
-    .map(({ id, title, rarity, copies, starred, shiny, labels, obtainedAt }) =>
-      [
-        `${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
-        ...collectionMarks({ starred, shiny, labels }),
-      ].join("  "),
+    .map(
+      ({
+        entryId,
+        id,
+        title,
+        rarity,
+        copies,
+        starred,
+        shiny,
+        labels,
+        obtainedAt,
+      }) =>
+        [
+          `${entryId}  ${id}  ${title} (${rarity})  x${copies}  obtained ${obtainedAt}`,
+          ...collectionMarks({ starred, shiny, labels }),
+        ].join("  "),
     )
     .join("\n");
 }

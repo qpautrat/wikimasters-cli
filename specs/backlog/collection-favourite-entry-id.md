@@ -4,7 +4,7 @@
 
 `wikimasters collection star` prend l'identifiant de la carte (`cards.id`), lit ma collection pour trouver l'entrée et son état, puis ne modifie l'entrée que si elle n'est pas déjà en favori. Or le jeu marque une entrée par un seul `PATCH user_cards?id=eq.<user_cards.id>` avec `{"starred":true}` : la commande compose deux appels.
 
-Dépend de : [Marquer une carte de ma collection en favori](../collection-favourite.md), [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md).
+Dépend de : [Marquer une carte de ma collection en favori](../collection-favourite.md), [Afficher l'identifiant d'entrée des cartes de ma collection](../collection-list-entry-id.md).
 
 ## User story
 

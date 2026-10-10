@@ -4,7 +4,7 @@
 
 `wikimasters collection tag` prend l'identifiant de la carte (`cards.id`) et le nom de l'étiquette, lit ma collection pour trouver l'entrée et ses étiquettes, lit mes étiquettes pour trouver celle qui porte ce nom, puis ne pose l'étiquette que si l'entrée ne l'a pas. Or le jeu pose une étiquette par un seul `POST user_card_tags` avec `{"user_card_id": <user_cards.id>, "tag_id": <tags.id>}` : la commande compose trois appels. La réponse du jeu à une étiquette déjà posée n'a pas été observée.
 
-Dépend de : [Étiqueter une carte de ma collection](../collection-tag.md), [Afficher l'identifiant d'entrée des cartes de ma collection](collection-list-entry-id.md), [Lister mes étiquettes](../label-list.md).
+Dépend de : [Étiqueter une carte de ma collection](../collection-tag.md), [Afficher l'identifiant d'entrée des cartes de ma collection](../collection-list-entry-id.md), [Lister mes étiquettes](../label-list.md).
 
 ## User story
 

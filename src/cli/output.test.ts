@@ -70,7 +70,9 @@ const runningBid = {
   leading: false,
   endsAt: "2026-10-06T08:56:58.649051+00:00",
 };
+const entryId = "3d2a29bf-b8a9-4519-924a-67f0daacc644";
 const owned = {
+  entryId,
   id: cardId,
   title: "Pointe de la Sambuy",
   rarity: "C",
@@ -118,7 +120,6 @@ const emptyGlobalSearch = {
   hasMore: false,
 };
 
-const entryId = "3d2a29bf-b8a9-4519-924a-67f0daacc644";
 const playerEntry = {
   entryId,
   id: cardId,
@@ -257,6 +258,7 @@ describe("JSON output", () => {
   it("lists the collection as an array of cards with each attribute in its own field", () => {
     expect(JSON.parse(formatCollection([owned], "json"))).toEqual([
       {
+        entryId,
         id: cardId,
         title: "Pointe de la Sambuy",
         rarity: "C",
@@ -623,9 +625,9 @@ describe("text output", () => {
     );
   });
 
-  it("prints one line per collection card", () => {
+  it("prints one line per collection card, entry id first", () => {
     expect(formatCollection([owned], "text")).toBe(
-      `${cardId}  Pointe de la Sambuy (C)  x1  obtained 2026-09-18T23:42:15.692426+00:00`,
+      `${entryId}  ${cardId}  Pointe de la Sambuy (C)  x1  obtained 2026-09-18T23:42:15.692426+00:00`,
     );
   });
 
@@ -644,7 +646,7 @@ describe("text output", () => {
         "text",
       ),
     ).toBe(
-      `${cardId}  Pointe de la Sambuy (C)  x2  obtained 2026-09-18T23:42:15.692426+00:00  [favourite]  [shiny]  [labels: "Lieux", "Montagnes"]`,
+      `${entryId}  ${cardId}  Pointe de la Sambuy (C)  x2  obtained 2026-09-18T23:42:15.692426+00:00  [favourite]  [shiny]  [labels: "Lieux", "Montagnes"]`,
     );
   });
 
