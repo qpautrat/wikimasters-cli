@@ -153,7 +153,7 @@ auction
   .option("--page <p>", "page to read, a strictly positive integer", "1")
   .option(
     "--limit <n>",
-    "number of bids per page, a strictly positive integer",
+    "number of bids per page, an integer sent to the game as given",
     String(PAGE_LIMIT),
   )
   .addHelpText(
@@ -412,7 +412,7 @@ collection
   .option("--page <p>", "page to read, a strictly positive integer", "1")
   .option(
     "--limit <n>",
-    "number of cards per page, a strictly positive integer",
+    "number of cards per page, an integer sent to the game as given",
     String(PAGE_LIMIT),
   )
   .addHelpText(

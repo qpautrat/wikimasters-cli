@@ -171,6 +171,28 @@ describe("listCollection", () => {
     });
   });
 
+  it("sends a negative limit as given and reports the game's refusal", async () => {
+    const { session, requests } = await sessionWith(
+      restRoute("GET", "user_cards", {
+        status: 416,
+        body: {
+          message: "Requested range not satisfiable",
+          details: "Limit should be greater than or equal to zero.",
+        },
+      }),
+    );
+
+    await expect(
+      listCollection(session, {
+        page: parsePageNumber("1"),
+        limit: parsePageLimit("-1"),
+      }),
+    ).rejects.toThrow("HTTP 416");
+    expect(collectionReads(requests)[0]?.url.searchParams.get("limit")).toBe(
+      "-1",
+    );
+  });
+
   it("fails when a label has no readable name", async () => {
     const { session } = await sessionWith(
       collectionSelect([{ ...ownedCard(0), user_card_tags: [{ tags: null }] }]),

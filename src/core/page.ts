@@ -1,4 +1,4 @@
-import { parseStrictlyPositiveInteger } from "./integer.js";
+import { parseInteger, parseStrictlyPositiveInteger } from "./integer.js";
 
 export const PAGE_LIMIT = 1000;
 
@@ -18,7 +18,7 @@ export function parsePageNumber(raw: string): PageNumber {
 }
 
 export function parsePageLimit(raw: string): PageLimit {
-  return parseStrictlyPositiveInteger(raw, {
+  return parseInteger(raw, {
     subject: "limit",
     untouched: "nothing was read",
   }) as PageLimit;

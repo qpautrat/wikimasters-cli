@@ -13,7 +13,7 @@ En tant que joueur, je lis mes mises sur les enchères en cours telles que le je
 ## Critères d'acceptation
 
 1. `wikimasters auction bids` envoie une seule requête et affiche la page demandée de mes mises sur les enchères en cours, la première par défaut.
-2. Les options `--page <p>` et `--limit <n>`, des entiers strictement positifs, choisissent la page et le nombre de mises par page, 1000 par défaut ; la limite est transmise au jeu telle quelle. Une page ou une limite qui n'en est pas un est refusée sans rien lire.
+2. Les options `--page <p>` et `--limit <n>` choisissent la page et le nombre de mises par page, 1000 par défaut. La page, un entier strictement positif, est convertie en position de départ ; une page qui n'en est pas un est refusée sans rien lire. La limite, un entier, est transmise au jeu telle quelle, nulle ou négative comprise ; une limite qui n'est pas un nombre entier est refusée sans rien lire, et un refus du jeu fait échouer la commande avec son motif.
 3. La commande affiche une ligne par mise, dans l'ordre où le jeu les renvoie : l'identifiant de l'enchère, le titre de la carte, le montant de la mise, la date de la mise, la mise actuelle, si je suis le meilleur enchérisseur et l'heure de fin.
 4. Une enchère est en cours tant que son statut est `active` et que son heure de fin n'est pas passée ; les mises sur les autres n'apparaissent pas.
 5. La commande signale quand la page est pleine, signe que d'autres pages peuvent suivre.

@@ -18,7 +18,7 @@ En tant que joueur, je consulte les cartes de ma collection et ce qui les distin
 4. Les cartes sont triées par date d'obtention, la plus ancienne en premier.
 5. Une page vide, ou sans carte de la rareté demandée, n'est pas une erreur : la commande le signale et sort avec le code 0.
 6. Avec `--json`, stdout porte la liste des cartes de la page, chacune avec ces informations dans des champs distincts, et un champ `full`, vrai quand la page porte autant de cartes que demandé.
-7. Les options `--page <p>` et `--limit <n>`, des entiers strictement positifs, choisissent la page et le nombre de cartes par page, 1000 par défaut ; la limite est transmise au jeu telle quelle. Une page ou une limite qui n'en est pas un est refusée sans rien lire.
+7. Les options `--page <p>` et `--limit <n>` choisissent la page et le nombre de cartes par page, 1000 par défaut. La page, un entier strictement positif, est convertie en position de départ ; une page qui n'en est pas un est refusée sans rien lire. La limite, un entier, est transmise au jeu telle quelle, nulle ou négative comprise ; une limite qui n'est pas un nombre entier est refusée sans rien lire, et un refus du jeu fait échouer la commande avec son motif.
 8. La commande signale quand la page est pleine, signe que d'autres pages peuvent suivre.
 
 ## Hors périmètre

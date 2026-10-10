@@ -66,7 +66,7 @@ Source: read-only query, 2026-10-02.
 - One row per owned card: no `card_id` appears twice.
 - Putting a card up for auction deletes its row; cancelling the auction creates a new one, with a new `id` and `obtained_at` set to the cancellation time (observed 2026-10-05).
 - Row-level security returns only the user's own rows.
-- `listCollection`: `GET` of `id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; a `limit` of 2000 answers 2000 rows (observed 2026-10-10).
+- `listCollection`: `GET` of `id, card_id, snapshot_title, snapshot_rarity, count, starred, is_shiny, obtained_at, user_card_tags(tags(name))`, filtered on `user_id`, `count=gt.0` and, with a rarity, `snapshot_rarity`, ordered by `obtained_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; a `limit` of 2000 answers 2000 rows; `limit=0` answers `[]`; a negative `limit` gets HTTP 416 `Requested range not satisfiable`, details `Limit should be greater than or equal to zero.` (observed 2026-10-10).
 - `listWishlist` embeds it as `cards(user_cards(card_id))`, filtered on `cards.user_cards.user_id` and `cards.user_cards.count=gt.0`, to tell whether each wished card is owned. The `count` filter guards against a zero-copy row, never seen so far.
 - `starEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":true}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`. The row count is 0 for an unknown entry and for another player's entry, which row-level security hides; an id that is not a UUID answers `400` `invalid input syntax for type uuid` (observed 2026-10-10). Source: capture `star-card.har`.
 - `unstarEntry`: `PATCH user_cards?id=eq.<entry id>` with `{"starred":false}` and `Prefer: count=exact`, as the interface sends it; PostgREST answers `204`, with the same row counts and refusals as `starEntry`. Source: capture `unstar-card.har`.
@@ -154,7 +154,7 @@ Source: read-only queries, 2026-10-06.
 
 - Row-level security returns only the user's own bids: none of another bidder's, even on an auction they lead.
 - One row per bid: an auction the user bid on several times appears several times.
-- `listRunningBids`: `GET` of `auction_id, amount, placed_at` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]` (observed 2026-10-10).
+- `listRunningBids`: `GET` of `auction_id, amount, placed_at` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; `limit=0` answers `[]`; a negative `limit` gets HTTP 416 `Requested range not satisfiable`, as on `user_cards` (observed 2026-10-10).
 
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 
