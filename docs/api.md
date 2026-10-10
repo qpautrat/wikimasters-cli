@@ -103,13 +103,12 @@ Source: read-only query, 2026-10-05.
 - `listLabels`: `GET` of `id, name, color` filtered on `user_id` and ordered by `name`, in a single request.
 - `tagCard` / `untagCard`: the `listLabels` read, to find the label by its exact name or list the user's labels.
 - `createLabel`: `POST tags?select=id,name,color` with `{"user_id":"<user id>","name":"<name>"}`, plus `"color"` when given, and `Prefer: return=representation`; PostgREST answers `201` with the created row. Without a colour the game stores `#94a3b8`. A colour that is not hex gets HTTP 400 `23514` from the check constraint `tags_color_hex_check`. A name the user already has, regardless of case, gets HTTP 409 `23505` from the unique index `tags_user_name_lower_unique`, which `createLabel` reports. Source: the site's JavaScript for the request, runs on the account (2026-10-08, 2026-10-09, 2026-10-10) for the answers.
-- `deleteLabel`: `GET` of `id` filtered on `user_id` and `name=eq.<name>`, with the name as given; the filter is case-sensitive (`eq.karmine corp` does not find `Karmine Corp`). No row means the user has no label of that name. Source: read-only query, 2026-10-08.
 
 ## `POST rpc/delete_tag`: delete a label
 
 Source: the site's JavaScript of `/collection` for the request, runs on the account (2026-10-08) for the answers.
 
-- `deleteLabel`: `POST /rest/v1/rpc/delete_tag` with `{"p_tag_id":"<tags.id>"}`; PostgREST answers `204` with no body. The label's `user_card_tags` rows go with it.
+- `deleteLabel`: `POST /rest/v1/rpc/delete_tag` with `{"p_tag_id":"<tags.id>"}` as given, in a single request; PostgREST answers `204` with no body. The label's `user_card_tags` rows go with it.
 - An id that is unknown or another user's gets HTTP 400 `P0001` `Tag not found or not owned by caller`.
 
 ## `POST /api/user-cards/bulk-discard`: discard collection entries

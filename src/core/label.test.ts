@@ -204,52 +204,24 @@ describe("createLabel", () => {
 });
 
 describe("deleteLabel", () => {
-  function labelNamed(...ids: string[]): Route {
-    return restRoute("GET", "tags", {
-      status: 200,
-      body: ids.map((id) => ({ id })),
-    });
-  }
-
-  it("deletes the label of that name through delete_tag", async () => {
+  it("deletes the label of that id through delete_tag in a single request", async () => {
     const { session, requests } = await sessionWith(
-      labelNamed("label-id"),
       restRoute("POST", "rpc/delete_tag", { status: 204 }),
     );
 
-    await expect(deleteLabel(session, "Test CLI")).resolves.toEqual({
-      name: "Test CLI",
-      deleted: true,
+    await expect(deleteLabel(session, "label-id")).resolves.toEqual({
+      id: "label-id",
     });
-    const read = requests.find(restRequest("GET", "tags"));
-    expect(read?.url.searchParams.get("user_id")).toBe(`eq.${USER_ID}`);
-    expect(read?.url.searchParams.get("name")).toBe("eq.Test CLI");
+    expect(
+      requests.filter((request) => request.url.pathname.startsWith("/rest/")),
+    ).toHaveLength(1);
     const call = requests.find(restRequest("POST", "rpc/delete_tag"));
     expect(JSON.parse(call?.body ?? "null")).toEqual({ p_tag_id: "label-id" });
     expect(call?.headers.get("authorization")).toBe(`Bearer ${ACCESS_TOKEN}`);
   });
 
-  it("sends the name to the API as given", async () => {
-    const { session, requests } = await sessionWith(labelNamed());
-
-    await deleteLabel(session, " montagne*");
-    const read = requests.find(restRequest("GET", "tags"));
-    expect(read?.url.searchParams.get("name")).toBe("eq. montagne*");
-  });
-
-  it("succeeds without deleting when the user has no label of that name", async () => {
-    const { session, requests } = await sessionWith(labelNamed());
-
-    await expect(deleteLabel(session, "Karmine Corp")).resolves.toEqual({
-      name: "Karmine Corp",
-      deleted: false,
-    });
-    expect(requests.filter(restRequest("POST", "rpc/delete_tag"))).toEqual([]);
-  });
-
   it("reports the game's refusal with its reason", async () => {
     const { session } = await sessionWith(
-      labelNamed("label-id"),
       restRoute("POST", "rpc/delete_tag", {
         status: 400,
         body: {
@@ -259,34 +231,20 @@ describe("deleteLabel", () => {
       }),
     );
 
-    await expect(deleteLabel(session, "Test CLI")).rejects.toThrow(
-      'Deleting label "Test CLI" failed (HTTP 400): Tag not found or not owned by caller',
-    );
-  });
-
-  it("reports a failed read of the label as a read", async () => {
-    const { session } = await sessionWith(
-      restRoute("GET", "tags", {
-        status: 400,
-        body: { code: "PGRST100", message: "failed to parse filter" },
-      }),
-    );
-
-    await expect(deleteLabel(session, "Test CLI")).rejects.toThrow(
-      'Reading label "Test CLI" failed (HTTP 400): failed to parse filter',
+    await expect(deleteLabel(session, "label-id")).rejects.toThrow(
+      "Deleting label label-id failed (HTTP 400): Tag not found or not owned by caller",
     );
   });
 
   it("requires a new login when the API rejects the session", async () => {
     const { session } = await sessionWith(
-      labelNamed("label-id"),
       restRoute("POST", "rpc/delete_tag", {
         status: 401,
         body: { code: "PGRST303", message: "JWT expired" },
       }),
     );
 
-    await expect(deleteLabel(session, "Test CLI")).rejects.toThrow(
+    await expect(deleteLabel(session, "label-id")).rejects.toThrow(
       AuthRequiredError,
     );
   });

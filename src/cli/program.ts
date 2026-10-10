@@ -74,6 +74,7 @@ export const program = new Command("wikimasters")
 const EXAMPLE_AUCTION_ID = "6f1c2d3e-4b5a-4c7d-8e9f-0a1b2c3d4e5f";
 const EXAMPLE_CARD_ID = "9b2e4f6a-1c3d-4e5f-8a7b-2c4d6e8f0a1b";
 const OTHER_EXAMPLE_CARD_ID = "0d4f6b8a-3e5c-4a7b-9c1d-5e7f9a1b3c5d";
+const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
 
 function examples(...calls: string[]): string {
   return `\nExamples:\n${calls.map((call) => `  $ ${call}`).join("\n")}`;
@@ -499,15 +500,16 @@ labels
 
 labels
   .command("delete")
-  .description(
-    "Delete a label, removing it from your cards; succeeds without deleting if the API finds no label of yours with that name",
+  .description("Delete one of your labels, removing it from your cards")
+  .argument("<label-id>", "label id, as given by labels list")
+  .addHelpText(
+    "after",
+    examples(`wikimasters labels delete ${EXAMPLE_LABEL_ID}`),
   )
-  .argument("<name>", "label name")
-  .addHelpText("after", examples('wikimasters labels delete "Karmine Corp"'))
-  .action(async (name: string) => {
+  .action(async (labelId: string) => {
     const session = await openSession();
     console.log(
-      formatLabelDeletion(await deleteLabel(session, name), format()),
+      formatLabelDeletion(await deleteLabel(session, labelId), format()),
     );
   });
 

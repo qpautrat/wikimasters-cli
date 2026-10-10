@@ -375,12 +375,15 @@ describe("JSON output", () => {
     expect(JSON.parse(formatLabelCreation(label, "json"))).toEqual(label);
   });
 
-  it("reports a label deletion with its name and whether it was just deleted", () => {
+  it("reports a label deletion with the deleted label's id", () => {
     expect(
       JSON.parse(
-        formatLabelDeletion({ name: "Karmine Corp", deleted: true }, "json"),
+        formatLabelDeletion(
+          { id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" },
+          "json",
+        ),
       ),
-    ).toEqual({ name: "Karmine Corp", deleted: true });
+    ).toEqual({ id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" });
   });
 
   it("reports a discard with its count, gain, balance and refused cards", () => {
@@ -769,14 +772,11 @@ describe("text output", () => {
 
   it("says when a label is deleted", () => {
     expect(
-      formatLabelDeletion({ name: "Karmine Corp", deleted: true }, "text"),
-    ).toBe('Label "Karmine Corp" deleted.');
-  });
-
-  it("says when there was no label of that name", () => {
-    expect(
-      formatLabelDeletion({ name: "Karmine Corp", deleted: false }, "text"),
-    ).toBe('You had no label named "Karmine Corp"; nothing was deleted.');
+      formatLabelDeletion(
+        { id: "5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35" },
+        "text",
+      ),
+    ).toBe("Label 5c0f8e2a-7b1d-4e3f-9a6c-2d8b4f1e7a35 deleted.");
   });
 
   it("says when a card is labelled", () => {

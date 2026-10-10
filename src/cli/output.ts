@@ -412,13 +412,11 @@ export function formatLabelCreation(
 }
 
 export function formatLabelDeletion(
-  { name, deleted }: LabelDeletion,
+  { id }: LabelDeletion,
   format: Format,
 ): string {
-  if (format === "json") return JSON.stringify({ name, deleted });
-  return deleted
-    ? `Label ${JSON.stringify(name)} deleted.`
-    : `You had no label named ${JSON.stringify(name)}; nothing was deleted.`;
+  if (format === "json") return JSON.stringify({ id });
+  return `Label ${id} deleted.`;
 }
 
 export function formatTag(
