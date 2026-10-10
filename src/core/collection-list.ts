@@ -1,30 +1,7 @@
 import type { CardId } from "./card-id.js";
 import { WikiMastersError, apiFailure } from "./errors.js";
-import { parseStrictlyPositiveInteger } from "./positive-integer.js";
+import { pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
-
-export const COLLECTION_PAGE_LIMIT = 1000;
-
-export type CollectionPageNumber = number & {
-  readonly __brand: "CollectionPageNumber";
-};
-export type CollectionPageLimit = number & {
-  readonly __brand: "CollectionPageLimit";
-};
-
-export function parseCollectionPageNumber(raw: string): CollectionPageNumber {
-  return parseStrictlyPositiveInteger(raw, {
-    subject: "page",
-    untouched: "nothing was read",
-  }) as CollectionPageNumber;
-}
-
-export function parseCollectionPageLimit(raw: string): CollectionPageLimit {
-  return parseStrictlyPositiveInteger(raw, {
-    subject: "limit",
-    untouched: "nothing was read",
-  }) as CollectionPageLimit;
-}
 
 export interface CollectionCard {
   entryId: string;
@@ -40,11 +17,6 @@ export interface CollectionCard {
 
 export interface CollectionFilter {
   rarity?: string;
-}
-
-export interface CollectionPageRequest {
-  page: CollectionPageNumber;
-  limit: CollectionPageLimit;
 }
 
 export interface CollectionPage {
@@ -79,7 +51,7 @@ function labelsOf({ card_id, user_card_tags }: OwnedCardRow): string[] {
 
 export async function listCollection(
   session: Session,
-  { page, limit }: CollectionPageRequest,
+  request: PageRequest,
   { rarity }: CollectionFilter = {},
 ): Promise<CollectionPage> {
   let query = session.client
@@ -90,11 +62,11 @@ export async function listCollection(
     .eq("user_id", session.userId)
     .gt("count", 0);
   if (rarity !== undefined) query = query.eq("snapshot_rarity", rarity);
-  const from = (page - 1) * limit;
+  const [from, to] = pageRange(request);
   const { data, error, status } = await query
     .order("obtained_at")
     .order("id")
-    .range(from, from + limit - 1)
+    .range(from, to)
     .overrideTypes<OwnedCardRow[], { merge: false }>();
   if (error) throw apiFailure("Listing the collection", status, error.message);
 
@@ -110,6 +82,6 @@ export async function listCollection(
       labels: labelsOf(row),
       obtainedAt: row.obtained_at,
     })),
-    full: data.length === limit,
+    full: data.length === request.limit,
   };
 }

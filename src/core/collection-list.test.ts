@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  listCollection,
-  parseCollectionPageLimit,
-  parseCollectionPageNumber,
-} from "./collection-list.js";
+import { listCollection } from "./collection-list.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
+import { parsePageLimit, parsePageNumber } from "./page.js";
 import { resumeSession } from "./session.js";
 import {
   USER_ID,
@@ -43,8 +40,8 @@ function collectionSelect(rows: unknown[]): Route {
 }
 
 const firstPage = {
-  page: parseCollectionPageNumber("1"),
-  limit: parseCollectionPageLimit("1000"),
+  page: parsePageNumber("1"),
+  limit: parsePageLimit("1000"),
 };
 
 async function sessionWith(...routes: Route[]) {
@@ -60,14 +57,6 @@ async function sessionWith(...routes: Route[]) {
 function collectionReads(requests: RecordedRequest[]) {
   return requests.filter(restRequest("GET", "user_cards"));
 }
-
-describe("parseCollectionPageNumber and parseCollectionPageLimit", () => {
-  it("refuse a page or a limit that is not a strictly positive integer", () => {
-    expect(() => parseCollectionPageNumber("0")).toThrow(WikiMastersError);
-    expect(() => parseCollectionPageLimit("-5")).toThrow(WikiMastersError);
-    expect(() => parseCollectionPageLimit("ten")).toThrow(WikiMastersError);
-  });
-});
 
 describe("listCollection", () => {
   it("reads the owned cards of the signed-in user, earliest obtained first", async () => {
@@ -127,8 +116,8 @@ describe("listCollection", () => {
     const { session, requests } = await sessionWith(collectionSelect(rows));
 
     const { cards } = await listCollection(session, {
-      page: parseCollectionPageNumber("2"),
-      limit: parseCollectionPageLimit("3"),
+      page: parsePageNumber("2"),
+      limit: parsePageLimit("3"),
     });
 
     expect(cards.map(({ id }) => id)).toEqual(
@@ -145,8 +134,8 @@ describe("listCollection", () => {
     const { session } = await sessionWith(collectionSelect(rows));
 
     const page = await listCollection(session, {
-      page: parseCollectionPageNumber("1"),
-      limit: parseCollectionPageLimit("3"),
+      page: parsePageNumber("1"),
+      limit: parsePageLimit("3"),
     });
 
     expect(page.full).toBe(true);
@@ -157,8 +146,8 @@ describe("listCollection", () => {
     const { session } = await sessionWith(collectionSelect(rows));
 
     const page = await listCollection(session, {
-      page: parseCollectionPageNumber("1"),
-      limit: parseCollectionPageLimit("3"),
+      page: parsePageNumber("1"),
+      limit: parsePageLimit("3"),
     });
 
     expect(page.full).toBe(false);

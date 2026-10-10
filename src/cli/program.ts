@@ -2,7 +2,7 @@ import { Command } from "commander";
 import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
-  COLLECTION_PAGE_LIMIT,
+  PAGE_LIMIT,
   addToWishlist,
   cancelAuction,
   createAuction,
@@ -22,8 +22,8 @@ import {
   parseBidAmount,
   parseCardId,
   parseCardSearchField,
-  parseCollectionPageLimit,
-  parseCollectionPageNumber,
+  parsePageLimit,
+  parsePageNumber,
   parseStartingPrice,
   placeBid,
   readCardValues,
@@ -406,7 +406,7 @@ collection
   .option(
     "--limit <n>",
     "number of cards per page, a strictly positive integer",
-    String(COLLECTION_PAGE_LIMIT),
+    String(PAGE_LIMIT),
   )
   .addHelpText(
     "after",
@@ -417,8 +417,8 @@ collection
   )
   .action(async ({ page, limit, ...filter }: CollectionListOptions) => {
     const request = {
-      page: parseCollectionPageNumber(page),
-      limit: parseCollectionPageLimit(limit),
+      page: parsePageNumber(page),
+      limit: parsePageLimit(limit),
     };
     const result = await listCollection(await openSession(), request, filter);
     console.log(formatCollection(result, format(), filter.rarity));
