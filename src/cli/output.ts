@@ -17,6 +17,7 @@ import type {
   GlobalCollectionSearch,
   Label,
   LabelDeletion,
+  NotificationPage,
   PlacedBid,
   ProfileCollectionPage,
   RunningBidPage,
@@ -321,6 +322,31 @@ export function formatRunningBids(
         `${auctionId}  ${title}: your bid ${wikibidous(amount)} placed ${placedAt}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
     ),
     ...fullPageNote(full, cards(bids.length, "bid")),
+  ].join("\n");
+}
+
+function notificationValue(value: unknown): string {
+  return typeof value === "string" ? value : JSON.stringify(value);
+}
+
+export function formatNotifications(
+  { notifications, full }: NotificationPage,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ notifications, full });
+  if (notifications.length === 0) {
+    return "This page of your notifications is empty.";
+  }
+  return [
+    ...notifications.map(({ type, read, createdAt, data }) =>
+      [
+        `${createdAt}  ${type}${read ? "" : " (unread)"}${"message" in data ? `: ${notificationValue(data.message)}` : ""}`,
+        ...Object.entries(data)
+          .filter(([key]) => key !== "title" && key !== "message")
+          .map(([key, value]) => `${key}=${notificationValue(value)}`),
+      ].join("  "),
+    ),
+    ...fullPageNote(full, cards(notifications.length, "notification")),
   ].join("\n");
 }
 

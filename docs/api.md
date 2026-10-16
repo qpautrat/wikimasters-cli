@@ -156,6 +156,22 @@ Source: read-only queries, 2026-10-06.
 - One row per bid: an auction the user bid on several times appears several times.
 - `listRunningBids`: `GET` of `auction_id, amount, placed_at` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; `limit=0` answers `[]`; a negative `limit` gets HTTP 416 `Requested range not satisfiable`, as on `user_cards` (observed 2026-10-10).
 
+## `notifications`: the notifications the game sent the user
+
+Source: read-only queries and the site's JavaScript, 2026-10-16.
+
+| Column | Meaning |
+|---|---|
+| `id` | notification UUID |
+| `user_id` | recipient |
+| `type` | kind of notification, e.g. `marketplace_wishlist_listed`, `marketplace_outbid`, `marketplace_auction_won`, `marketplace_auction_sold`, `marketplace_auction_unsold`, `friend_request`, `trade_offer`, `trade_accepted` |
+| `data` | JSON object: `title`, `message` and, by type, `auction_id`, `card_id`, `card_title`, `final_price`, `previous_bid`, `new_bid`, `requester_id`, `requester_username`, `initiator_id`, `initiator_username`, `recipient_id`, `recipient_username`, `trade_id` |
+| `read` | whether the user read it |
+| `created_at` | when the game sent it |
+
+- The site reads `GET /api/notifications`, which answers `{ notifications: [...] }` with the 50 most recent, without filter, and marks them read with `PATCH /api/notifications` (body `{ ids }`, or `{}` for all). The core does not use these routes.
+- `listNotifications`: `GET` of `id, type, read, created_at, data`, filtered on `user_id`, on `type=in.(<types>)` when types are given, on `read=eq.false` for unread ones and on `created_at=gt.<date>` when a date is given, ordered by `created_at` then `id`, both descending, as the site sorts them, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An unknown type answers `[]`; a date PostgreSQL cannot read gets HTTP 400 `invalid input syntax for type timestamp with time zone`; a negative `limit` gets HTTP 416 `Requested range not satisfiable` (observed 2026-10-16).
+
 ## `POST /api/marketplace/<auction id>/bid`: bid on an auction
 
 Source: capture `place-bid.har`, the auction page's JavaScript for the error codes, and refused bids on the account (2026-10-06).

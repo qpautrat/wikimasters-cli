@@ -2,6 +2,7 @@ import { Command } from "commander";
 import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
+  NOTIFICATION_LIMIT,
   PAGE_LIMIT,
   addToWishlist,
   asEntryId,
@@ -14,6 +15,7 @@ import {
   listAuctions,
   listCollection,
   listLabels,
+  listNotifications,
   listRunningBids,
   listWishlist,
   loginInBrowser,
@@ -63,6 +65,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatNotifications,
   formatProfileCollection,
   formatRemoval,
   formatRunningBids,
@@ -581,6 +584,60 @@ labels
         format(),
       ),
     );
+  });
+
+const notifications = program
+  .command("notifications")
+  .description("Read the notifications the game sent you");
+
+interface NotificationOptions extends PageOptions {
+  type: string[];
+  unread?: boolean;
+  after?: string;
+}
+
+notifications
+  .command("list")
+  .description(
+    "Read a page of your notifications, most recent first, each with its date, type, whether it is unread, message and the other data the game attaches to it, such as the auction, card, player or trade concerned; says when the page is full",
+  )
+  .option(
+    "--type <type>",
+    "keep this type, sent as given, e.g. marketplace_wishlist_listed, marketplace_outbid, marketplace_auction_won, marketplace_auction_sold, marketplace_auction_unsold, friend_request, trade_offer or trade_accepted; repeat to keep several",
+    repeated,
+    [],
+  )
+  .option("--unread", "keep only the notifications you have not read")
+  .option(
+    "--after <date>",
+    "keep the notifications received strictly after this date, sent as given, e.g. 2026-10-16T13:31:00.222902+00:00",
+  )
+  .option("--page <p>", "page to read, a strictly positive integer", "1")
+  .option(
+    "--limit <n>",
+    "number of notifications per page, an integer sent to the game as given",
+    String(NOTIFICATION_LIMIT),
+  )
+  .addHelpText(
+    "after",
+    examples(
+      "wikimasters notifications list",
+      "wikimasters notifications list --type marketplace_wishlist_listed --after 2026-10-16T13:31:00.222902+00:00",
+      "wikimasters notifications list --type marketplace_outbid --type marketplace_auction_won --unread",
+      "wikimasters notifications list --limit 10 --page 2",
+    ),
+  )
+  .action(async ({ type, page, limit, ...filter }: NotificationOptions) => {
+    const request = {
+      page: parsePageNumber(page),
+      limit: parsePageLimit(limit),
+    };
+    const result = await listNotifications(
+      await openSession(),
+      { types: type, ...filter },
+      request,
+    );
+    console.log(formatNotifications(result, format()));
   });
 
 const profile = program

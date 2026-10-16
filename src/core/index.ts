@@ -66,6 +66,13 @@ export {
   type LabelId,
 } from "./label.js";
 export {
+  NOTIFICATION_LIMIT,
+  listNotifications,
+  type Notification,
+  type NotificationFilter,
+  type NotificationPage,
+} from "./notification-list.js";
+export {
   PAGE_LIMIT,
   parsePageLimit,
   parsePageNumber,

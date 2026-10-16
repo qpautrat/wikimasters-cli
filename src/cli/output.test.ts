@@ -25,6 +25,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatNotifications,
   formatProfileCollection,
   formatRemoval,
   formatRunningBids,
@@ -55,6 +56,19 @@ const bid = {
   auctionId: parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f"),
   amount: 359,
   balance: 7743,
+};
+const notification = {
+  id: "0363a628-f2a1-46dc-ac7b-ab0c2d301486",
+  type: "marketplace_wishlist_listed",
+  read: false,
+  createdAt: "2026-10-16T13:31:00.222902+00:00",
+  data: {
+    title: "Carte de votre liste de souhaits",
+    card_id: "674c1d3f-8c24-4ea1-a897-ec0a5004e652",
+    message: "Caliste (esport) vient d'être mise en vente sur le marché.",
+    auction_id: "3bb1dff2-ddc4-4746-99d3-1a4738101415",
+    card_title: "Caliste (esport)",
+  },
 };
 const shownAuction = {
   auctionId: bid.auctionId,
@@ -146,6 +160,17 @@ describe("JSON output", () => {
     expect(
       JSON.parse(formatRunningBids({ bids: [runningBid], full: true }, "json")),
     ).toEqual({ bids: [{ id: auctionId, ...state }], full: true });
+  });
+
+  it("lists each notification with its data as the game returns them, and whether the page is full", () => {
+    expect(
+      JSON.parse(
+        formatNotifications(
+          { notifications: [notification], full: true },
+          "json",
+        ),
+      ),
+    ).toEqual({ notifications: [notification], full: true });
   });
 
   it("lists each auction with its state in its own field", () => {
@@ -476,6 +501,46 @@ describe("text output", () => {
     expect(formatAuctions([], "text", "cancelled")).toBe(
       "No auction with status cancelled.",
     );
+  });
+
+  it("prints one line per notification with its message and its other data", () => {
+    expect(
+      formatNotifications(
+        {
+          notifications: [
+            notification,
+            {
+              ...notification,
+              type: "marketplace_outbid",
+              read: true,
+              data: { new_bid: 221, nested: { a: 1 } },
+            },
+          ],
+          full: false,
+        },
+        "text",
+      ),
+    ).toBe(
+      [
+        "2026-10-16T13:31:00.222902+00:00  marketplace_wishlist_listed (unread): Caliste (esport) vient d'être mise en vente sur le marché.  card_id=674c1d3f-8c24-4ea1-a897-ec0a5004e652  auction_id=3bb1dff2-ddc4-4746-99d3-1a4738101415  card_title=Caliste (esport)",
+        '2026-10-16T13:31:00.222902+00:00  marketplace_outbid  new_bid=221  nested={"a":1}',
+      ].join("\n"),
+    );
+  });
+
+  it("says when the page of notifications is full", () => {
+    expect(
+      formatNotifications(
+        { notifications: [notification], full: true },
+        "text",
+      ).split("\n")[1],
+    ).toBe("The page is full (1 notification); more may follow.");
+  });
+
+  it("says when the page of notifications is empty", () => {
+    expect(
+      formatNotifications({ notifications: [], full: false }, "text"),
+    ).toBe("This page of your notifications is empty.");
   });
 
   it("prints one line per bid on a running auction", () => {
