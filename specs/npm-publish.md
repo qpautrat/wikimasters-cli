@@ -24,5 +24,5 @@ En tant que joueur, j'installe la CLI depuis npm, sans cloner le dépôt, et je 
 
 ## Hors périmètre
 
-- La publication depuis une CI.
+- La publication depuis GitHub Actions.
 - Le choix et l'incrément des numéros de version.
