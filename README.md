@@ -6,7 +6,7 @@
 
 - [Node.js](https://nodejs.org) 22.13.0 or later, with npm.
 - A browser, to sign in to the site.
-- For `login --firefox` only: Firefox installed in `/Applications` on macOS.
+- Optional: Firefox installed as `/Applications/Firefox.app`, needed only by `wikimasters login --firefox`, which works on macOS only.
 
 ## Getting started
 
