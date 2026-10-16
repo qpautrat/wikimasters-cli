@@ -19,5 +19,5 @@ fi
 
 npm version "$bump" -m "chore: bump the version to %s"
 tag="v$(jq -r .version package.json)"
-npm publish
 git push --atomic origin HEAD "refs/tags/$tag"
+npm publish
