@@ -25,7 +25,7 @@ function pasteInstructions(hidden: boolean): string {
 
 export function readPastedLines(
   input: PasteInput,
-  isComplete: (chunks: readonly string[]) => boolean,
+  onChunk: (chunks: readonly string[], chunk: string) => boolean,
 ): Promise<string[]> {
   const reader = createInterface({
     input,
@@ -41,7 +41,7 @@ export function readPastedLines(
       if (ended) return;
       const value = line.trim();
       if (value !== "") lines.push(value);
-      if (value === "" || isComplete(lines)) {
+      if (value === "" || onChunk(lines, value)) {
         ended = true;
         reader.close();
       }
@@ -54,23 +54,23 @@ export function readPastedLines(
   });
 }
 
-function acknowledgeChunk(chunks: readonly string[]): boolean {
-  const index = chunks.length - 1;
-  console.error(
-    `Received chunk .${index}: ${chunks[index]?.length ?? 0} characters.`,
-  );
-  const complete = findRefreshTokenInAuthCookieChunks(chunks) !== undefined;
-  if (!complete) {
-    console.error(`Paste chunk .${chunks.length}, or an empty line to finish.`);
-  }
-  return complete;
+function askForChunk(index: number): void {
+  console.error(`Paste chunk .${index}, or an empty line to finish.`);
 }
 
 export async function readPastedRefreshToken(
   input: PasteInput = process.stdin,
 ): Promise<string> {
   console.error(pasteInstructions(input.isTTY === true));
-  return refreshTokenFromAuthCookieChunks(
-    await readPastedLines(input, acknowledgeChunk),
-  );
+  askForChunk(0);
+  let refreshToken: string | undefined;
+  const chunks = await readPastedLines(input, (received, chunk) => {
+    console.error(
+      `Received chunk .${received.length - 1}: ${chunk.length} characters.`,
+    );
+    refreshToken = findRefreshTokenInAuthCookieChunks(received);
+    if (refreshToken === undefined) askForChunk(received.length);
+    return refreshToken !== undefined;
+  });
+  return refreshToken ?? refreshTokenFromAuthCookieChunks(chunks);
 }
