@@ -38,27 +38,34 @@ export function refreshTokenFromAuthCookies(
     : refreshTokenFromAuthCookieChunks(chunks);
 }
 
-export function refreshTokenFromAuthCookieChunks(
+export function findRefreshTokenInAuthCookieChunks(
   chunks: readonly string[],
-): string {
+): string | undefined {
   let session: unknown;
   try {
     session = decodeSession(chunks.join(""));
   } catch {
-    session = undefined;
+    return undefined;
   }
-  if (
-    typeof session !== "object" ||
-    session === null ||
-    !("refresh_token" in session) ||
-    typeof session.refresh_token !== "string" ||
-    session.refresh_token === ""
-  ) {
+  return typeof session === "object" &&
+    session !== null &&
+    "refresh_token" in session &&
+    typeof session.refresh_token === "string" &&
+    session.refresh_token !== ""
+    ? session.refresh_token
+    : undefined;
+}
+
+export function refreshTokenFromAuthCookieChunks(
+  chunks: readonly string[],
+): string {
+  const refreshToken = findRefreshTokenInAuthCookieChunks(chunks);
+  if (refreshToken === undefined) {
     throw new WikiMastersError(
       `The ${AUTH_COOKIE_NAME} cookie holds no refresh token: check that every chunk is there, in order`,
     );
   }
-  return session.refresh_token;
+  return refreshToken;
 }
 
 // @supabase/ssr reads the unchunked cookie before any `.N` chunk; its 3180-byte chunk limit only matters to browsers.

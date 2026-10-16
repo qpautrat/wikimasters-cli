@@ -35,6 +35,7 @@ export {
 } from "./auction.js";
 export {
   AUTH_COOKIE_NAME,
+  findRefreshTokenInAuthCookieChunks,
   refreshTokenFromAuthCookieChunks,
   refreshTokenFromAuthCookies,
   type Cookie,

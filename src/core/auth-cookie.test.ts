@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AUTH_COOKIE_NAME,
+  findRefreshTokenInAuthCookieChunks,
   refreshTokenFromAuthCookieChunks,
   refreshTokenFromAuthCookies,
 } from "./auth-cookie.js";
@@ -71,5 +72,24 @@ describe("refreshTokenFromAuthCookieChunks", () => {
     expect(() => refreshTokenFromAuthCookieChunks([value])).toThrow(
       `The ${AUTH_COOKIE_NAME} cookie holds no refresh token`,
     );
+  });
+});
+
+describe("findRefreshTokenInAuthCookieChunks", () => {
+  it("finds the refresh token once every chunk is there", () => {
+    expect(
+      findRefreshTokenInAuthCookieChunks([
+        encoded.slice(0, 40),
+        encoded.slice(40),
+      ]),
+    ).toBe("refresh-token");
+  });
+
+  it.each([
+    ["no chunk", []],
+    ["the first chunk only", [encoded.slice(0, 40)]],
+    ["every chunk but the last character", [encoded.slice(0, -1)]],
+  ])("returns undefined with %s", (_, chunks) => {
+    expect(findRefreshTokenInAuthCookieChunks(chunks)).toBeUndefined();
   });
 });

@@ -22,7 +22,7 @@ Dépend de : [Connexion](login.md).
 ### `wikimasters login`
 
 1. La commande explique sur stderr où trouver la session : se connecter sur le site dans une fenêtre privée, ouvrir les outils de développement, copier la valeur du cookie `sb-cyrxjeppjqsxxjayfrur-auth-token`, ou de chacun de ses morceaux, puis fermer la fenêtre privée sans se déconnecter avant de coller.
-2. La commande lit un morceau par ligne, dans l'ordre `.0`, `.1`…, jusqu'à une ligne vide ou la fin de l'entrée, et les joint. Sur un terminal, la saisie n'est pas affichée ; hors terminal, la commande lit l'entrée standard de la même façon.
+2. La commande lit un morceau par ligne, dans l'ordre `.0`, `.1`…, et les joint ; elle accuse réception de chaque morceau et s'arrête dès que les morceaux joints contiennent un refresh token, à une ligne vide ou à la fin de l'entrée ([Accuser réception de chaque morceau collé à la connexion](login-paste-feedback.md)). Sur un terminal, la saisie n'est pas affichée ; hors terminal, la commande lit l'entrée standard de la même façon.
 3. Une valeur qui ne contient pas de refresh token échoue avec le code 1 et un message qui le dit, sans rien enregistrer.
 4. La commande échange aussitôt le refresh token collé et enregistre la session comme aujourd'hui ; un refresh token que l'API refuse sort avec le code 4.
 5. Avec `--json`, stdout ne porte que le résultat, comme aujourd'hui.

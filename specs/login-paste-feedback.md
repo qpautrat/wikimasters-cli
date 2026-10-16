@@ -2,11 +2,11 @@
 
 ## Contexte
 
-`wikimasters login` lit sans l'afficher un morceau du cookie `sb-cyrxjeppjqsxxjayfrur-auth-token` par ligne, et ne s'arrête qu'à une ligne vide ou à la fin de l'entrée ([Se connecter en collant la session](../login-paste-session.md)). Un testeur a trouvé l'absence de retour déroutante : rien ne lui confirmait qu'un collage était reçu, ni comment indiquer qu'il avait tout collé.
+`wikimasters login` lit sans l'afficher un morceau du cookie `sb-cyrxjeppjqsxxjayfrur-auth-token` par ligne, et ne s'arrête qu'à une ligne vide ou à la fin de l'entrée ([Se connecter en collant la session](login-paste-session.md)). Un testeur a trouvé l'absence de retour déroutante : rien ne lui confirmait qu'un collage était reçu, ni comment indiquer qu'il avait tout collé.
 
 Les morceaux joints ne se décodent en une session portant un refresh token qu'une fois tous collés, dans l'ordre : la CLI peut donc reconnaître seule la fin de la saisie.
 
-Dépend de : [Se connecter en collant la session](../login-paste-session.md).
+Dépend de : [Se connecter en collant la session](login-paste-session.md).
 
 ## User story
 
