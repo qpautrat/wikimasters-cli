@@ -84,7 +84,7 @@ The site signs in with an email and a password behind a captcha, so the CLI neve
 3. Close the private window without logging out.
 4. Run `wikimasters login` and paste each value in order, pressing Enter after each one. What you paste is not displayed: the CLI shows the number and length of each chunk it receives, and goes on by itself once the session is complete. An empty line or the end of the input stops reading; if the session is still incomplete, the login fails.
 
-On macOS with Firefox, `wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most.
+On macOS with Firefox, `wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most. On macOS, `wikimasters login` reminds you of this option before its copy instructions.
 
 What the CLI does with your session:
 

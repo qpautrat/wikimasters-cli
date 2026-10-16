@@ -2,9 +2,9 @@
 
 ## Contexte
 
-Sur macOS, `wikimasters login --firefox` connecte sans rien copier ([Connexion](../login.md)). `wikimasters login` sans option n'explique que la copie du cookie ([Se connecter en collant la session](../login-paste-session.md)) : un testeur sur macOS n'a découvert l'option qu'après avoir copié les cookies à la main.
+Sur macOS, `wikimasters login --firefox` connecte sans rien copier ([Connexion](login.md)). `wikimasters login` sans option n'explique que la copie du cookie ([Se connecter en collant la session](login-paste-session.md)) : un testeur sur macOS n'a découvert l'option qu'après avoir copié les cookies à la main.
 
-Dépend de : [Se connecter en collant la session](../login-paste-session.md).
+Dépend de : [Se connecter en collant la session](login-paste-session.md).
 
 ## User story
 

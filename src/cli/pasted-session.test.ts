@@ -112,6 +112,28 @@ describe("readPastedRefreshToken", () => {
     ]);
   });
 
+  it("points to the Firefox sign-in before the copy instructions on macOS", async () => {
+    const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await readPastedRefreshToken(pasted(`${encoded}\n`), "darwin");
+
+    const [instructions = ""] = stderrLines(stderr);
+    const [firstLine, secondLine] = instructions.split("\n");
+    expect(firstLine).toBe(
+      "wikimasters login --firefox signs you in through a Firefox window without copying the session.",
+    );
+    expect(secondLine).toMatch(/^Sign in to /);
+  });
+
+  it("starts with the copy instructions on other systems", async () => {
+    const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await readPastedRefreshToken(pasted(`${encoded}\n`), "linux");
+
+    expect(stderrLines(stderr)[0]).toMatch(/^Sign in to /);
+    expect(stderrLines(stderr).join("\n")).not.toContain("--firefox");
+  });
+
   it("never echoes the pasted value nor the refresh token", async () => {
     const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
 

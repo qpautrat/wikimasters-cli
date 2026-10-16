@@ -13,7 +13,7 @@ Chrome chiffre la valeur de ses cookies sur macOS (sources Chromium lues le 2026
 - le texte déchiffré commence par le SHA-256 du domaine du cookie, depuis la version 24 de la base (`net/extras/sqlite/sqlite_persistent_cookie_store.cc`) ;
 - Chrome écrit un cookie modifié sur disque au plus 30 secondes après (même fichier, `kCommitInterval`).
 
-Dépend de : [Connexion](../login.md), [Signaler la connexion par Firefox sur macOS](login-firefox-hint.md).
+Dépend de : [Connexion](../login.md), [Signaler la connexion par Firefox sur macOS](../login-firefox-hint.md).
 
 ## User story
 
