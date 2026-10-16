@@ -21,7 +21,7 @@ Dépend de : [Connexion](login.md).
 
 ### `wikimasters login`
 
-1. La commande explique sur stderr où trouver la session : se connecter sur le site dans une fenêtre privée, ouvrir les outils de développement, copier la valeur du cookie `sb-cyrxjeppjqsxxjayfrur-auth-token`, ou de chacun de ses morceaux, puis fermer la fenêtre privée sans se déconnecter avant de coller. Sur macOS, une ligne affichée avant ces instructions indique que `wikimasters login --firefox` connecte sans copier la session ([Signaler la connexion par Firefox sur macOS](login-firefox-hint.md)).
+1. La commande explique sur stderr où trouver la session : se connecter sur le site dans une fenêtre privée, ouvrir les outils de développement, copier la valeur du cookie `sb-cyrxjeppjqsxxjayfrur-auth-token`, ou de chacun de ses morceaux, puis fermer la fenêtre privée sans se déconnecter avant de coller. Sur macOS, une ligne affichée avant ces instructions indique que `wikimasters login --firefox` et `wikimasters login --chrome` connectent sans copier la session ([Signaler la connexion par Firefox sur macOS](login-firefox-hint.md), [Se connecter par Chrome sur macOS](login-chrome.md)).
 2. La commande lit un morceau par ligne, dans l'ordre `.0`, `.1`…, et les joint ; elle accuse réception de chaque morceau et s'arrête dès que les morceaux joints contiennent un refresh token, à une ligne vide ou à la fin de l'entrée ([Accuser réception de chaque morceau collé à la connexion](login-paste-feedback.md)). Sur un terminal, la saisie n'est pas affichée ; hors terminal, la commande lit l'entrée standard de la même façon.
 3. Une valeur qui ne contient pas de refresh token échoue avec le code 1 et un message qui le dit, sans rien enregistrer.
 4. La commande échange aussitôt le refresh token collé et enregistre la session comme aujourd'hui ; un refresh token que l'API refuse sort avec le code 4.
@@ -38,5 +38,5 @@ Dépend de : [Connexion](login.md).
 
 ## Hors périmètre
 
-- Lancer Firefox ailleurs que sur macOS.
-- Lire les cookies d'un autre navigateur que Firefox.
+- Lancer Firefox ou Chrome ailleurs que sur macOS.
+- Lire les cookies d'un autre navigateur que Firefox ou Chrome.

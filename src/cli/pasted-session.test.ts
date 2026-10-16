@@ -112,7 +112,7 @@ describe("readPastedRefreshToken", () => {
     ]);
   });
 
-  it("points to the Firefox sign-in before the copy instructions on macOS", async () => {
+  it("points to the Firefox and Chrome sign-ins before the copy instructions on macOS", async () => {
     const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
 
     await readPastedRefreshToken(pasted(`${encoded}\n`), "darwin");
@@ -120,7 +120,7 @@ describe("readPastedRefreshToken", () => {
     const [instructions = ""] = stderrLines(stderr);
     const [firstLine, secondLine] = instructions.split("\n");
     expect(firstLine).toBe(
-      "wikimasters login --firefox signs you in through a Firefox window without copying the session.",
+      "wikimasters login --firefox or wikimasters login --chrome signs you in through a Firefox or Chrome window without copying the session.",
     );
     expect(secondLine).toMatch(/^Sign in to /);
   });
@@ -132,6 +132,7 @@ describe("readPastedRefreshToken", () => {
 
     expect(stderrLines(stderr)[0]).toMatch(/^Sign in to /);
     expect(stderrLines(stderr).join("\n")).not.toContain("--firefox");
+    expect(stderrLines(stderr).join("\n")).not.toContain("--chrome");
   });
 
   it("never echoes the pasted value nor the refresh token", async () => {

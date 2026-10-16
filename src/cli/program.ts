@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
@@ -18,6 +18,7 @@ import {
   listNotifications,
   listRunningBids,
   listWishlist,
+  loginInChrome,
   loginInFirefox,
   parseAuctionDuration,
   parseAuctionId,
@@ -95,11 +96,25 @@ function format(): Format {
   return program.opts<{ json?: boolean }>().json ? "json" : "text";
 }
 
-function signInThroughFirefox(): Promise<string> {
-  console.error(
-    "Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…",
-  );
-  return loginInFirefox();
+interface LoginOptions {
+  firefox?: boolean;
+  chrome?: boolean;
+}
+
+function readRefreshToken({ firefox, chrome }: LoginOptions): Promise<string> {
+  if (firefox) {
+    console.error(
+      "Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…",
+    );
+    return loginInFirefox();
+  }
+  if (chrome) {
+    console.error(
+      "Sign in to WikiMasters in the Chrome window that just opened; it closes once the session is found, up to 30 s after you sign in…",
+    );
+    return loginInChrome();
+  }
+  return readPastedRefreshToken();
 }
 
 program
@@ -111,15 +126,23 @@ program
     "--firefox",
     "sign in through a Firefox window the command opens instead, on macOS",
   )
+  .addOption(
+    new Option(
+      "--chrome",
+      "sign in through a Chrome window the command opens instead, on macOS",
+    ).conflicts("firefox"),
+  )
   .addHelpText(
     "after",
-    examples("wikimasters login", "wikimasters login --firefox"),
+    examples(
+      "wikimasters login",
+      "wikimasters login --firefox",
+      "wikimasters login --chrome",
+    ),
   )
-  .action(async ({ firefox }: { firefox?: boolean }) => {
+  .action(async (options: LoginOptions) => {
     loadConfig();
-    const session = await openSession(
-      firefox ? await signInThroughFirefox() : await readPastedRefreshToken(),
-    );
+    const session = await openSession(await readRefreshToken(options));
     console.log(formatLogin(session.userId, format()));
   });
 

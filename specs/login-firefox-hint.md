@@ -12,7 +12,7 @@ En tant que joueur sur macOS, j'apprends dès `wikimasters login` que `--firefox
 
 ## Critères d'acceptation
 
-1. Sur macOS, `wikimasters login` affiche sur stderr, avant les instructions de copie, une ligne qui indique que `wikimasters login --firefox` connecte sans copier la session.
+1. Sur macOS, `wikimasters login` affiche sur stderr, avant les instructions de copie, une ligne qui indique que `wikimasters login --firefox` connecte sans copier la session ; elle nomme aussi `wikimasters login --chrome` ([Se connecter par Chrome sur macOS](login-chrome.md)).
 2. Sur les autres systèmes, les instructions restent inchangées.
 3. La commande continue de lire la session collée, comme aujourd'hui.
 4. Le commit qui implémente cette spec met à jour `specs/login-paste-session.md`.

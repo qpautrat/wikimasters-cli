@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createDecipheriv, createHash, pbkdf2Sync } from "node:crypto";
 import {
   copyFileSync,
   existsSync,
@@ -28,6 +29,18 @@ const FIREFOX_PREFS = [
   'user_pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);',
 ];
 
+export const CHROME_BINARY =
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+
+// Chromium crypto/apple/fake_keychain_v2.mm: with --use-mock-keychain, "mock_password" stands for the "Chrome Safe Storage" keychain entry; components/os_crypt/async/browser/keychain_key_provider.mm derives the key from it.
+const CHROME_MOCK_KEYCHAIN_KEY = pbkdf2Sync(
+  "mock_password",
+  "saltysalt",
+  1003,
+  16,
+  "sha1",
+);
+
 const LOGIN_URL = `${SITE_URL}/login`;
 
 export interface BrowserLoginOptions {
@@ -53,6 +66,19 @@ const FIREFOX: Browser = {
   readRefreshToken: readRefreshTokenFromFirefoxProfile,
 };
 
+const CHROME: Browser = {
+  name: "Chrome",
+  binary: CHROME_BINARY,
+  prepareLaunch: (profileDir) => [
+    `--user-data-dir=${profileDir}`,
+    "--use-mock-keychain",
+    "--no-first-run",
+    "--no-default-browser-check",
+    LOGIN_URL,
+  ],
+  readRefreshToken: readRefreshTokenFromChromeProfile,
+};
+
 function readCookieDatabase<T>(
   database: string,
   read: (db: DatabaseSync) => T,
@@ -62,7 +88,7 @@ function readCookieDatabase<T>(
   const snapshot = mkdtempSync(join(tmpdir(), "wikimasters-cookies-"));
   const copy = join(snapshot, basename(database));
   try {
-    for (const suffix of ["", "-wal"]) {
+    for (const suffix of ["", "-wal", "-journal"]) {
       if (existsSync(database + suffix))
         copyFileSync(database + suffix, copy + suffix);
     }
@@ -92,6 +118,51 @@ export function readRefreshTokenFromFirefoxProfile(
         name: String(name),
         value: String(value),
       }));
+    return refreshTokenFromAuthCookies(cookies);
+  });
+}
+
+// Cookie encryption format: Chromium components/os_crypt/async/common/encryptor.cc.
+function decryptChromeCookie(
+  hostKey: string,
+  encrypted: Uint8Array,
+): string | undefined {
+  const data = Buffer.from(encrypted);
+  if (data.subarray(0, 3).toString("latin1") !== "v10") return undefined;
+  const decipher = createDecipheriv(
+    "aes-128-cbc",
+    CHROME_MOCK_KEYCHAIN_KEY,
+    Buffer.alloc(16, " "),
+  );
+  const plain = Buffer.concat([
+    decipher.update(data.subarray(3)),
+    decipher.final(),
+  ]);
+  // Chromium net/extras/sqlite/sqlite_persistent_cookie_store.cc: from database version 24, the value follows the SHA-256 of the cookie's domain.
+  const domainHash = createHash("sha256").update(hostKey).digest();
+  return (
+    plain.subarray(0, domainHash.length).equals(domainHash)
+      ? plain.subarray(domainHash.length)
+      : plain
+  ).toString("utf8");
+}
+
+export function readRefreshTokenFromChromeProfile(
+  profileDir: string,
+): string | undefined {
+  return readCookieDatabase(join(profileDir, "Default", "Cookies"), (db) => {
+    const cookies: Cookie[] = db
+      .prepare(
+        "SELECT host_key, name, encrypted_value FROM cookies WHERE host_key LIKE '%wiki-masters.com' AND name LIKE ? || '%'",
+      )
+      .all(AUTH_COOKIE_NAME)
+      .flatMap(({ host_key, name, encrypted_value }) => {
+        const value =
+          encrypted_value instanceof Uint8Array
+            ? decryptChromeCookie(String(host_key), encrypted_value)
+            : undefined;
+        return value === undefined ? [] : [{ name: String(name), value }];
+      });
     return refreshTokenFromAuthCookies(cookies);
   });
 }
@@ -156,4 +227,10 @@ export function loginInFirefox(
   options: BrowserLoginOptions = {},
 ): Promise<string> {
   return loginInBrowser(FIREFOX, options);
+}
+
+export function loginInChrome(
+  options: BrowserLoginOptions = {},
+): Promise<string> {
+  return loginInBrowser(CHROME, options);
 }

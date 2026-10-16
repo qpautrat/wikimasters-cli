@@ -6,7 +6,7 @@
 
 - [Node.js](https://nodejs.org) 22.13.0 or later, with npm.
 - A browser, to sign in to the site.
-- Optional: Firefox installed as `/Applications/Firefox.app`, needed only by `wikimasters login --firefox`, which works on macOS only.
+- Optional: Firefox installed as `/Applications/Firefox.app`, needed only by `wikimasters login --firefox`, or Google Chrome installed as `/Applications/Google Chrome.app`, needed only by `wikimasters login --chrome`; both work on macOS only.
 
 ## Getting started
 
@@ -36,7 +36,7 @@ Run every command from any directory as `wikimasters <command>`. `wikimasters <c
 
 | Command | What it does | Example |
 |---|---|---|
-| `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `~/.config/wikimasters-cli/.env` | `wikimasters login` |
+| `login` | Signs in by pasting your browser's session, or with `--firefox` or `--chrome` through a Firefox or Chrome window it opens on macOS, and stores the session in `~/.config/wikimasters-cli/.env` | `wikimasters login` |
 | `cards search <text...> [--in <field>]` | Finds the catalogue cards whose title contains the text, regardless of case, at most 50, ordered by title; `--in category` or `--in summary` searches the card's Wikipedia category or summary instead | `wikimasters cards search half dome` |
 | `cards value <card-id...>` | Shows the average sale price in wikibidous of each card, owned or not, for each rarity it sold under, or that it never sold; stops at the first card the game refuses | `wikimasters cards value <card-uuid> <card-uuid>` |
 | `cards global [text] [--page <n>] [--sort <field>] [--rarity <code>]... [--wishlist]` | Searches the game's Global Collection, in the card title and category, and prints one page of cards with whether you own or wish each one and the friends who own it with their rarities, then the total, the count by rarity, the pending offers and whether more cards match; options go to the game as given, pages counting from 0, `--rarity` repeated for several rarities, `--wishlist` keeping your wishlist's cards | `wikimasters cards global "Mont Blanc"` |
@@ -84,7 +84,7 @@ The site signs in with an email and a password behind a captcha, so the CLI neve
 3. Close the private window without logging out.
 4. Run `wikimasters login` and paste each value in order, pressing Enter after each one. What you paste is not displayed: the CLI shows the number and length of each chunk it receives, and goes on by itself once the session is complete. An empty line or the end of the input stops reading; if the session is still incomplete, the login fails.
 
-On macOS with Firefox, `wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most. On macOS, `wikimasters login` reminds you of this option before its copy instructions.
+On macOS with Firefox, `wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most. On macOS with Google Chrome, `wikimasters login --chrome` does the same with Chrome, without touching your usual Chrome profile or the macOS keychain; Chrome writes the cookie to disk up to 30 seconds after you sign in, so the window closes within that delay. The two options cannot be combined. On macOS, `wikimasters login` reminds you of these options before its copy instructions.
 
 What the CLI does with your session:
 
@@ -100,7 +100,7 @@ The code handling the session:
 | File | Role |
 |---|---|
 | `src/cli/pasted-session.ts` | reads the pasted cookie value |
-| `src/core/browser-login.ts` | reads the cookie from the throwaway Firefox profile |
+| `src/core/browser-login.ts` | reads the cookie from the throwaway Firefox or Chrome profile |
 | `src/core/auth-cookie.ts` | extracts the refresh token from the cookie, and builds the cookie sent to the `/api/...` routes |
 | `src/cli/config.ts` | reads the session file and writes the new refresh token to it |
 | `src/cli/session.ts`, `src/core/session.ts` | exchange the refresh token with Supabase and send the session with every Supabase request |

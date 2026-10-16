@@ -41,8 +41,11 @@ export {
   type Cookie,
 } from "./auth-cookie.js";
 export {
+  CHROME_BINARY,
   FIREFOX_BINARY,
+  loginInChrome,
   loginInFirefox,
+  readRefreshTokenFromChromeProfile,
   readRefreshTokenFromFirefoxProfile,
   type BrowserLoginOptions,
 } from "./browser-login.js";

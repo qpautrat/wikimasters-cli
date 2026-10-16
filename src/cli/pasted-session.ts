@@ -18,7 +18,7 @@ function pasteInstructions(hidden: boolean, platform: NodeJS.Platform): string {
   return [
     ...(platform === "darwin"
       ? [
-          "wikimasters login --firefox signs you in through a Firefox window without copying the session.",
+          "wikimasters login --firefox or wikimasters login --chrome signs you in through a Firefox or Chrome window without copying the session.",
         ]
       : []),
     `Sign in to ${SITE_URL}/login in a private browser window.`,

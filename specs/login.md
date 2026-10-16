@@ -2,11 +2,11 @@
 
 ## Contexte
 
-La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. `wikimasters login --firefox` lit la session dans les cookies du profil avec `node:sqlite`, que Node charge sans option depuis la version 22.13.0. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. Un agent qui lance la CLI doit savoir, à la sortie d'une commande, si une reconnexion est requise.
+La connexion à WikiMasters est protégée par un captcha, qu'un humain doit résoudre dans un vrai navigateur. `wikimasters login --firefox` et `wikimasters login --chrome` lisent la session dans les cookies du profil avec `node:sqlite`, et `node:crypto` pour déchiffrer ceux de Chrome ; Node charge `node:sqlite` sans option depuis la version 22.13.0. Ensuite, les commandes `wikimasters` doivent fonctionner sans redemander de connexion tant que la session est valide. Un agent qui lance la CLI doit savoir, à la sortie d'une commande, si une reconnexion est requise.
 
 ## User stories
 
-1. En tant que joueur, je me connecte depuis le terminal en collant la session de mon navigateur ([Se connecter en collant la session](login-paste-session.md)) ou, sur macOS, en résolvant le captcha dans une fenêtre Firefox que la commande ouvre pour moi.
+1. En tant que joueur, je me connecte depuis le terminal en collant la session de mon navigateur ([Se connecter en collant la session](login-paste-session.md)) ou, sur macOS, en résolvant le captcha dans une fenêtre Firefox, ou Chrome ([Se connecter par Chrome sur macOS](login-chrome.md)), que la commande ouvre pour moi.
 2. En tant que joueur, je ne me reconnecte pas tant que ma session reste valide.
 3. En tant qu'agent, je sais à la sortie d'une commande si l'utilisateur doit se reconnecter.
 

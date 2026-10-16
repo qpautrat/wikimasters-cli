@@ -2,18 +2,18 @@
 
 ## Contexte
 
-Sur macOS, `wikimasters login --firefox` ouvre Firefox sur un profil temporaire, sans l'automatiser, et lit la session dans ses cookies ([Connexion](../login.md)). Un joueur qui n'a que Chrome doit copier le cookie à la main ([Se connecter en collant la session](../login-paste-session.md)).
+Sur macOS, `wikimasters login --firefox` ouvre Firefox sur un profil temporaire, sans l'automatiser, et lit la session dans ses cookies ([Connexion](login.md)). Un joueur qui n'a que Chrome doit copier le cookie à la main ([Se connecter en collant la session](login-paste-session.md)).
 
 Chrome chiffre la valeur de ses cookies sur macOS (sources Chromium lues le 2026-10-16) :
 
-- un profil garde ses cookies dans la base SQLite `Network/Cookies`, table `cookies`, colonne `encrypted_value` (`chrome/browser/net/profile_network_context_service.cc`) ;
+- un profil temporaire lancé avec `--user-data-dir` garde ses cookies dans la base SQLite `Default/Cookies` (mesuré sur Chrome 155 macOS), table `cookies`, colonne `encrypted_value` ;
 - la valeur commence par `v10`, suivie d'un chiffrement AES-128-CBC avec un IV de 16 espaces ; la clé est dérivée d'un mot de passe par PBKDF2-HMAC-SHA1, sel `saltysalt`, 1003 itérations, 16 octets (`components/os_crypt/async/browser/keychain_key_provider.mm`, `components/os_crypt/async/common/encryptor.cc`) ;
 - ce mot de passe est l'entrée « Chrome Safe Storage » du trousseau macOS, unique pour tous les profils Chrome de l'utilisateur (`components/os_crypt/common/keychain_password_mac.mm`). La lire depuis la CLI ouvrirait une fenêtre du trousseau et donnerait à la CLI la clé des cookies du Chrome habituel ;
 - lancé avec `--use-mock-keychain`, Chrome ne touche pas au trousseau et prend la constante `mock_password` comme mot de passe (`crypto/apple/fake_keychain_v2.mm`). Ce paramètre n'affiche pas l'avertissement « stability and security will suffer » (absent de `kBadFlags`, `chrome/browser/ui/startup/bad_flags_prompt.cc`) et n'automatise pas le navigateur ;
 - le texte déchiffré commence par le SHA-256 du domaine du cookie, depuis la version 24 de la base (`net/extras/sqlite/sqlite_persistent_cookie_store.cc`) ;
 - Chrome écrit un cookie modifié sur disque au plus 30 secondes après (même fichier, `kCommitInterval`).
 
-Dépend de : [Connexion](../login.md), [Signaler la connexion par Firefox sur macOS](../login-firefox-hint.md).
+Dépend de : [Connexion](login.md), [Signaler la connexion par Firefox sur macOS](login-firefox-hint.md).
 
 ## User story
 
