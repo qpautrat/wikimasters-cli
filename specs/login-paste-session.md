@@ -8,9 +8,9 @@ Le site ne propose qu'une connexion par email et mot de passe, protégée par un
 
 Supabase révoque toute la session quand un refresh token déjà échangé est réutilisé hors de ses exceptions (« A reuse attempt that matches neither exception revokes the whole session », documentation Supabase, *Sessions*). Le navigateur d'où vient la session ne doit donc plus s'en servir.
 
-Je garde la connexion par Firefox, transparente pour moi sur macOS, que mon agent lance selon mes règles.
+Je garde la connexion par Firefox, transparente pour moi sur macOS.
 
-Dépend de : [Connexion](login.md), [Se connecter depuis un agent](login-agent.md).
+Dépend de : [Connexion](login.md).
 
 ## User stories
 
@@ -40,4 +40,3 @@ Dépend de : [Connexion](login.md), [Se connecter depuis un agent](login-agent.m
 
 - Lancer Firefox ailleurs que sur macOS.
 - Lire les cookies d'un autre navigateur que Firefox.
-- La façon dont l'agent réagit au code 4, traitée dans [Se connecter depuis un agent](login-agent.md).

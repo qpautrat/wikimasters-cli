@@ -80,15 +80,6 @@ Results are text by default. With the global `--json` option, stdout carries onl
 
 Each command first rebuilds the CLI from `src/`. When that build fails, the CLI does not run: stderr carries the compiler errors, and the command exits 1.
 
-## Playing through an agent
-
-Open [Claude Code](https://claude.com/claude-code) at the repository root and ask in natural language. The `wikimasters` skill in `.claude/skills/` turns your request into CLI commands, resolves card names to ids, and asks you to sign in when a command exits with code 4. For example:
-
-- "Remove Half Dome from my wishlist."
-- "Which auctions am I leading?"
-
-Write your way of playing in a `CLAUDE.local.md` at the repository root, which git ignores and Claude Code loads on its own: which cards to discard, how to bid, how you sign in. The agent follows it for every command it runs on your account.
-
 ## Signing in
 
 The site signs in with an email and a password behind a captcha, so the CLI never signs in by itself: it takes the session of a browser where you signed in.

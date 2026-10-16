@@ -26,4 +26,3 @@ En tant que joueur, j'installe la CLI depuis npm, sans cloner le dépôt, et je 
 
 - La publication depuis une CI.
 - Le choix et l'incrément des numéros de version.
-- Le skill `wikimasters` pour un joueur qui n'a pas cloné le dépôt.

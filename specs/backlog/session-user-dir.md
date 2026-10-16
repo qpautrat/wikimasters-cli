@@ -17,8 +17,8 @@ En tant que joueur, ma session survit à une mise à jour de la CLI, qu'elle soi
 3. Un `.env` à la racine du dépôt n'est plus ni lu ni écrit : après la mise à jour, le joueur se reconnecte une fois.
 4. `WIKIMASTERS_SUPABASE_ANON_KEY` et `WIKIMASTERS_REFRESH_TOKEN` gardent leur rôle, lus dans ce fichier puis dans l'environnement, le fichier l'emportant.
 5. `npm run -s api:get` et `npm run -s api:site` lisent et écrivent le même fichier que `wikimasters`.
-6. `.env.example` est supprimé. Le README, `CLAUDE.md`, l'aide de `wikimasters login` et le skill `wikimasters` nomment le nouvel emplacement.
-7. Le commit qui implémente cette spec modifie le critère 5 de [Outils de développement hors de `src/`](../dev-tools.md) et le critère 9 de [Présenter le dépôt dans un README](../readme.md).
+6. `.env.example` est supprimé. Le README, `CLAUDE.md` et l'aide de `wikimasters login` nomment le nouvel emplacement.
+7. Le commit qui implémente cette spec modifie le critère 5 de [Outils de développement hors de `src/`](../dev-tools.md) et le critère 7 de [Présenter le dépôt dans un README](../readme.md).
 
 ## Hors périmètre
 
