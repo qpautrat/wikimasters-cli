@@ -27,6 +27,17 @@ export function restRoute(
   return (request) => (matches(request) ? response : undefined);
 }
 
+export function pagedRestRead(table: string, rows: readonly unknown[]): Route {
+  const isRead = restRequest("GET", table);
+  return (request) => {
+    if (!isRead(request)) return undefined;
+    const { url } = request;
+    const offset = Number(url.searchParams.get("offset") ?? 0);
+    const limit = Number(url.searchParams.get("limit") ?? rows.length);
+    return { status: 200, body: rows.slice(offset, offset + limit) };
+  };
+}
+
 export const USER_ID = "5d14f22b-ea20-4a25-bc4a-fa879af3d0ee";
 export const ACCESS_TOKEN = "fake-access-token";
 export const ROTATED_REFRESH_TOKEN = "rotated-refresh-token";

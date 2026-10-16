@@ -6,6 +6,7 @@ import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
+  pagedRestRead,
   restRequest,
   restRoute,
   tokenRefresh,
@@ -25,17 +26,6 @@ function ownedCard(index: number) {
     is_shiny: false,
     obtained_at: `2026-09-18T23:42:15.${suffix.slice(-6)}+00:00`,
     user_card_tags: [],
-  };
-}
-
-function collectionSelect(rows: unknown[]): Route {
-  const isCollectionRead = restRequest("GET", "user_cards");
-  return (request) => {
-    if (!isCollectionRead(request)) return undefined;
-    const { url } = request;
-    const offset = Number(url.searchParams.get("offset") ?? 0);
-    const limit = Number(url.searchParams.get("limit") ?? rows.length);
-    return { status: 200, body: rows.slice(offset, offset + limit) };
   };
 }
 
@@ -61,7 +51,7 @@ function collectionReads(requests: RecordedRequest[]) {
 describe("listCollection", () => {
   it("reads the owned cards of the signed-in user, earliest obtained first", async () => {
     const { session, requests } = await sessionWith(
-      collectionSelect([ownedCard(0)]),
+      pagedRestRead("user_cards", [ownedCard(0)]),
     );
 
     await listCollection(session, firstPage);
@@ -75,7 +65,7 @@ describe("listCollection", () => {
 
   it("gives each card its entry id, card id, owned rarity, copies, favourite, shiny, labels and obtention date", async () => {
     const { session } = await sessionWith(
-      collectionSelect([
+      pagedRestRead("user_cards", [
         {
           id: "3d2a29bf-b8a9-4519-924a-67f0daacc644",
           card_id: "037975c2-7d8d-432c-9315-3b51087e6d50",
@@ -113,7 +103,9 @@ describe("listCollection", () => {
 
   it("reads the requested page in a single request", async () => {
     const rows = Array.from({ length: 7 }, (_, index) => ownedCard(index));
-    const { session, requests } = await sessionWith(collectionSelect(rows));
+    const { session, requests } = await sessionWith(
+      pagedRestRead("user_cards", rows),
+    );
 
     const { cards } = await listCollection(session, {
       page: parsePageNumber("2"),
@@ -131,7 +123,7 @@ describe("listCollection", () => {
 
   it("says the page is full when it holds as many cards as requested", async () => {
     const rows = Array.from({ length: 3 }, (_, index) => ownedCard(index));
-    const { session } = await sessionWith(collectionSelect(rows));
+    const { session } = await sessionWith(pagedRestRead("user_cards", rows));
 
     const page = await listCollection(session, {
       page: parsePageNumber("1"),
@@ -143,7 +135,7 @@ describe("listCollection", () => {
 
   it("says the page is not full when it holds fewer cards than requested", async () => {
     const rows = Array.from({ length: 2 }, (_, index) => ownedCard(index));
-    const { session } = await sessionWith(collectionSelect(rows));
+    const { session } = await sessionWith(pagedRestRead("user_cards", rows));
 
     const page = await listCollection(session, {
       page: parsePageNumber("1"),
@@ -154,7 +146,9 @@ describe("listCollection", () => {
   });
 
   it("keeps only the cards of the requested owned rarity", async () => {
-    const { session, requests } = await sessionWith(collectionSelect([]));
+    const { session, requests } = await sessionWith(
+      pagedRestRead("user_cards", []),
+    );
 
     await listCollection(session, firstPage, { rarity: "PC" });
 
@@ -163,7 +157,7 @@ describe("listCollection", () => {
   });
 
   it("returns an empty list for an empty collection", async () => {
-    const { session } = await sessionWith(collectionSelect([]));
+    const { session } = await sessionWith(pagedRestRead("user_cards", []));
 
     await expect(listCollection(session, firstPage)).resolves.toEqual({
       cards: [],
@@ -195,7 +189,9 @@ describe("listCollection", () => {
 
   it("fails when a label has no readable name", async () => {
     const { session } = await sessionWith(
-      collectionSelect([{ ...ownedCard(0), user_card_tags: [{ tags: null }] }]),
+      pagedRestRead("user_cards", [
+        { ...ownedCard(0), user_card_tags: [{ tags: null }] },
+      ]),
     );
 
     await expect(listCollection(session, firstPage)).rejects.toThrow(

@@ -10,6 +10,7 @@ import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
+  pagedRestRead,
   restRequest,
   restRoute,
   tokenRefresh,
@@ -43,17 +44,6 @@ function notification(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function notificationSelect(rows: unknown[]): Route {
-  const isNotificationRead = restRequest("GET", "notifications");
-  return (request) => {
-    if (!isNotificationRead(request)) return undefined;
-    const { url } = request;
-    const offset = Number(url.searchParams.get("offset") ?? 0);
-    const limit = Number(url.searchParams.get("limit") ?? rows.length);
-    return { status: 200, body: rows.slice(offset, offset + limit) };
-  };
-}
-
 async function sessionWith(...routes: Route[]) {
   const { fetch, requests } = fakeFetch(tokenRefresh, ...routes);
   const session = await resumeSession({
@@ -67,7 +57,9 @@ async function sessionWith(...routes: Route[]) {
 
 describe("listNotifications", () => {
   it("reads the user's notifications, most recent first, unfiltered by default", async () => {
-    const { session, reads } = await sessionWith(notificationSelect([]));
+    const { session, reads } = await sessionWith(
+      pagedRestRead("notifications", []),
+    );
 
     await listNotifications(session, anyNotification, firstPage);
 
@@ -81,7 +73,9 @@ describe("listNotifications", () => {
   });
 
   it("sends the types, the unread filter and the date as given", async () => {
-    const { session, reads } = await sessionWith(notificationSelect([]));
+    const { session, reads } = await sessionWith(
+      pagedRestRead("notifications", []),
+    );
 
     await listNotifications(
       session,
@@ -103,7 +97,7 @@ describe("listNotifications", () => {
 
   it("gives each notification with its data as the game returns them", async () => {
     const { session } = await sessionWith(
-      notificationSelect([
+      pagedRestRead("notifications", [
         notification(),
         notification({
           id: "6f3315e7-cd60-45b1-97fc-9161e7da2d03",
@@ -140,7 +134,9 @@ describe("listNotifications", () => {
     const rows = Array.from({ length: 7 }, (_, index) =>
       notification({ id: String(index) }),
     );
-    const { session, reads } = await sessionWith(notificationSelect(rows));
+    const { session, reads } = await sessionWith(
+      pagedRestRead("notifications", rows),
+    );
 
     const { notifications } = await listNotifications(
       session,
@@ -156,7 +152,7 @@ describe("listNotifications", () => {
 
   it("says whether the page holds as many notifications as requested", async () => {
     const { session } = await sessionWith(
-      notificationSelect([notification(), notification()]),
+      pagedRestRead("notifications", [notification(), notification()]),
     );
 
     const twoPerPage = { page: firstPage.page, limit: parsePageLimit("2") };
@@ -170,7 +166,7 @@ describe("listNotifications", () => {
   });
 
   it("returns an empty page when no notification matches", async () => {
-    const { session } = await sessionWith(notificationSelect([]));
+    const { session } = await sessionWith(pagedRestRead("notifications", []));
 
     await expect(
       listNotifications(session, anyNotification, firstPage),

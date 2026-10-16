@@ -6,6 +6,7 @@ import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
+  pagedRestRead,
   restRequest,
   restRoute,
   tokenRefresh,
@@ -42,17 +43,6 @@ function bid(
   };
 }
 
-function bidSelect(rows: unknown[]): Route {
-  const isBidRead = restRequest("GET", "auction_bids");
-  return (request) => {
-    if (!isBidRead(request)) return undefined;
-    const { url } = request;
-    const offset = Number(url.searchParams.get("offset") ?? 0);
-    const limit = Number(url.searchParams.get("limit") ?? rows.length);
-    return { status: 200, body: rows.slice(offset, offset + limit) };
-  };
-}
-
 async function sessionWith(...routes: Route[]) {
   const { fetch, requests } = fakeFetch(tokenRefresh, ...routes);
   const session = await resumeSession({
@@ -65,7 +55,9 @@ async function sessionWith(...routes: Route[]) {
 
 describe("listRunningBids", () => {
   it("reads the user's bids on running auctions only", async () => {
-    const { session, requests } = await sessionWith(bidSelect([]));
+    const { session, requests } = await sessionWith(
+      pagedRestRead("auction_bids", []),
+    );
 
     await listRunningBids(session, firstPage);
 
@@ -86,7 +78,7 @@ describe("listRunningBids", () => {
 
   it("gives one line per bid, in the order the game returns them", async () => {
     const { session } = await sessionWith(
-      bidSelect([
+      pagedRestRead("auction_bids", [
         bid(AUCTION_ID, 25),
         bid(AUCTION_ID, 16),
         bid("11111111-1111-4111-8111-000000000001", 30, {
@@ -124,7 +116,9 @@ describe("listRunningBids", () => {
     const rows = Array.from({ length: 7 }, (_, index) =>
       bid(AUCTION_ID, index + 1),
     );
-    const { session, requests } = await sessionWith(bidSelect(rows));
+    const { session, requests } = await sessionWith(
+      pagedRestRead("auction_bids", rows),
+    );
 
     const { bids } = await listRunningBids(session, {
       page: parsePageNumber("2"),
@@ -140,7 +134,7 @@ describe("listRunningBids", () => {
 
   it("says whether the page holds as many bids as requested", async () => {
     const rows = [bid(AUCTION_ID, 1), bid(AUCTION_ID, 2)];
-    const { session } = await sessionWith(bidSelect(rows));
+    const { session } = await sessionWith(pagedRestRead("auction_bids", rows));
 
     const twoPerPage = {
       page: parsePageNumber("1"),
@@ -156,7 +150,7 @@ describe("listRunningBids", () => {
   });
 
   it("returns an empty page when the user has no bid on a running auction", async () => {
-    const { session } = await sessionWith(bidSelect([]));
+    const { session } = await sessionWith(pagedRestRead("auction_bids", []));
 
     await expect(listRunningBids(session, firstPage)).resolves.toEqual({
       bids: [],
@@ -166,7 +160,7 @@ describe("listRunningBids", () => {
 
   it("fails when an auctioned card cannot be read", async () => {
     const { session } = await sessionWith(
-      bidSelect([bid(AUCTION_ID, 25, { cards: null })]),
+      pagedRestRead("auction_bids", [bid(AUCTION_ID, 25, { cards: null })]),
     );
 
     await expect(listRunningBids(session, firstPage)).rejects.toThrow(
