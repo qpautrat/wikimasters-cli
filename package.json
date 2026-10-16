@@ -1,7 +1,6 @@
 {
   "name": "wikimasters-cli",
   "version": "0.1.0",
-  "private": true,
   "description": "Interact with WikiMasters from the command line",
   "license": "MIT",
   "type": "module",
@@ -22,7 +21,8 @@
     "format:check": "biome format src tools",
     "wikimasters": "node dist/cli/main.js",
     "api:get": "npm run -s build:tools && node dist-tools/tools/api-get.js",
-    "api:site": "npm run -s build:tools && node dist-tools/tools/api-site.js"
+    "api:site": "npm run -s build:tools && node dist-tools/tools/api-site.js",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -33,5 +33,12 @@
     "@types/node": "^22.20.4",
     "typescript": "^7.0.2",
     "vitest": "^5.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qpautrat/wikimasters-cli.git"
+  },
+  "files": [
+    "dist"
+  ]
 }

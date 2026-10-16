@@ -7,21 +7,8 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
-import { AuthRequiredError, WikiMastersError } from "../core/index.js";
-
-export function packageRoot(): string {
-  let dir = dirname(fileURLToPath(import.meta.url));
-  while (!existsSync(join(dir, "package.json"))) {
-    const parent = dirname(dir);
-    if (parent === dir) {
-      throw new WikiMastersError("No package.json above the CLI");
-    }
-    dir = parent;
-  }
-  return dir;
-}
+import { AuthRequiredError } from "../core/index.js";
 
 const ANON_KEY = "WIKIMASTERS_SUPABASE_ANON_KEY";
 const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";

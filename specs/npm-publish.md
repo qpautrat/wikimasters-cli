@@ -6,7 +6,7 @@ Pour utiliser la CLI, il faut aujourd'hui cloner le dépôt, lancer `mise instal
 
 Le nom du paquet sera choisi au moment de la publication ; cette spec l'écrit `<nom>`. `wikimasters` et `wikimasters-cli` sont libres sur npm (`npm view` répond 404, mesuré le 2026-10-07).
 
-Dépend de : [Licence du dépôt](../license.md), [Ranger la session dans le dossier de l'utilisateur](../session-user-dir.md).
+Dépend de : [Licence du dépôt](license.md), [Ranger la session dans le dossier de l'utilisateur](session-user-dir.md).
 
 ## User story
 
@@ -20,7 +20,7 @@ En tant que joueur, j'installe la CLI depuis npm, sans cloner le dépôt, et je 
 4. Sur une machine sans clone du dépôt, avec un Node qui satisfait `engines`, `npm install -g <nom>` installe la commande `wikimasters`, et `wikimasters --help` affiche l'aide depuis n'importe quel dossier.
 5. Après cette installation, `wikimasters login` puis `wikimasters wishlist list` fonctionnent depuis n'importe quel dossier.
 6. Le README décrit l'installation depuis npm et donne les commandes sous la forme `wikimasters <commande>` pour la CLI installée, en gardant l'installation depuis un clone pour contribuer.
-7. Le commit qui implémente cette spec modifie le critère 6 de [Connexion](../login.md) : le message du code 4 indique de lancer `wikimasters login`, la commande de la CLI installée.
+7. Le commit qui implémente cette spec modifie le critère 6 de [Connexion](login.md) : le message du code 4 indique de lancer `wikimasters login`, la commande de la CLI installée.
 
 ## Hors périmètre
 
