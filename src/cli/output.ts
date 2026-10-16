@@ -143,7 +143,7 @@ export function formatGlobalCollection(
     ...(found.length === 0
       ? ["No card of the global collection matches."]
       : found.map(globalCardLine)),
-    ...(total === null ? [] : [`Total: ${cards(total, "card")}.`]),
+    ...(total === null ? [] : [`Total: ${counted(total, "card")}.`]),
     ...(counts.length > 0
       ? [
           `By rarity: ${counts.map(([rarity, count]) => `${rarity} ${count}`).join(", ")}.`,
@@ -204,7 +204,7 @@ export function formatCollection(
           ...collectionMarks({ starred, shiny, labels }),
         ].join("  "),
     ),
-    ...fullPageNote(full, cards(pageCards.length, "card")),
+    ...fullPageNote(full, counted(pageCards.length, "card")),
   ].join("\n");
 }
 
@@ -238,7 +238,7 @@ export function formatProfileCollection(
   ].join("\n");
 }
 
-function cards(count: number, noun: string): string {
+function counted(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
 
@@ -265,7 +265,7 @@ export function formatDiscard(
   const summary =
     discarded === 0
       ? `No card discarded; balance ${wikibidous(balance)}.`
-      : `Discarded ${cards(discarded, "card")} for ${wikibidous(gained)}; balance ${wikibidous(balance)}.`;
+      : `Discarded ${counted(discarded, "card")} for ${wikibidous(gained)}; balance ${wikibidous(balance)}.`;
   return [
     summary,
     ...failed.map(
@@ -321,7 +321,7 @@ export function formatRunningBids(
       ({ auctionId, title, amount, placedAt, currentBid, leading, endsAt }) =>
         `${auctionId}  ${title}: your bid ${wikibidous(amount)} placed ${placedAt}, ${currentBidState(currentBid, leading)}, ends ${endsAt}`,
     ),
-    ...fullPageNote(full, cards(bids.length, "bid")),
+    ...fullPageNote(full, counted(bids.length, "bid")),
   ].join("\n");
 }
 
@@ -346,7 +346,7 @@ export function formatNotifications(
           .map(([key, value]) => `${key}=${notificationValue(value)}`),
       ].join("  "),
     ),
-    ...fullPageNote(full, cards(notifications.length, "notification")),
+    ...fullPageNote(full, counted(notifications.length, "notification")),
   ].join("\n");
 }
 
