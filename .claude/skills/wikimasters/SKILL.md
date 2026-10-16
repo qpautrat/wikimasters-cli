@@ -1,6 +1,6 @@
 ---
 name: wikimasters
-description: Act on the user's WikiMasters account through the `wikimasters` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes"), collection or auctions ("enchères"), e.g. "enlève Half Dome de ma liste de souhaits".
+description: Act on the user's WikiMasters account through the `wikimasters` CLI. Use when the user asks to see or change something in WikiMasters, such as their wishlist ("liste de souhaits"), cards ("cartes"), collection, auctions ("enchères") or notifications, e.g. "enlève Half Dome de ma liste de souhaits".
 ---
 
 # Using `wikimasters`
