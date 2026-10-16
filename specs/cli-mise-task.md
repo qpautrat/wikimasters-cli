@@ -18,7 +18,7 @@ En tant que joueur, je lance une commande `wikimasters` par `mise run wikimaster
 4. `mise run wikimasters` sort avec le code de sortie de la CLI : 0, 1, 4 ou 75, ou avec celui du build quand il échoue ([Reconstruire la CLI avant chaque lancement](rebuild-before-run.md), critère 4).
 5. L'entrée standard reste celle du terminal : `mise run wikimasters -- login` lit la session collée sans l'afficher.
 6. `mise -C <racine du dépôt> run wikimasters -- <commande>` fonctionne de la même façon depuis n'importe quel dossier.
-7. Le README et `CLAUDE.md` donnent chaque commande de la CLI sous la forme `mise run wikimasters -- <commande>`.
+7. Le README, pour un clone, et `CLAUDE.md` donnent chaque commande de la CLI sous la forme `mise run wikimasters -- <commande>`.
 8. `npm run -s wikimasters -- <commande>` fonctionne toujours.
 9. Le commit qui implémente cette spec modifie le critère 2 de [Construire la CLI à l'installation](build-on-install.md).
 10. Sur un échec, la sortie d'erreur contient ce qu'écrit la CLI, suivi de la ligne `[wikimasters] ERROR task failed` que mise ajoute. Le README la mentionne.

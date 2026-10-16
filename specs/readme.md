@@ -10,7 +10,7 @@ Dépend de : [Se connecter en collant la session](login-paste-session.md).
 
 ## User story
 
-En tant que développeur qui vient de cloner le dépôt, je lis le README et j'exécute ma première commande sur mon compte WikiMasters sans lire le code.
+En tant que joueur qui installe la CLI depuis npm, je lis le README et j'exécute ma première commande sur mon compte WikiMasters sans lire le code.
 
 ## Critères d'acceptation
 
@@ -28,7 +28,7 @@ En tant que développeur qui vient de cloner le dépôt, je lis le README et j'e
    - pourquoi fermer la fenêtre privée sans se déconnecter avant de coller, et ce que la déconnexion depuis le site fait à la session de la CLI ;
    - les fichiers du code qui lisent, enregistrent et envoient la session.
 8. Chaque exemple d'une commande en lecture seule, exécuté tel quel sur le compte, se comporte comme le README le décrit. Chaque exemple d'une commande qui modifie le compte suit la syntaxe que donne `--help` pour cette commande, et n'est pas exécuté pour vérifier le README.
-9. Chaque commande `wikimasters` que donne le README, en bloc de code ou dans le texte, s'exécute telle quelle depuis n'importe quel dossier une fois la CLI installée depuis npm. Chaque commande de l'installation depuis un clone s'exécute telle quelle depuis la racine du dépôt.
+9. Chaque commande `wikimasters` que donne le README, en bloc de code ou dans le texte, s'exécute telle quelle depuis n'importe quel dossier une fois la CLI installée depuis npm, et `npm install -g wikimasters-cli` s'exécute tel quel. Chaque commande de l'installation depuis un clone s'exécute telle quelle depuis la racine du dépôt.
 
 ## Hors périmètre
 
