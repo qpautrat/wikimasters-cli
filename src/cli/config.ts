@@ -1,4 +1,11 @@
-import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
@@ -16,14 +23,15 @@ export function packageRoot(): string {
   return dir;
 }
 
-function defaultEnvFile(): string {
-  return join(packageRoot(), ".env");
-}
-
 const ANON_KEY = "WIKIMASTERS_SUPABASE_ANON_KEY";
 const REFRESH_TOKEN = "WIKIMASTERS_REFRESH_TOKEN";
 
 type Env = Record<string, string | undefined>;
+
+export function sessionFile(env: Env = process.env): string {
+  const configHome = env.XDG_CONFIG_HOME || join(homedir(), ".config");
+  return join(configHome, "wikimasters-cli", ".env");
+}
 
 export interface Config {
   anonKey: string | undefined;
@@ -31,7 +39,7 @@ export interface Config {
 }
 
 export function loadConfig(
-  envFile = defaultEnvFile(),
+  envFile = sessionFile(),
   env: Env = process.env,
 ): Config {
   const fileEnv: Env = existsSync(envFile)
@@ -54,7 +62,7 @@ export function requireRefreshToken(config: Config): string {
 
 export function saveRefreshToken(
   refreshToken: string,
-  envFile = defaultEnvFile(),
+  envFile = sessionFile(),
 ): void {
   const line = `${REFRESH_TOKEN}=${refreshToken}`;
   const lines = existsSync(envFile)
@@ -73,6 +81,7 @@ export function saveRefreshToken(
     lines[index] = line;
   }
   const content = lines.join("\n");
+  mkdirSync(dirname(envFile), { recursive: true });
   writeFileSync(envFile, content.endsWith("\n") ? content : `${content}\n`, {
     mode: 0o600,
   });

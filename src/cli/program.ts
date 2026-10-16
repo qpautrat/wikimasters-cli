@@ -105,7 +105,7 @@ function loginInFirefox(): Promise<string> {
 program
   .command("login")
   .description(
-    "Sign in by pasting the session of your browser and store it in .env",
+    "Sign in by pasting the session of your browser and store it in $XDG_CONFIG_HOME/wikimasters-cli/.env, ~/.config/wikimasters-cli/.env by default",
   )
   .option(
     "--firefox",

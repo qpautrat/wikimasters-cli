@@ -31,7 +31,7 @@
    mise run wikimasters -- wishlist list
    ```
 
-The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SUPABASE_ANON_KEY` in `.env` at the repository root or in the environment; `.env` wins, and an empty value is ignored.
+The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SUPABASE_ANON_KEY` in the session file described in [Signing in](#signing-in) or in the environment; the file wins, and an empty value is ignored.
 
 ## Commands
 
@@ -39,7 +39,7 @@ Run every command from the repository root as `mise run wikimasters -- <command>
 
 | Command | What it does | Example |
 |---|---|---|
-| `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `.env` | `mise run wikimasters -- login` |
+| `login` | Signs in by pasting your browser's session, or with `--firefox` through a Firefox window it opens on macOS, and stores the session in `~/.config/wikimasters-cli/.env` | `mise run wikimasters -- login` |
 | `cards search <text...> [--in <field>]` | Finds the catalogue cards whose title contains the text, regardless of case, at most 50, ordered by title; `--in category` or `--in summary` searches the card's Wikipedia category or summary instead | `mise run wikimasters -- cards search half dome` |
 | `cards value <card-id...>` | Shows the average sale price in wikibidous of each card, owned or not, for each rarity it sold under, or that it never sold; stops at the first card the game refuses | `mise run wikimasters -- cards value <card-uuid> <card-uuid>` |
 | `cards global [text] [--page <n>] [--sort <field>] [--rarity <code>]... [--wishlist]` | Searches the game's Global Collection, in the card title and category, and prints one page of cards with whether you own or wish each one and the friends who own it with their rarities, then the total, the count by rarity, the pending offers and whether more cards match; options go to the game as given, pages counting from 0, `--rarity` repeated for several rarities, `--wishlist` keeping your wishlist's cards | `mise run wikimasters -- cards global "Mont Blanc"` |
@@ -95,7 +95,7 @@ What the CLI does with your session:
 
 - It never sees your email or your password: you sign in on the site itself.
 - The value you paste is a session, not your credentials. The CLI keeps only its refresh token, which Supabase, the site's back-end, replaces on every use: each command exchanges it for a new one, which only works once.
-- The refresh token is stored only in `.env` at the repository root, which git ignores and which the CLI makes readable by its owner only on macOS and Linux. The CLI never prints it.
+- The refresh token is stored only in `$XDG_CONFIG_HOME/wikimasters-cli/.env`, or `~/.config/wikimasters-cli/.env` when `XDG_CONFIG_HOME` is unset or empty, a file outside the repository that the CLI creates and makes readable by its owner only on macOS and Linux. The CLI never prints it.
 - The session is sent only where the browser sends it: the site's Supabase (`https://cyrxjeppjqsxxjayfrur.supabase.co`) and the site's own `/api/...` routes (`https://www.wiki-masters.com`).
 - Close the private window without logging out because logging out ends the very session you paste. Closing the window also stops the browser from refreshing that session: Supabase revokes a whole session when one of its used refresh tokens is reused, so the browser and the CLI cannot share it.
 - Logging out on the site ends the CLI's session when it ends all your sessions, which is what Supabase's JavaScript sign-out does by default. The next command then exits with code 4; run `mise run wikimasters -- login` again.
@@ -107,7 +107,7 @@ The code handling the session:
 | `src/cli/pasted-session.ts` | reads the pasted cookie value |
 | `src/core/browser-login.ts` | reads the cookie from the throwaway Firefox profile |
 | `src/core/auth-cookie.ts` | extracts the refresh token from the cookie, and builds the cookie sent to the `/api/...` routes |
-| `src/cli/config.ts` | reads `.env` and writes the new refresh token to it |
+| `src/cli/config.ts` | reads the session file and writes the new refresh token to it |
 | `src/cli/session.ts`, `src/core/session.ts` | exchange the refresh token with Supabase and send the session with every Supabase request |
 | `src/core/site.ts` | sends the session to the site's `/api/...` routes |
 

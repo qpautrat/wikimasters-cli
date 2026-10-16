@@ -1,15 +1,35 @@
 import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { AuthRequiredError } from "../core/index.js";
-import { loadConfig, requireRefreshToken, saveRefreshToken } from "./config.js";
+import {
+  loadConfig,
+  requireRefreshToken,
+  saveRefreshToken,
+  sessionFile,
+} from "./config.js";
 
 function envFile(content?: string): string {
   const path = join(mkdtempSync(join(tmpdir(), "wikimasters-")), ".env");
   if (content !== undefined) writeFileSync(path, content);
   return path;
 }
+
+describe("sessionFile", () => {
+  it("lives under XDG_CONFIG_HOME when set", () => {
+    expect(sessionFile({ XDG_CONFIG_HOME: "/home/me/conf" })).toBe(
+      "/home/me/conf/wikimasters-cli/.env",
+    );
+  });
+
+  it("lives under ~/.config when XDG_CONFIG_HOME is unset or empty", () => {
+    const expected = join(homedir(), ".config", "wikimasters-cli", ".env");
+
+    expect(sessionFile({})).toBe(expected);
+    expect(sessionFile({ XDG_CONFIG_HOME: "" })).toBe(expected);
+  });
+});
 
 describe("loadConfig", () => {
   it("reads the anon key and refresh token from the env file", () => {
@@ -89,6 +109,20 @@ describe("saveRefreshToken", () => {
     expect(readFileSync(path, "utf8")).toBe(
       "WIKIMASTERS_SUPABASE_ANON_KEY=anon-key\nWIKIMASTERS_REFRESH_TOKEN=new\n",
     );
+    expect(statSync(path).mode & 0o777).toBe(0o600);
+  });
+
+  it("creates the missing directories of the file", () => {
+    const path = join(
+      mkdtempSync(join(tmpdir(), "wikimasters-")),
+      "config",
+      "wikimasters-cli",
+      ".env",
+    );
+
+    saveRefreshToken("new", path);
+
+    expect(readFileSync(path, "utf8")).toBe("WIKIMASTERS_REFRESH_TOKEN=new\n");
     expect(statSync(path).mode & 0o777).toBe(0o600);
   });
 });

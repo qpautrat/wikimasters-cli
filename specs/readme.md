@@ -23,7 +23,7 @@ En tant que développeur qui vient de cloner le dépôt, je lis le README et j'e
 7. Une section décrit la connexion pas à pas et ce que la CLI fait de la session :
    - la CLI ne voit jamais l'email ni le mot de passe, la connexion se fait sur le site ;
    - la valeur collée est une session, dont le refresh token change à chaque commande et ne sert qu'une fois ;
-   - le refresh token n'est enregistré que dans `.env`, ignoré par git, lisible par son seul propriétaire sur macOS et Linux, et n'est jamais affiché ;
+   - le refresh token n'est enregistré que dans le fichier de session, hors du dépôt, lisible par son seul propriétaire sur macOS et Linux, et n'est jamais affiché ;
    - la session n'est envoyée qu'au site, à son Supabase et à ses routes `/api/...`, comme le fait le navigateur ;
    - pourquoi fermer la fenêtre privée sans se déconnecter avant de coller, et ce que la déconnexion depuis le site fait à la session de la CLI ;
    - les fichiers du code qui lisent, enregistrent et envoient la session.
