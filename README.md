@@ -1,6 +1,6 @@
 # wikimasters-cli
 
-`wikimasters` lets you play [WikiMasters](https://www.wiki-masters.com), the collectible card game built from Wikipedia articles, from the terminal or through an AI agent. The site has no public API: the CLI calls the internal HTTP API its web front-end uses.
+`wikimasters` lets you play [WikiMasters](https://www.wiki-masters.com), the collectible card game built from Wikipedia articles, from the terminal. The site has no public API: the CLI calls the internal HTTP API its web front-end uses.
 
 ## Prerequisites
 
