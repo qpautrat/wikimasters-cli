@@ -42,7 +42,7 @@ export {
 } from "./auth-cookie.js";
 export {
   FIREFOX_BINARY,
-  loginInBrowser,
+  loginInFirefox,
   readRefreshTokenFromFirefoxProfile,
   type BrowserLoginOptions,
 } from "./browser-login.js";

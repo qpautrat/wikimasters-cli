@@ -18,7 +18,7 @@ import {
   listNotifications,
   listRunningBids,
   listWishlist,
-  loginInBrowser,
+  loginInFirefox,
   parseAuctionDuration,
   parseAuctionId,
   parseAuctionLimit,
@@ -95,11 +95,11 @@ function format(): Format {
   return program.opts<{ json?: boolean }>().json ? "json" : "text";
 }
 
-function loginInFirefox(): Promise<string> {
+function signInThroughFirefox(): Promise<string> {
   console.error(
     "Sign in to WikiMasters in the Firefox window that just opened; it closes once the session is found…",
   );
-  return loginInBrowser();
+  return loginInFirefox();
 }
 
 program
@@ -118,7 +118,7 @@ program
   .action(async ({ firefox }: { firefox?: boolean }) => {
     loadConfig();
     const session = await openSession(
-      firefox ? await loginInFirefox() : await readPastedRefreshToken(),
+      firefox ? await signInThroughFirefox() : await readPastedRefreshToken(),
     );
     console.log(formatLogin(session.userId, format()));
   });
