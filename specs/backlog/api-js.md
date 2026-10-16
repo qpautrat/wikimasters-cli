@@ -19,6 +19,6 @@ En tant que développeur, je donne une page du site et un texte, et je lis chaqu
 5. Sans occurrence, la commande le dit sur la sortie d'erreur et sort avec le code 1.
 6. Quand la page ou un fichier répond un statut autre que 2xx, la commande écrit ce statut et l'adresse demandée sur la sortie d'erreur et sort avec le code 1.
 7. Aucun fichier téléchargé, HTML ou JavaScript, ne reste sur le disque à la fin de l'exécution, qu'elle réussisse ou échoue.
-8. Le jeton de rafraîchissement renouvelé est enregistré dans `.env` avant la première requête. Ni le cookie ni aucun jeton n'est affiché.
+8. Le jeton de rafraîchissement renouvelé est enregistré dans le fichier de session de `wikimasters` avant la première requête. Ni le cookie ni aucun jeton n'est affiché.
 9. Sans session valide ou sur HTTP 401, la commande sort avec le code 4. Sur une erreur passagère qui persiste, elle sort avec le code 75, comme `wikimasters`.
 10. L'étape 2 de la règle `.claude/rules/api-discovery.md` indique cette commande pour trouver une requête dans le JavaScript du site.
