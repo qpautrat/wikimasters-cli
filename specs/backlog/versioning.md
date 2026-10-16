@@ -13,4 +13,6 @@ En tant que joueur qui installe la CLI depuis npm, je sais d'après son numéro 
 ## Critères d'acceptation
 
 1. Avant chaque publication, la version de `package.json` augmente selon SemVer d'après les commits depuis la version publiée précédente : majeure pour un changement cassant (`!` ou `BREAKING CHANGE`), mineure pour un `feat`, correctif pour un `fix` ou un `perf`.
-2. Chaque version publiée a un tag git `v<version>` sur le commit publié, poussé sur GitHub.
+2. Un changement cassant depuis une version `0.x` fait passer la version à `1.0.0`.
+3. Sans `feat`, `fix`, `perf` ni changement cassant depuis la version publiée précédente, aucune version n'est publiée.
+4. Chaque version publiée a un tag git `v<version>` sur le commit publié, poussé sur GitHub.
