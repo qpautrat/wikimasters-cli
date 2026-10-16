@@ -4,7 +4,7 @@
 
 La CLI est publiée sur npm sous le nom `wikimasters-cli`, en version `0.1.0`. Le choix et l'incrément des numéros de version sont hors du périmètre de la publication : rien ne dit aujourd'hui quel numéro porte la version suivante, ni quel commit correspond à une version publiée.
 
-Dépend de : [Publier la CLI sur npm](../npm-publish.md).
+Dépend de : [Publier la CLI sur npm](npm-publish.md).
 
 ## User story
 

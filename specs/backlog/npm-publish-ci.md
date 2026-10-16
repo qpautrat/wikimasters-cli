@@ -4,7 +4,7 @@
 
 La CLI est publiée sur npm sous le nom `wikimasters-cli` depuis le poste du mainteneur : `npm publish` demande une connexion à npm et une validation par clé de sécurité, et publie ce que contient le clone à ce moment, commité ou non. La publication depuis une CI est hors du périmètre de [Publier la CLI sur npm](../npm-publish.md).
 
-Dépend de : [Publier la CLI sur npm](../npm-publish.md), [Numéroter les versions publiées](versioning.md).
+Dépend de : [Publier la CLI sur npm](../npm-publish.md), [Numéroter les versions publiées](../versioning.md).
 
 ## User story
 
