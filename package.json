@@ -22,7 +22,7 @@
     "wikimasters": "node dist/cli/main.js",
     "api:get": "npm run -s build:tools && node dist-tools/tools/api-get.js",
     "api:site": "npm run -s build:tools && node dist-tools/tools/api-site.js",
-    "prepack": "npm run build"
+    "prepack": "node --eval \"fs.rmSync('dist', { recursive: true, force: true })\" && npm run build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
