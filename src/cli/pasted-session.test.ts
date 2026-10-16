@@ -105,9 +105,9 @@ describe("readPastedRefreshToken", () => {
     await readPastedRefreshToken(pasted(`${firstChunk}\n${lastChunk}\n`));
 
     expect(stderrLines(stderr).slice(1)).toEqual([
-      "Paste chunk .0, or an empty line to finish.",
+      "Paste chunk .0 and press Enter, or press Enter on an empty line to finish.",
       `Received chunk .0: ${firstChunk.length} characters.`,
-      "Paste chunk .1, or an empty line to finish.",
+      "Paste chunk .1 and press Enter, or press Enter on an empty line to finish.",
       `Received chunk .1: ${lastChunk.length} characters.`,
     ]);
   });

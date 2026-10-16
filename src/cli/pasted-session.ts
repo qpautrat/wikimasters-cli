@@ -18,7 +18,7 @@ function pasteInstructions(hidden: boolean): string {
   return [
     `Sign in to ${SITE_URL}/login in a private browser window.`,
     `Open the developer tools (Storage tab in Firefox, Application tab in Chrome) and copy the value of the ${AUTH_COOKIE_NAME} cookie, or of each of its chunks ${AUTH_COOKIE_NAME}.0, .1…`,
-    "Close the private window without logging out, then paste each value here in order, one per line: the command goes on once the session is complete.",
+    "Close the private window without logging out, then paste each value here in order and press Enter after each one: the command goes on once the session is complete.",
     ...(hidden ? ["What you paste is not displayed."] : []),
   ].join("\n");
 }
@@ -55,7 +55,9 @@ export function readPastedLines(
 }
 
 function askForChunk(index: number): void {
-  console.error(`Paste chunk .${index}, or an empty line to finish.`);
+  console.error(
+    `Paste chunk .${index} and press Enter, or press Enter on an empty line to finish.`,
+  );
 }
 
 export async function readPastedRefreshToken(

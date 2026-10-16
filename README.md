@@ -82,7 +82,7 @@ The site signs in with an email and a password behind a captcha, so the CLI neve
 1. Open `https://www.wiki-masters.com/login` in a private browser window and sign in.
 2. Open the developer tools: Storage tab in Firefox, Application tab in Chrome. In the cookies of `www.wiki-masters.com`, copy the value of `sb-cyrxjeppjqsxxjayfrur-auth-token`, or of each of its chunks `sb-cyrxjeppjqsxxjayfrur-auth-token.0`, `.1`…
 3. Close the private window without logging out.
-4. Run `wikimasters login` and paste each value in order, one per line. What you paste is not displayed: the CLI shows the number and length of each chunk it receives, and goes on by itself once the session is complete. An empty line or the end of the input stops reading; if the session is still incomplete, the login fails.
+4. Run `wikimasters login` and paste each value in order, pressing Enter after each one. What you paste is not displayed: the CLI shows the number and length of each chunk it receives, and goes on by itself once the session is complete. An empty line or the end of the input stops reading; if the session is still incomplete, the login fails.
 
 On macOS with Firefox, `wikimasters login --firefox` does the same without copying anything: it opens Firefox on a throwaway profile, you sign in there, and the CLI reads the cookie from that profile, closes Firefox and deletes the profile. It waits 5 minutes at most.
 
