@@ -13,6 +13,7 @@ En tant que développeur, je trouve dans les règles du dépôt ce qu'une comman
 1. Le principe est énoncé dans `CLAUDE.md`, section Architecture, et dans `.claude/rules/specs.md`, pour toute nouvelle spec.
 2. Une règle que l'interface web applique sans que l'API l'impose n'est pas reproduite dans le core : la commande envoie la requête et rapporte le refus de l'API.
 3. `.claude/rules/api-discovery.md` ne demande plus de rechercher les règles, verrous et filtres appliqués par l'interface.
+4. Une commande correspond à un endpoint et est nommée d'après lui : une valeur qui n'est qu'un champ de la réponse d'un endpoint, comme le solde de wikibidous dans le profil, n'a pas de commande à elle ; la commande de l'endpoint l'affiche, et l'agent l'y lit.
 
 ## Hors périmètre
 

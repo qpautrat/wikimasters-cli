@@ -27,7 +27,7 @@ Each table has three columns:
 
 ## Command scope
 
-A command sends exactly one request to the API and nothing more: it takes the identifiers that request takes, as given, and the agent chains commands to resolve, complete or check them. A command takes every parameter its API call takes and never checks beforehand what the API checks: it sends the request and reports the API's refusal. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec stays out of the repo, with the player.
+A command sends exactly one request to the API and nothing more: it takes the identifiers that request takes, as given, and the agent chains commands to resolve, complete or check them. A command maps one endpoint and is named after it: never spec a command for a value that is only a field of an endpoint's response, such as the wikibidous balance in the profile; spec the endpoint's command, which shows it, and the agent reads it there. A command takes every parameter its API call takes and never checks beforehand what the API checks: it sends the request and reports the API's refusal. Never write a criterion that reproduces a rule the web interface applies without the API imposing it, or that decides how the player plays (which cards to keep, which bid tactic to follow): turn the choice into a command parameter, or leave it to the agent composing the commands. A player rule taken out of a spec stays out of the repo, with the player.
 
 ## Spec before code
 
