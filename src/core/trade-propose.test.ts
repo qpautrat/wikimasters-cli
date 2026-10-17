@@ -77,10 +77,11 @@ describe("parseTradeCard", () => {
     );
   });
 
-  it("refuses a card id that is not a UUID", () => {
-    expect(() => parseTradeCard(`${myEntry}:abc`)).toThrow(
-      /Invalid card id "abc"/,
-    );
+  it("takes both ids as given", () => {
+    expect(parseTradeCard(" Entry:ABC")).toEqual({
+      entryId: " Entry",
+      cardId: "ABC",
+    });
   });
 });
 

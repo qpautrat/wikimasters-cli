@@ -1,4 +1,4 @@
-import { type CardId, parseCardId } from "./card-id.js";
+import { asCardId, type CardId } from "./card-id.js";
 import { asEntryId, type EntryId } from "./entry-id.js";
 import { WikiMastersError } from "./errors.js";
 import { parseInteger } from "./integer.js";
@@ -43,7 +43,7 @@ export function parseTradeCard(raw: string): TradeCard {
   }
   return {
     entryId: asEntryId(raw.slice(0, separator)),
-    cardId: parseCardId(raw.slice(separator + 1)),
+    cardId: asCardId(raw.slice(separator + 1)),
   };
 }
 
