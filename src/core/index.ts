@@ -112,6 +112,7 @@ export {
   type GlobalCollectionQuery,
   type GlobalCollectionSearch,
 } from "./global-collection.js";
+export { readMyProfile, type MyProfile } from "./my-profile.js";
 export {
   readProfileCollection,
   type ProfileCollectionEntry,

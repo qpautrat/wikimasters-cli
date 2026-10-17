@@ -17,6 +17,7 @@ import type {
   GlobalCollectionSearch,
   Label,
   LabelDeletion,
+  MyProfile,
   NotificationPage,
   PlacedBid,
   ProfileCollectionPage,
@@ -327,6 +328,13 @@ export function formatRunningBids(
 
 function notificationValue(value: unknown): string {
   return typeof value === "string" ? value : JSON.stringify(value);
+}
+
+export function formatMyProfile(profile: MyProfile, format: Format): string {
+  if (format === "json") return JSON.stringify(profile);
+  return Object.entries(profile)
+    .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+    .join("\n");
 }
 
 export function formatNotifications(

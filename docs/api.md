@@ -109,6 +109,13 @@ Source: the site's JavaScript of `/collection` for the request, runs on the acco
 - `deleteLabel`: `POST /rest/v1/rpc/delete_tag` with `{"p_tag_id":"<tags.id>"}` as given, in a single request; PostgREST answers `204` with no body. The label's `user_card_tags` rows go with it.
 - An id that is unknown or another user's gets HTTP 400 `P0001` `Tag not found or not owned by caller`.
 
+## `POST rpc/get_my_profile`: the user's profile
+
+Source: a call on the account (2026-10-17).
+
+- `POST /rest/v1/rpc/get_my_profile` with no parameter; PostgREST answers `200` with one object, the signed-in user's profile: `id`, `username`, `wikibidous_balance` (the wikibidous balance), `packs_remaining`, `is_pro`, `is_vip` and other account fields.
+- `readMyProfile`: calls it in a single request and returns the object as given.
+
 ## `POST /api/user-cards/bulk-discard`: discard collection entries
 
 Source: capture `discard-cards.har`, a discard of an auctioned card's former entry (2026-10-05), and runs on the account (2026-10-10).

@@ -25,6 +25,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatMyProfile,
   formatNotifications,
   formatProfileCollection,
   formatRemoval,
@@ -151,6 +152,12 @@ const playerEntry = {
   shiny: false,
   labels: [],
   pendingTrade: false,
+};
+const profile = {
+  username: "Joueur",
+  wikibidous_balance: 7989,
+  avatar_url: null,
+  ban_words: ["spoiler"],
 };
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
 
@@ -442,9 +449,22 @@ describe("JSON output", () => {
       userId: "user-id",
     });
   });
+
+  it("reports the profile as the game returns it", () => {
+    expect(JSON.parse(formatMyProfile(profile, "json"))).toEqual(profile);
+  });
 });
 
 describe("text output", () => {
+  it("prints each field of the profile with its value", () => {
+    expect(formatMyProfile(profile, "text").split("\n")).toEqual([
+      'username="Joueur"',
+      "wikibidous_balance=7989",
+      "avatar_url=null",
+      'ban_words=["spoiler"]',
+    ]);
+  });
+
   it("prints one line per auction with its card, state, and the user's part in it", () => {
     expect(
       formatAuctions(

@@ -32,6 +32,7 @@ import {
   parseStartingPrice,
   placeBid,
   readCardValues,
+  readMyProfile,
   readProfileCollection,
   removeFromWishlist,
   searchAuctions,
@@ -66,6 +67,7 @@ import {
   formatLabelDeletion,
   formatLabels,
   formatLogin,
+  formatMyProfile,
   formatNotifications,
   formatProfileCollection,
   formatRemoval,
@@ -665,7 +667,19 @@ notifications
 
 const profile = program
   .command("profile")
-  .description("Look at other players' profiles");
+  .description("Look at players' profiles");
+
+profile
+  .command("me")
+  .description(
+    "Show every field of your profile as the game returns it, such as wikibidous_balance",
+  )
+  .addHelpText("after", examples("wikimasters profile me"))
+  .action(async () => {
+    console.log(
+      formatMyProfile(await readMyProfile(await openSession()), format()),
+    );
+  });
 
 interface ProfileCollectionOptions {
   page: string;
