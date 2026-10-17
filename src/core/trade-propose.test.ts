@@ -8,9 +8,9 @@ import {
   type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
+import { asPlayerId } from "./player-id.js";
+import { asTradeId } from "./trade-id.js";
 import {
-  asPlayerId,
-  asTradeId,
   parseTradeCard,
   parseTradeWikibidous,
   proposeTrade,

@@ -124,16 +124,14 @@ export {
   type ResumeSessionOptions,
   type Session,
 } from "./session.js";
+export { asPlayerId, type PlayerId } from "./player-id.js";
+export { asTradeId, type TradeId } from "./trade-id.js";
 export {
-  asPlayerId,
-  asTradeId,
   parseTradeCard,
   parseTradeWikibidous,
   proposeTrade,
-  type PlayerId,
   type ProposedTrade,
   type TradeCard,
-  type TradeId,
   type TradeProposal,
   type TradeWikibidous,
 } from "./trade-propose.js";

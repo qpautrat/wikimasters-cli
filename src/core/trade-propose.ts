@@ -3,16 +3,14 @@ import { asEntryId, type EntryId } from "./entry-id.js";
 import { WikiMastersError } from "./errors.js";
 import { parseInteger } from "./integer.js";
 import { isObject } from "./object.js";
+import type { PlayerId } from "./player-id.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
+import type { TradeId } from "./trade-id.js";
 
 const TRADES_PAGE = "/trades";
 
 const UNTOUCHED = "no trade was proposed";
-
-export type PlayerId = string & { readonly __brand: "PlayerId" };
-
-export type TradeId = string & { readonly __brand: "TradeId" };
 
 export type TradeWikibidous = number & {
   readonly __brand: "TradeWikibidous";
@@ -34,14 +32,6 @@ export interface TradeProposal {
 
 export interface ProposedTrade {
   tradeId: TradeId;
-}
-
-export function asPlayerId(raw: string): PlayerId {
-  return raw as PlayerId;
-}
-
-export function asTradeId(raw: string): TradeId {
-  return raw as TradeId;
 }
 
 export function parseTradeCard(raw: string): TradeCard {
