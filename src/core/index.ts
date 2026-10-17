@@ -125,6 +125,19 @@ export {
   type Session,
 } from "./session.js";
 export {
+  asPlayerId,
+  asTradeId,
+  parseTradeCard,
+  parseTradeWikibidous,
+  proposeTrade,
+  type PlayerId,
+  type ProposedTrade,
+  type TradeCard,
+  type TradeId,
+  type TradeProposal,
+  type TradeWikibidous,
+} from "./trade-propose.js";
+export {
   tagEntry,
   untagEntry,
   type EntryTag,

@@ -21,6 +21,7 @@ import type {
   NotificationPage,
   PlacedBid,
   ProfileCollectionPage,
+  ProposedTrade,
   RunningBidPage,
   WishlistAddition,
   WishlistCard,
@@ -291,6 +292,14 @@ export function formatCreatedAuction(
 ): string {
   if (format === "json") return JSON.stringify({ auctionId });
   return `Auction ${auctionId} created.`;
+}
+
+export function formatProposedTrade(
+  { tradeId }: ProposedTrade,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ tradeId });
+  return `Trade ${tradeId} proposed.`;
 }
 
 export function formatCancelledAuction(

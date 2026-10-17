@@ -248,3 +248,12 @@ Source: the trade form's JavaScript on `/trades`, the profile page's on `/profil
 - `pendingTradeCardIds` lists `cards.id` values: the trade form checks it against each entry's `card.id`.
 - The route also answers a player who is not a friend. A player id instead of a pseudo gets HTTP 404 `{"error":"Profil introuvable"}`.
 - `readProfileCollection`: sends the pseudo and `page` given, `sort` when given, `stats=0`, `pending=1`, the text as `q` when given, each rarity given and `wishlisted_by_me=1` when asked, maps each entry, reports whether `pendingTradeCardIds` holds its card and whether the page holds 50 entries, and reports a refusal with its body.
+
+## `POST /api/trades`: propose a trade
+
+Source: the trade form's JavaScript on `/trades` and proposals on the account (2026-10-17).
+
+- Body `{"recipient_id": <profiles.id>, "items": [{"user_card_id": <user_cards.id>, "card_id": <cards.id>, "offered_by": <profiles.id of the player giving it>}…], "initiator_wikibidous": <wikibidous given>, "recipient_wikibidous": <wikibidous asked>}`, plus `"parent_trade_id": <trades id>` for a counter-offer. Response HTTP 201 `{"trade": {"id", "initiator_id", "recipient_id", "status": "pending", "parent_trade_id", "created_at", "updated_at", "initiator_wikibidous", "recipient_wikibidous"}}`; `GET /api/trades` then lists the trade with its `items` as sent.
+- Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The form handles `human_verification_required` (it then shows a captcha) and shows `error` otherwise. Observed: a proposal without cards or wikibidous gets HTTP 400 `{"error":"Sélectionnez au moins une carte ou des wikibidous à échanger"}`.
+- The form opens only with a friend and refuses, before sending, more than 100 cards, more than 10 000 wikibidous per player and a balance below the wikibidous given. The route accepted a second pending trade offering the same entry as a first one, and the offered entry stays in the collection under the same id while the trade is pending (observed 2026-10-17).
+- `proposeTrade`: sends the player id, the cards and the amounts given, each card given offered by the user and each card taken by the player, and the counter-offered trade when given, in a single request, reports `trade.id`, and reports a refusal with its body.

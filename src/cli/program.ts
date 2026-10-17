@@ -7,6 +7,8 @@ import {
   addToWishlist,
   asEntryId,
   asLabelId,
+  asPlayerId,
+  asTradeId,
   cancelAuction,
   createAuction,
   createLabel,
@@ -30,7 +32,10 @@ import {
   parsePageLimit,
   parsePageNumber,
   parseStartingPrice,
+  parseTradeCard,
+  parseTradeWikibidous,
   placeBid,
+  proposeTrade,
   readCardValues,
   readMyProfile,
   readProfileCollection,
@@ -70,6 +75,7 @@ import {
   formatMyProfile,
   formatNotifications,
   formatProfileCollection,
+  formatProposedTrade,
   formatRemoval,
   formatRunningBids,
   formatWishlist,
@@ -89,6 +95,8 @@ const OTHER_EXAMPLE_CARD_ID = "0d4f6b8a-3e5c-4a7b-9c1d-5e7f9a1b3c5d";
 const EXAMPLE_ENTRY_ID = "4a7c9e1b-6d2f-4b8a-9e3c-1f5a7b9d2e4c";
 const OTHER_EXAMPLE_ENTRY_ID = "8e2d5a9c-3b7f-4c1e-a6d4-9f3b1e7c5a28";
 const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
+const EXAMPLE_PLAYER_ID = "5c8e2a4f-7b1d-4e9a-b3c6-2d4f6a8b0c1e";
+const EXAMPLE_TRADE_ID = "7d3a9f1c-2e6b-4a8d-b5c7-3f1e9a2d6b84";
 
 function examples(...calls: string[]): string {
   return `\nExamples:\n${calls.map((call) => `  $ ${call}`).join("\n")}`;
@@ -731,6 +739,65 @@ profile
       console.log(formatProfileCollection(result, format()));
     },
   );
+
+const trade = program.command("trade").description("Trade with players");
+
+interface TradeProposeOptions {
+  give: string[];
+  take: string[];
+  giveWikibidous: string;
+  takeWikibidous: string;
+  counter?: string;
+}
+
+trade
+  .command("propose")
+  .description(
+    "Propose a trade of cards and wikibidous to a player, in a single request, and print the trade id; the game accepts or refuses it and gives its reason",
+  )
+  .argument("<player-id>", "the player's id, as given by cards global")
+  .option(
+    "--give <entry-id:card-id>",
+    "an entry of your collection and its card, as given by collection list; repeat to give several",
+    repeated,
+    [],
+  )
+  .option(
+    "--take <entry-id:card-id>",
+    "an entry of the player's collection and its card, as given by profile collection; repeat to take several",
+    repeated,
+    [],
+  )
+  .option("--give-wikibidous <n>", "wikibidous you give, an integer", "0")
+  .option("--take-wikibidous <n>", "wikibidous you ask for, an integer", "0")
+  .option(
+    "--counter <trade-id>",
+    "send the proposal as a counter-offer to this trade",
+  )
+  .addHelpText(
+    "after",
+    examples(
+      `wikimasters trade propose ${EXAMPLE_PLAYER_ID} --give ${EXAMPLE_ENTRY_ID}:${EXAMPLE_CARD_ID} --take ${OTHER_EXAMPLE_ENTRY_ID}:${OTHER_EXAMPLE_CARD_ID}`,
+      `wikimasters trade propose ${EXAMPLE_PLAYER_ID} --take ${OTHER_EXAMPLE_ENTRY_ID}:${OTHER_EXAMPLE_CARD_ID} --give-wikibidous 50`,
+      `wikimasters trade propose ${EXAMPLE_PLAYER_ID} --give ${EXAMPLE_ENTRY_ID}:${EXAMPLE_CARD_ID} --take-wikibidous 20 --counter ${EXAMPLE_TRADE_ID}`,
+    ),
+  )
+  .action(async (playerId: string, options: TradeProposeOptions) => {
+    const proposal = {
+      recipientId: asPlayerId(playerId),
+      give: options.give.map(parseTradeCard),
+      take: options.take.map(parseTradeCard),
+      giveWikibidous: parseTradeWikibidous(options.giveWikibidous),
+      takeWikibidous: parseTradeWikibidous(options.takeWikibidous),
+      ...(options.counter === undefined
+        ? {}
+        : { counterTo: asTradeId(options.counter) }),
+    };
+    const session = await openSession();
+    console.log(
+      formatProposedTrade(await proposeTrade(session, proposal), format()),
+    );
+  });
 
 const wishlist = program
   .command("wishlist")

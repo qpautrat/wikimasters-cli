@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   asEntryId,
   asLabelId,
+  asTradeId,
   parseAuctionId,
   parseCardId,
 } from "../core/index.js";
@@ -28,6 +29,7 @@ import {
   formatMyProfile,
   formatNotifications,
   formatProfileCollection,
+  formatProposedTrade,
   formatRemoval,
   formatRunningBids,
   formatWishlist,
@@ -48,6 +50,9 @@ const label = {
 };
 const createdAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
+};
+const proposedTrade = {
+  tradeId: asTradeId("c2ab7935-4b63-41f3-b23c-d00c11d2f1f9"),
 };
 const cancelledAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
@@ -245,6 +250,12 @@ describe("JSON output", () => {
   it("reports the created auction's id as auctionId", () => {
     expect(JSON.parse(formatCreatedAuction(createdAuction, "json"))).toEqual({
       auctionId: createdAuction.auctionId,
+    });
+  });
+
+  it("reports the proposed trade's id as tradeId", () => {
+    expect(JSON.parse(formatProposedTrade(proposedTrade, "json"))).toEqual({
+      tradeId: proposedTrade.tradeId,
     });
   });
 
@@ -604,6 +615,12 @@ describe("text output", () => {
   it("prints the created auction's id", () => {
     expect(formatCreatedAuction(createdAuction, "text")).toBe(
       `Auction ${createdAuction.auctionId} created.`,
+    );
+  });
+
+  it("prints the proposed trade's id", () => {
+    expect(formatProposedTrade(proposedTrade, "text")).toBe(
+      `Trade ${proposedTrade.tradeId} proposed.`,
     );
   });
 
