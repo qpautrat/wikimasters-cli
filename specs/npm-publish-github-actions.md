@@ -2,11 +2,11 @@
 
 ## Contexte
 
-La CLI est publiée sur npm sous le nom `wikimasters-cli` depuis le poste du mainteneur : `npm publish` demande une connexion à npm et une validation par clé de sécurité, et publie ce que contient le clone à ce moment, commité ou non. La publication depuis GitHub Actions est hors du périmètre de [Publier la CLI sur npm](../npm-publish.md).
+La CLI est publiée sur npm sous le nom `wikimasters-cli` depuis le poste du mainteneur : `npm publish` demande une connexion à npm et une validation par clé de sécurité, et publie ce que contient le clone à ce moment, commité ou non. La publication depuis GitHub Actions est hors du périmètre de [Publier la CLI sur npm](npm-publish.md).
 
 Le trusted publishing se déclare sur npmjs.com, dans les réglages du paquet, en y nommant le dépôt GitHub et le fichier du workflow : le mainteneur fait cette déclaration à la main.
 
-Dépend de : [Publier la CLI sur npm](../npm-publish.md), [Numéroter les versions publiées](../versioning.md).
+Dépend de : [Publier la CLI sur npm](npm-publish.md), [Numéroter les versions publiées](versioning.md).
 
 ## User story
 
