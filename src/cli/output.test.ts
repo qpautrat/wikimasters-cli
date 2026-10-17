@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   asEntryId,
   asLabelId,
+  asPlayerId,
   asTradeId,
   parseAuctionId,
   parseCardId,
@@ -116,7 +117,7 @@ const soldCard = {
 };
 const unsoldCard = { id: cardId, title: "Pointe de la Sambuy", averages: {} };
 
-const friendId = "37fe4f31-003f-40c1-9eb6-1f39e0947037";
+const friendId = asPlayerId("37fe4f31-003f-40c1-9eb6-1f39e0947037");
 const globalCard = {
   id: cardId,
   title: "Pointe de la Sambuy",
@@ -126,7 +127,7 @@ const globalCard = {
   friends: [
     { id: friendId, username: "LucasPerso", rarities: ["R"] },
     {
-      id: "de78c800-d3b9-4942-a26d-e7942441aa72",
+      id: asPlayerId("de78c800-d3b9-4942-a26d-e7942441aa72"),
       username: "Marie",
       rarities: ["C", "SR"],
     },

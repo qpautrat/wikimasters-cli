@@ -1,6 +1,7 @@
 import type { CardId } from "./card-id.js";
 import { WikiMastersError } from "./errors.js";
 import { isObject } from "./object.js";
+import type { PlayerId } from "./player-id.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -13,7 +14,7 @@ export interface GlobalCollectionQuery {
 }
 
 export interface FriendOwner {
-  id: string;
+  id: PlayerId;
   username: string;
   rarities: string[];
 }
