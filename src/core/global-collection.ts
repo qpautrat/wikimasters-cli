@@ -1,5 +1,6 @@
 import type { CardId } from "./card-id.js";
 import { WikiMastersError } from "./errors.js";
+import { isObject } from "./object.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -49,10 +50,6 @@ interface GlobalCollectionResponse {
   ownedCardIds: string[];
   wishlistCardIds: string[];
   friendPendingOfferKeys: string[];
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function isGlobalCollectionResponse(
