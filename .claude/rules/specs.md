@@ -6,11 +6,10 @@ The user drives the project through specs in `specs/`, written in French. Implem
 
 List the specs by title with `head -n1 specs/*.md specs/backlog/*.md`, then read only those related to the subject.
 
-Present a backlog listing in three tables, an empty one included:
+Present a backlog listing in two tables, an empty one included:
 
 1. **API features**: a CLI command that exposes a call of the WikiMasters API.
-2. **Player rules**: a choice of how the player plays, which stays out of the repo, with the player.
-3. **Technical**: tooling, rules and infrastructure of the repo.
+2. **Technical**: tooling, rules and infrastructure of the repo.
 
 Each table has three columns:
 
