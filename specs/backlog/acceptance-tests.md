@@ -6,7 +6,7 @@ Les tests automatisés du dépôt sont unitaires : ils passent un faux `fetch` (
 
 Ces tests ont besoin du réseau et de la session de l'utilisateur, ouverte par une connexion avec captcha dans un navigateur (`specs/login*.md`) ; ils ne peuvent donc tourner ni dans le hook de pre-commit ni dans GitHub Actions. Le site refuse les requêtes qu'il juge automatisées (`automation_limit`, observé sur `GET /api/marketplace`).
 
-Dépend de : [Sortie JSON des commandes](../json-output.md), [Numéroter les versions publiées](../versioning.md), [Annuler un de mes échanges](trade-cancel.md).
+Dépend de : [Sortie JSON des commandes](../json-output.md), [Annuler un de mes échanges](trade-cancel.md).
 
 ## User story
 
@@ -23,8 +23,7 @@ En tant que développeur, je lance une commande qui exécute chaque commande de 
 7. Un test qui touche un autre joueur prend son pseudo et son identifiant dans l'environnement, et est ignoré, en le disant, quand ils manquent.
 8. Les tests s'exécutent l'un après l'autre, jamais en parallèle.
 9. Sans session valide, la suite s'arrête dès le premier test en demandant de lancer `wikimasters login`.
-10. `scripts/release.sh` lance les tests d'acceptation avant de changer la version, et s'arrête sans rien publier si l'un échoue.
-11. Le commit qui ajoute ou change une commande ajoute ou met à jour son test d'acceptation, et `CLAUDE.md` remplace la vérification manuelle sur le compte avant un commit par le passage de ce test.
+10. Le commit qui ajoute ou change une commande ajoute ou met à jour son test d'acceptation, et `CLAUDE.md` remplace la vérification manuelle sur le compte avant un commit par le passage de ce test.
 
 ## Hors périmètre
 
