@@ -814,13 +814,11 @@ trade
     "after",
     examples(`wikimasters trade cancel ${EXAMPLE_TRADE_ID}`),
   )
-  .action(async (tradeId: string) => {
+  .action(async (rawTradeId: string) => {
+    const tradeId = asTradeId(rawTradeId);
     const session = await openSession();
     console.log(
-      formatCancelledTrade(
-        await cancelTrade(session, asTradeId(tradeId)),
-        format(),
-      ),
+      formatCancelledTrade(await cancelTrade(session, tradeId), format()),
     );
   });
 
