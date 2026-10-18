@@ -3,6 +3,7 @@ import { WikiMastersError } from "./errors.js";
 import { isFullPage } from "./page.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
+import { TRADES_PAGE } from "./trades-page.js";
 
 export const PROFILE_COLLECTION_PAGE_SIZE = 50;
 
@@ -74,7 +75,7 @@ export async function readProfileCollection(
     session,
     await siteCookie(session),
     action,
-    "/trades",
+    TRADES_PAGE,
     `/api/profile/${encodeURIComponent(username)}/collection?${query}`,
     { method: "GET" },
   );

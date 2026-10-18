@@ -7,8 +7,7 @@ import type { PlayerId } from "./player-id.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 import type { TradeId } from "./trade-id.js";
-
-const TRADES_PAGE = "/trades";
+import { TRADES_PAGE } from "./trades-page.js";
 
 const UNTOUCHED = "no trade was proposed";
 

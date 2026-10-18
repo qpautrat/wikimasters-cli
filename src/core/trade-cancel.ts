@@ -3,6 +3,7 @@ import { isObject } from "./object.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 import type { TradeId } from "./trade-id.js";
+import { TRADES_PAGE } from "./trades-page.js";
 
 export interface CancelledTrade {
   tradeId: TradeId;
@@ -23,7 +24,7 @@ export async function cancelTrade(
     session,
     await siteCookie(session),
     action,
-    "/trades",
+    TRADES_PAGE,
     `/api/trades/${tradeId}`,
     { method: "PATCH", body: { action: "cancel" } },
   );
