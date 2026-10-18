@@ -257,3 +257,11 @@ Source: the trade form's JavaScript on `/trades` and proposals on the account (2
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The form handles `human_verification_required` (it then shows a captcha) and shows `error` otherwise. Observed: a proposal without cards or wikibidous gets HTTP 400 `{"error":"Sélectionnez au moins une carte ou des wikibidous à échanger"}`.
 - The form opens only with a friend and refuses, before sending, more than 100 cards, more than 10 000 wikibidous per player and a balance below the wikibidous given. The route accepted a second pending trade offering the same entry as a first one, and the offered entry stays in the collection under the same id while the trade is pending (observed 2026-10-17).
 - `proposeTrade`: sends the player id, the cards and the amounts given, each card given offered by the user and each card taken by the player, and the counter-offered trade when given, in a single request, reports `trade.id`, and reports a refusal with its body.
+
+## `PATCH /api/trades/<trade id>`: cancel a trade
+
+Source: the trade card's JavaScript on `/trades` and cancellations on the account (2026-10-17, 2026-10-18).
+
+- Body `{"action": "cancel"}`; the page sends other `action` values, such as `accept`, from the same card. Response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
+- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha. Observed: an already cancelled trade and an accepted trade both get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
+- `cancelTrade`: sends the trade id given, reports `status`, and reports a refusal with its body.

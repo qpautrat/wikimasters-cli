@@ -14,6 +14,7 @@ import {
   formatAuctions,
   formatBid,
   formatCancelledAuction,
+  formatCancelledTrade,
   formatCardSearch,
   formatCardValues,
   formatCollection,
@@ -57,6 +58,10 @@ const proposedTrade = {
 };
 const cancelledAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
+  status: "cancelled",
+};
+const cancelledTrade = {
+  tradeId: asTradeId("57202da8-3e09-40d6-9c0b-b42a4e149133"),
   status: "cancelled",
 };
 const bid = {
@@ -257,6 +262,13 @@ describe("JSON output", () => {
   it("reports the proposed trade's id as tradeId", () => {
     expect(JSON.parse(formatProposedTrade(proposedTrade, "json"))).toEqual({
       tradeId: proposedTrade.tradeId,
+    });
+  });
+
+  it("reports the cancelled trade's id and the status the game gives", () => {
+    expect(JSON.parse(formatCancelledTrade(cancelledTrade, "json"))).toEqual({
+      tradeId: cancelledTrade.tradeId,
+      status: "cancelled",
     });
   });
 
@@ -622,6 +634,12 @@ describe("text output", () => {
   it("prints the proposed trade's id", () => {
     expect(formatProposedTrade(proposedTrade, "text")).toBe(
       `Trade ${proposedTrade.tradeId} proposed.`,
+    );
+  });
+
+  it("prints the cancelled trade's id and the status the game gives", () => {
+    expect(formatCancelledTrade(cancelledTrade, "text")).toBe(
+      `Trade ${cancelledTrade.tradeId} cancelled.`,
     );
   });
 

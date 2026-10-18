@@ -6,7 +6,7 @@ Les tests automatisés du dépôt sont unitaires : ils passent un faux `fetch` (
 
 Ces tests ont besoin du réseau et de la session de l'utilisateur, ouverte par une connexion avec captcha dans un navigateur (`specs/login*.md`) ; ils ne peuvent donc tourner ni dans le hook de pre-commit ni dans GitHub Actions. Le site refuse les requêtes qu'il juge automatisées (`automation_limit`, observé sur `GET /api/marketplace`).
 
-Dépend de : [Sortie JSON des commandes](../json-output.md), [Annuler un de mes échanges](trade-cancel.md).
+Dépend de : [Sortie JSON des commandes](../json-output.md), [Annuler un de mes échanges](../trade-cancel.md).
 
 ## User story
 

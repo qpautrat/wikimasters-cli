@@ -10,6 +10,7 @@ import {
   asPlayerId,
   asTradeId,
   cancelAuction,
+  cancelTrade,
   createAuction,
   createLabel,
   deleteLabel,
@@ -59,6 +60,7 @@ import {
   formatAuctions,
   formatBid,
   formatCancelledAuction,
+  formatCancelledTrade,
   formatCardSearch,
   formatCardValues,
   formatCollection,
@@ -796,6 +798,29 @@ trade
     const session = await openSession();
     console.log(
       formatProposedTrade(await proposeTrade(session, proposal), format()),
+    );
+  });
+
+trade
+  .command("cancel")
+  .description(
+    "Cancel a trade you proposed, in a single request, and print the trade id and the status the game gives; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<trade-id>",
+    "the trade's id, as given by trade propose or the trade_id of a notification",
+  )
+  .addHelpText(
+    "after",
+    examples(`wikimasters trade cancel ${EXAMPLE_TRADE_ID}`),
+  )
+  .action(async (tradeId: string) => {
+    const session = await openSession();
+    console.log(
+      formatCancelledTrade(
+        await cancelTrade(session, asTradeId(tradeId)),
+        format(),
+      ),
     );
   });
 

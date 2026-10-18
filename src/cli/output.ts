@@ -3,6 +3,7 @@ import type {
   AuctionId,
   AuctionSearch,
   CancelledAuction,
+  CancelledTrade,
   CardSearch,
   CardValue,
   CatalogueCard,
@@ -300,6 +301,14 @@ export function formatProposedTrade(
 ): string {
   if (format === "json") return JSON.stringify({ tradeId });
   return `Trade ${tradeId} proposed.`;
+}
+
+export function formatCancelledTrade(
+  { tradeId, status }: CancelledTrade,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ tradeId, status });
+  return `Trade ${tradeId} ${status}.`;
 }
 
 export function formatCancelledAuction(

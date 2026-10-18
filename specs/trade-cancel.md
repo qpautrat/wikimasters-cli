@@ -2,9 +2,9 @@
 
 ## Contexte
 
-`wikimasters trade propose` propose un échange, et aucune commande ne l'annule. La page `/trades` l'annule par `PATCH /api/trades/<id>` avec `{"action":"cancel"}`. Le 2026-10-17, sur un échange `pending` que j'avais proposé, la route a répondu HTTP 200 `{"status":"cancelled"}`, et la carte que j'offrais est restée dans ma collection sous la même entrée. La page traite `human_verification_required` en affichant un captcha et affiche `error` sinon. La réponse du jeu pour un échange déjà annulé, accepté, ou proposé par un autre joueur n'est pas établie.
+`wikimasters trade propose` propose un échange, et aucune commande ne l'annule. La page `/trades` l'annule par `PATCH /api/trades/<id>` avec `{"action":"cancel"}`. Le 2026-10-17, sur un échange `pending` que j'avais proposé, la route a répondu HTTP 200 `{"status":"cancelled"}`, et la carte que j'offrais est restée dans ma collection sous la même entrée. La page traite `human_verification_required` en affichant un captcha et affiche `error` sinon. Le 2026-10-18, un échange déjà annulé et un échange accepté ont reçu HTTP 409 `{"error":"Cet échange n'est plus en attente"}`. La réponse du jeu pour un échange proposé par un autre joueur n'est pas établie.
 
-Dépend de : [Proposer un échange](../trade-propose.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Proposer un échange](trade-propose.md), [Sortie JSON des commandes](json-output.md).
 
 ## User story
 
