@@ -258,18 +258,12 @@ Source: the trade form's JavaScript on `/trades` and proposals on the account (2
 - The form opens only with a friend and refuses, before sending, more than 100 cards, more than 10 000 wikibidous per player and a balance below the wikibidous given. The route accepted a second pending trade offering the same entry as a first one, and the offered entry stays in the collection under the same id while the trade is pending (observed 2026-10-17).
 - `proposeTrade`: sends the player id, the cards and the amounts given, each card given offered by the user and each card taken by the player, and the counter-offered trade when given, in a single request, reports `trade.id`, and reports a refusal with its body.
 
-## `PATCH /api/trades/<trade id>`: cancel a trade
+## `PATCH /api/trades/<trade id>`: cancel or accept a trade
 
-Source: the trade card's JavaScript on `/trades` and cancellations on the account (2026-10-17, 2026-10-18).
+Source: the trade card's JavaScript on `/trades`, cancellations on the account (2026-10-17, 2026-10-18) and an acceptance on the account (2026-10-20).
 
-- Body `{"action": "cancel"}`; the page sends other `action` values, such as `accept` and `decline`, from the same card. Response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
-- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha. Observed: an already cancelled trade and an accepted trade both get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
-- `cancelTrade`: sends the trade id given, reports `status`, and reports a refusal with its body.
-
-## `PATCH /api/trades/<trade id>`: accept a trade
-
-Source: the trade card's JavaScript on `/trades` and an acceptance on the account (2026-10-20).
-
-- Body `{"action": "accept"}`, sent by the card's accept button on a trade the user received, and again once the captcha the page shows on `human_verification_required` is solved. Response HTTP 200 `{"status": "accepted"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `accepted`, and the entry the user gave no longer appears in the user's `user_cards`.
-- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, as for a cancellation.
-- `acceptTrade`: sends the trade id given, reports `status`, and reports a refusal with its body.
+- Body `{"action": <action>}`; the card sends `cancel` on a trade the user proposed, `accept` and `decline` on a trade the user received. The core sends `cancel` and `accept`.
+- `cancel`: response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
+- `accept`: response HTTP 200 `{"status": "accepted"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `accepted`, and the entry the user gave no longer appears in the user's `user_cards`.
+- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha, then sends the same action again once it is solved. Observed: cancelling an already cancelled or an accepted trade, and accepting an accepted trade, get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
+- `cancelTrade` and `acceptTrade`: send the trade id given with their action, report `status`, and report a refusal with its body.
