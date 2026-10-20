@@ -8,14 +8,13 @@ import {
   parseCardId,
 } from "../core/index.js";
 import {
-  formatAcceptedTrade,
   formatAddition,
   formatAuction,
   formatAuctionSearch,
   formatAuctions,
   formatBid,
   formatCancelledAuction,
-  formatCancelledTrade,
+  formatTradeStatus,
   formatCardSearch,
   formatCardValues,
   formatCollection,
@@ -271,14 +270,14 @@ describe("JSON output", () => {
   });
 
   it("reports the accepted trade's id and the status the game gives", () => {
-    expect(JSON.parse(formatAcceptedTrade(acceptedTrade, "json"))).toEqual({
+    expect(JSON.parse(formatTradeStatus(acceptedTrade, "json"))).toEqual({
       tradeId: acceptedTrade.tradeId,
       status: "accepted",
     });
   });
 
   it("reports the cancelled trade's id and the status the game gives", () => {
-    expect(JSON.parse(formatCancelledTrade(cancelledTrade, "json"))).toEqual({
+    expect(JSON.parse(formatTradeStatus(cancelledTrade, "json"))).toEqual({
       tradeId: cancelledTrade.tradeId,
       status: "cancelled",
     });
@@ -650,13 +649,13 @@ describe("text output", () => {
   });
 
   it("prints the accepted trade's id and the status the game gives", () => {
-    expect(formatAcceptedTrade(acceptedTrade, "text")).toBe(
+    expect(formatTradeStatus(acceptedTrade, "text")).toBe(
       `Trade ${acceptedTrade.tradeId} accepted.`,
     );
   });
 
   it("prints the cancelled trade's id and the status the game gives", () => {
-    expect(formatCancelledTrade(cancelledTrade, "text")).toBe(
+    expect(formatTradeStatus(cancelledTrade, "text")).toBe(
       `Trade ${cancelledTrade.tradeId} cancelled.`,
     );
   });

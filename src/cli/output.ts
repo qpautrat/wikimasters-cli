@@ -1,10 +1,8 @@
 import type {
-  AcceptedTrade,
   Auction,
   AuctionId,
   AuctionSearch,
   CancelledAuction,
-  CancelledTrade,
   CardSearch,
   CardValue,
   CatalogueCard,
@@ -25,6 +23,7 @@ import type {
   ProfileCollectionPage,
   ProposedTrade,
   RunningBidPage,
+  TradeStatus,
   WishlistAddition,
   WishlistCard,
   WishlistRemoval,
@@ -304,16 +303,8 @@ export function formatProposedTrade(
   return `Trade ${tradeId} proposed.`;
 }
 
-export function formatAcceptedTrade(
-  { tradeId, status }: AcceptedTrade,
-  format: Format,
-): string {
-  if (format === "json") return JSON.stringify({ tradeId, status });
-  return `Trade ${tradeId} ${status}.`;
-}
-
-export function formatCancelledTrade(
-  { tradeId, status }: CancelledTrade,
+export function formatTradeStatus(
+  { tradeId, status }: TradeStatus,
   format: Format,
 ): string {
   if (format === "json") return JSON.stringify({ tradeId, status });

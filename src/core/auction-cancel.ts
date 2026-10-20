@@ -1,5 +1,5 @@
 import type { AuctionId } from "./auction.js";
-import { cancelledStatus } from "./cancelled-status.js";
+import { returnedStatus } from "./returned-status.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
@@ -21,5 +21,5 @@ export async function cancelAuction(
     `/api/marketplace/${auctionId}`,
     { method: "DELETE" },
   );
-  return { auctionId, status: cancelledStatus(action, body) };
+  return { auctionId, status: returnedStatus(action, body, "cancelled") };
 }

@@ -55,14 +55,13 @@ import {
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
 import {
-  formatAcceptedTrade,
   formatAddition,
   formatAuction,
   formatAuctionSearch,
   formatAuctions,
   formatBid,
   formatCancelledAuction,
-  formatCancelledTrade,
+  formatTradeStatus,
   formatCardSearch,
   formatCardValues,
   formatCollection,
@@ -820,7 +819,7 @@ trade
     const tradeId = asTradeId(rawTradeId);
     const session = await openSession();
     console.log(
-      formatCancelledTrade(await cancelTrade(session, tradeId), format()),
+      formatTradeStatus(await cancelTrade(session, tradeId), format()),
     );
   });
 
@@ -841,7 +840,7 @@ trade
     const tradeId = asTradeId(rawTradeId);
     const session = await openSession();
     console.log(
-      formatAcceptedTrade(await acceptTrade(session, tradeId), format()),
+      formatTradeStatus(await acceptTrade(session, tradeId), format()),
     );
   });
 

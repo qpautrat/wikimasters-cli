@@ -126,8 +126,8 @@ export {
 } from "./session.js";
 export { asPlayerId, type PlayerId } from "./player-id.js";
 export { asTradeId, type TradeId } from "./trade-id.js";
-export { acceptTrade, type AcceptedTrade } from "./trade-accept.js";
-export { cancelTrade, type CancelledTrade } from "./trade-cancel.js";
+export { acceptTrade } from "./trade-accept.js";
+export { cancelTrade } from "./trade-cancel.js";
 export {
   parseTradeCard,
   parseTradeWikibidous,
@@ -137,6 +137,7 @@ export {
   type TradeProposal,
   type TradeWikibidous,
 } from "./trade-propose.js";
+export type { TradeStatus } from "./trade-status.js";
 export {
   tagEntry,
   untagEntry,
