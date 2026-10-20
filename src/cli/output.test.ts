@@ -8,6 +8,7 @@ import {
   parseCardId,
 } from "../core/index.js";
 import {
+  formatAcceptedTrade,
   formatAddition,
   formatAuction,
   formatAuctionSearch,
@@ -59,6 +60,10 @@ const proposedTrade = {
 const cancelledAuction = {
   auctionId: parseAuctionId("0f3a7c21-5b8e-4d96-a1c4-7e2b9d5f8a63"),
   status: "cancelled",
+};
+const acceptedTrade = {
+  tradeId: asTradeId("e59bd303-1cae-4fa4-b29a-122b4c825420"),
+  status: "accepted",
 };
 const cancelledTrade = {
   tradeId: asTradeId("57202da8-3e09-40d6-9c0b-b42a4e149133"),
@@ -262,6 +267,13 @@ describe("JSON output", () => {
   it("reports the proposed trade's id as tradeId", () => {
     expect(JSON.parse(formatProposedTrade(proposedTrade, "json"))).toEqual({
       tradeId: proposedTrade.tradeId,
+    });
+  });
+
+  it("reports the accepted trade's id and the status the game gives", () => {
+    expect(JSON.parse(formatAcceptedTrade(acceptedTrade, "json"))).toEqual({
+      tradeId: acceptedTrade.tradeId,
+      status: "accepted",
     });
   });
 
@@ -634,6 +646,12 @@ describe("text output", () => {
   it("prints the proposed trade's id", () => {
     expect(formatProposedTrade(proposedTrade, "text")).toBe(
       `Trade ${proposedTrade.tradeId} proposed.`,
+    );
+  });
+
+  it("prints the accepted trade's id and the status the game gives", () => {
+    expect(formatAcceptedTrade(acceptedTrade, "text")).toBe(
+      `Trade ${acceptedTrade.tradeId} accepted.`,
     );
   });
 

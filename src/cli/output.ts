@@ -1,4 +1,5 @@
 import type {
+  AcceptedTrade,
   Auction,
   AuctionId,
   AuctionSearch,
@@ -301,6 +302,14 @@ export function formatProposedTrade(
 ): string {
   if (format === "json") return JSON.stringify({ tradeId });
   return `Trade ${tradeId} proposed.`;
+}
+
+export function formatAcceptedTrade(
+  { tradeId, status }: AcceptedTrade,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ tradeId, status });
+  return `Trade ${tradeId} ${status}.`;
 }
 
 export function formatCancelledTrade(

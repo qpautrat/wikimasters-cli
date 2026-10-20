@@ -262,6 +262,14 @@ Source: the trade form's JavaScript on `/trades` and proposals on the account (2
 
 Source: the trade card's JavaScript on `/trades` and cancellations on the account (2026-10-17, 2026-10-18).
 
-- Body `{"action": "cancel"}`; the page sends other `action` values, such as `accept`, from the same card. Response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
+- Body `{"action": "cancel"}`; the page sends other `action` values, such as `accept` and `decline`, from the same card. Response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
 - Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha. Observed: an already cancelled trade and an accepted trade both get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
 - `cancelTrade`: sends the trade id given, reports `status`, and reports a refusal with its body.
+
+## `PATCH /api/trades/<trade id>`: accept a trade
+
+Source: the trade card's JavaScript on `/trades` and an acceptance on the account (2026-10-20).
+
+- Body `{"action": "accept"}`, sent by the card's accept button on a trade the user received, and again once the captcha the page shows on `human_verification_required` is solved. Response HTTP 200 `{"status": "accepted"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `accepted`, and the entry the user gave no longer appears in the user's `user_cards`.
+- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, as for a cancellation.
+- `acceptTrade`: sends the trade id given, reports `status`, and reports a refusal with its body.
