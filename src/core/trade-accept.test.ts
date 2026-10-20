@@ -73,10 +73,7 @@ describe("acceptTrade", () => {
     {
       reason: "human verification",
       status: 403,
-      body: {
-        error: "Vérification humaine requise",
-        code: "human_verification_required",
-      },
+      body: { code: "human_verification_required" },
       expected: /human_verification_required/,
     },
     {
