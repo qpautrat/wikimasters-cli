@@ -2,7 +2,7 @@
 
 ## Contexte
 
-La CLI est publiée sur npm et le site modifie parfois son API interne, ce qui peut casser une version ancienne. `wikimasters --version` donne la version installée, mais rien ne prévient l'utilisateur qu'une version plus récente est publiée. Les CLI distribuées par npm le signalent d'habitude dans le terminal, sans gêner les scripts ni les agents qui lisent leur sortie.
+La CLI est publiée sur npm et le site modifie parfois son API interne, ce qui peut casser une version ancienne. `wikimasters --version` donne la version installée, mais rien ne prévient l'utilisateur qu'une version plus récente est publiée.
 
 Dépend de : [Afficher la version installée de la CLI](../version-option.md).
 
@@ -17,4 +17,4 @@ En tant qu'utilisateur de la CLI dans un terminal, je suis prévenu qu'une versi
 3. L'avis n'apparaît jamais sur la sortie standard, avec ou sans `--json`.
 4. Hors d'un terminal ou en intégration continue, aucun avis ne s'affiche.
 5. L'utilisateur peut désactiver l'avis.
-6. Une commande ne met pas plus de temps à répondre, et son code de sortie ne change pas, que la dernière version publiée soit connue ou non.
+6. Une commande répond dans le même temps et sort avec le même code, que la recherche d'une version plus récente ait lieu ou non, aboutisse ou échoue.
