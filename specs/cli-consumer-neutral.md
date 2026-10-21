@@ -18,5 +18,5 @@ En tant que développeur, je trouve dans `CLAUDE.md` et les règles du dépôt u
 
 ## Hors périmètre
 
-- La reformulation des user stories des specs déjà implémentées qui parlent d'un agent.
+- La reformulation des specs déjà implémentées qui parlent d'un agent comme utilisateur de la CLI.
 - Les mentions de l'agent qui contribue au dépôt, comme la configuration d'agent suivie dans `CLAUDE.md`.
