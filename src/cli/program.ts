@@ -1,4 +1,5 @@
 import { Command, Option } from "commander";
+import { createRequire } from "node:module";
 import {
   AUCTION_LIMIT,
   CARD_SEARCH_FIELDS,
@@ -87,8 +88,13 @@ import {
 import { readPastedRefreshToken } from "./pasted-session.js";
 import { openSession } from "./session.js";
 
+const { version } = createRequire(import.meta.url)("../../package.json") as {
+  version: string;
+};
+
 export const program = new Command("wikimasters")
   .description("Interact with WikiMasters")
+  .version(version)
   .option("--json", "print the result as JSON on stdout")
   .configureHelp({ showGlobalOptions: true });
 

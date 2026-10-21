@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { describe, expect, it } from "vitest";
 import { program } from "./program.js";
@@ -52,5 +53,18 @@ describe.each(
         flags.some((flag) => example.split(" ").includes(flag)),
       ),
     ).toBe(true);
+  });
+});
+
+describe("wikimasters --version", () => {
+  it("is the version of the installed package", () => {
+    const { version } = JSON.parse(
+      readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+    ) as { version: string };
+    expect(program.version()).toBe(version);
+  });
+
+  it("is listed in the help", () => {
+    expect(helpOutput(program)).toContain("-V, --version");
   });
 });

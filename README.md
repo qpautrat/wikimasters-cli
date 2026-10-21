@@ -32,7 +32,7 @@ The CLI knows the site's public Supabase key. To replace it, set `WIKIMASTERS_SU
 
 ## Commands
 
-Run every command from any directory as `wikimasters <command>`. `wikimasters <command> --help` gives its arguments, options and examples.
+Run every command from any directory as `wikimasters <command>`. `wikimasters <command> --help` gives its arguments, options and examples. `wikimasters --version` prints the installed version, e.g. `1.4.0`.
 
 | Command | What it does | Example |
 |---|---|---|
