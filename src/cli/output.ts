@@ -20,6 +20,7 @@ import type {
   MyProfile,
   NotificationPage,
   PlacedBid,
+  PlayerSearch,
   ProfileCollectionPage,
   ProposedTrade,
   RunningBidPage,
@@ -238,6 +239,23 @@ export function formatProfileCollection(
         ].join("  "),
     ),
     ...fullPageNote(full, `${entries.length} entries`),
+  ].join("\n");
+}
+
+export function formatPlayerSearch(
+  search: PlayerSearch,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify(search);
+  const { users, full } = search;
+  if (users.length === 0) return "No player matches.";
+  return [
+    ...users.map(({ id, username }) => `${id}  ${username}`),
+    ...(full
+      ? [
+          `The game returns at most ${users.length} players; more may match, refine the text.`,
+        ]
+      : []),
   ].join("\n");
 }
 

@@ -249,6 +249,15 @@ Source: the trade form's JavaScript on `/trades`, the profile page's on `/profil
 - The route also answers a player who is not a friend. A player id instead of a pseudo gets HTTP 404 `{"error":"Profil introuvable"}`.
 - `readProfileCollection`: sends the pseudo and `page` given, `sort` when given, `stats=0`, `pending=1`, the text as `q` when given, each rarity given and `wishlisted_by_me=1` when asked, maps each entry, reports whether `pendingTradeCardIds` holds its card and whether the page holds 50 entries, and reports a refusal with its body.
 
+## `GET /api/friends/search`: search the players by pseudo
+
+Source: the `/friends` page's JavaScript and reads on the account (2026-10-22).
+
+- Query `q`, the text; the page sends it only from 2 characters.
+- Response `{"users": [{"id", "username", "avatar_url", "avatar_pos_x", "avatar_pos_y"}…]}`, at most 10 players, `id` being the `profiles` id. The text matches anywhere in the pseudo, regardless of case: `q=luc` answers `Luc`, `luc.` and `LUc1`. A one-character text, or none, answers `"users": []`.
+- `q=%'"(` gets HTTP 500 `{"error":"Erreur serveur"}`; a 3000-character text answers `"users": []`.
+- `searchPlayers`: sends the text given as `q`, maps each player to its `id` and `username`, reports whether the response holds 10 players, and reports a refusal with its body.
+
 ## `POST /api/trades`: propose a trade
 
 Source: the trade form's JavaScript on `/trades` and proposals on the account (2026-10-17).

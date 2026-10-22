@@ -43,6 +43,7 @@ import {
   readMyProfile,
   readProfileCollection,
   removeFromWishlist,
+  searchPlayers,
   searchAuctions,
   searchCards,
   searchGlobalCollection,
@@ -78,6 +79,7 @@ import {
   formatLogin,
   formatMyProfile,
   formatNotifications,
+  formatPlayerSearch,
   formatProfileCollection,
   formatProposedTrade,
   formatRemoval,
@@ -680,6 +682,24 @@ notifications
       request,
     );
     console.log(formatNotifications(result, format()));
+  });
+
+const player = program.command("player").description("Find players");
+
+player
+  .command("search")
+  .description(
+    "Search the players whose pseudo contains the text, regardless of case, and print each one's id and pseudo; the game returns at most 10 players, and none for a text shorter than 2 characters",
+  )
+  .argument("<text>", "all or part of a pseudo, sent to the game as given")
+  .addHelpText("after", examples("wikimasters player search luc"))
+  .action(async (text: string) => {
+    console.log(
+      formatPlayerSearch(
+        await searchPlayers(await openSession(), text),
+        format(),
+      ),
+    );
   });
 
 const profile = program

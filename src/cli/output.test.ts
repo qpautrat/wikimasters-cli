@@ -30,6 +30,7 @@ import {
   formatLogin,
   formatMyProfile,
   formatNotifications,
+  formatPlayerSearch,
   formatProfileCollection,
   formatProposedTrade,
   formatRemoval,
@@ -168,6 +169,7 @@ const playerEntry = {
   labels: [],
   pendingTrade: false,
 };
+const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
   wikibidous_balance: 7989,
@@ -374,6 +376,14 @@ describe("JSON output", () => {
       ],
       full: false,
     });
+  });
+
+  it("reports the players found with their id and pseudo, and whether the response is full", () => {
+    expect(
+      JSON.parse(
+        formatPlayerSearch({ users: [foundPlayer], full: false }, "json"),
+      ),
+    ).toEqual({ users: [{ id: friendId, username: "Luc" }], full: false });
   });
 
   it("gives no entry for an empty page of a player's collection", () => {
@@ -814,6 +824,27 @@ describe("text output", () => {
       ),
     ).toBe(
       `${entryId}  ${cardId}  Pointe de la Sambuy (C)  x2  obtained 2026-09-18T23:42:15.692426+00:00  [favourite]  [shiny]  [labels: "Lieux", "Montagnes"]`,
+    );
+  });
+
+  it("prints one line per player found, id first", () => {
+    expect(
+      formatPlayerSearch({ users: [foundPlayer], full: false }, "text"),
+    ).toBe(`${friendId}  Luc`);
+  });
+
+  it("says when the game returns as many players as it does at most", () => {
+    const users = Array.from({ length: 10 }, () => foundPlayer);
+    expect(
+      formatPlayerSearch({ users, full: true }, "text").split("\n").at(-1),
+    ).toBe(
+      "The game returns at most 10 players; more may match, refine the text.",
+    );
+  });
+
+  it("says when no player matches", () => {
+    expect(formatPlayerSearch({ users: [], full: false }, "text")).toBe(
+      "No player matches.",
     );
   });
 

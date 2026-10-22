@@ -4,7 +4,7 @@
 
 L'interface du jeu ne propose un échange qu'à un ami, et ajouter un joueur en ami demande aujourd'hui d'ouvrir la page « Amis » du jeu. La demande attend que l'autre joueur l'accepte.
 
-Dépend de : [Rechercher un joueur](player-search.md).
+Dépend de : [Rechercher un joueur](../player-search.md).
 
 ## User story
 

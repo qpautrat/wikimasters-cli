@@ -125,6 +125,12 @@ export {
   type Session,
 } from "./session.js";
 export { asPlayerId, type PlayerId } from "./player-id.js";
+export {
+  PLAYER_SEARCH_LIMIT,
+  searchPlayers,
+  type FoundPlayer,
+  type PlayerSearch,
+} from "./player-search.js";
 export { asTradeId, type TradeId } from "./trade-id.js";
 export { acceptTrade } from "./trade-accept.js";
 export { cancelTrade } from "./trade-cancel.js";
