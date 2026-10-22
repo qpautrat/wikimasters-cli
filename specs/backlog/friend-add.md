@@ -24,5 +24,5 @@ En tant que joueur, je donne l'identifiant d'un joueur et la commande lui envoie
 - [Accepter une demande d'ami](friend-accept.md).
 - [Refuser une demande d'ami](friend-decline.md).
 - [Annuler une demande d'ami que j'ai envoyée](friend-cancel.md).
-- Retirer un ami.
+- [Retirer un ami](friend-remove.md).
 - [Lister mes amis et mes demandes en attente](friend-list.md).
