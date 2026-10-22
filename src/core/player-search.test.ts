@@ -99,14 +99,14 @@ describe("searchPlayers", () => {
 
   it("fails with the game's reason", async () => {
     const { session } = await sessionAnswering({
-      status: 400,
-      body: { error: "Requête invalide" },
+      status: 500,
+      body: { error: "Erreur serveur" },
     });
 
     const failure = searchPlayers(session, "luc");
     await expect(failure).rejects.toThrow(WikiMastersError);
     await expect(failure).rejects.toThrow(
-      'Searching the players matching "luc" failed (HTTP 400): {"error":"Requête invalide"}',
+      'Searching the players matching "luc" failed (HTTP 500): {"error":"Erreur serveur"}',
     );
   });
 

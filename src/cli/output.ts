@@ -29,6 +29,7 @@ import type {
   WishlistCard,
   WishlistRemoval,
 } from "../core/index.js";
+import { PLAYER_SEARCH_LIMIT } from "../core/index.js";
 
 export type Format = "text" | "json";
 
@@ -253,7 +254,7 @@ export function formatPlayerSearch(
     ...users.map(({ id, username }) => `${id}  ${username}`),
     ...(full
       ? [
-          `The game returns at most ${users.length} players; more may match, refine the text.`,
+          `The game returns at most ${PLAYER_SEARCH_LIMIT} players; more may match, refine the text.`,
         ]
       : []),
   ].join("\n");
