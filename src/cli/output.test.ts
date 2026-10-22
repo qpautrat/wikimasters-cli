@@ -174,7 +174,7 @@ const playerEntry = {
   pendingTrade: false,
 };
 const friendRequest = {
-  id: "cdee9111-6a3d-4ce4-a1ab-278de345831d",
+  id: asFriendshipId("cdee9111-6a3d-4ce4-a1ab-278de345831d"),
   requester_id: "8896a517-9221-44a0-8081-79bc4a5674ba",
   addressee_id: friendId,
   status: "pending",

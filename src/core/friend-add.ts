@@ -1,4 +1,5 @@
 import { WikiMastersError } from "./errors.js";
+import type { FriendshipId } from "./friendship-id.js";
 import { FRIENDS_PAGE } from "./friends-page.js";
 import { isObject } from "./object.js";
 import type { PlayerId } from "./player-id.js";
@@ -6,7 +7,7 @@ import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
 export type FriendRequest = Record<string, unknown> & {
-  id: string;
+  id: FriendshipId;
   status: string;
 };
 
