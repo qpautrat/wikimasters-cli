@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   asEntryId,
   asFriendshipId,
+  asGuildId,
   asLabelId,
   asPlayerId,
   asTradeId,
@@ -28,6 +29,7 @@ import {
   formatFriendshipStatus,
   formatFriendships,
   formatGlobalCollection,
+  formatGuildJoin,
   formatLabelCreation,
   formatLabelDeletion,
   formatLabels,
@@ -199,6 +201,10 @@ const acceptedFriendRequest = {
   friendshipId: asFriendshipId("c33d11f8-973d-43f5-8045-18f22caaa6d7"),
   status: "accepted",
 };
+const guildJoin = {
+  guildId: asGuildId("768c8705-546d-44c8-a495-cffd0bf1d29f"),
+  ok: true as const,
+};
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -323,6 +329,13 @@ describe("JSON output", () => {
     ).toEqual({
       friendshipId: acceptedFriendRequest.friendshipId,
       status: "accepted",
+    });
+  });
+
+  it("reports the joined guild's id and the result the game gives", () => {
+    expect(JSON.parse(formatGuildJoin(guildJoin, "json"))).toEqual({
+      guildId: guildJoin.guildId,
+      ok: true,
     });
   });
 
@@ -737,6 +750,12 @@ describe("text output", () => {
   it("prints the accepted friend request's id and the status the game gives", () => {
     expect(formatFriendshipStatus(acceptedFriendRequest, "text")).toBe(
       `Friend request ${acceptedFriendRequest.friendshipId} accepted.`,
+    );
+  });
+
+  it("prints the id of the guild whose invitation was accepted", () => {
+    expect(formatGuildJoin(guildJoin, "text")).toBe(
+      `Guild ${guildJoin.guildId} invitation accepted.`,
     );
   });
 

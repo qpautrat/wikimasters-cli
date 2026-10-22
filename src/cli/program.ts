@@ -11,6 +11,7 @@ import {
   addToWishlist,
   asEntryId,
   asFriendshipId,
+  asGuildId,
   asLabelId,
   asPlayerId,
   asTradeId,
@@ -20,6 +21,7 @@ import {
   createLabel,
   deleteLabel,
   discardEntries,
+  joinGuild,
   listAuctions,
   listCollection,
   listFriendships,
@@ -81,6 +83,7 @@ import {
   formatFriendshipStatus,
   formatFriendships,
   formatGlobalCollection,
+  formatGuildJoin,
   formatLabelCreation,
   formatLabelDeletion,
   formatLabels,
@@ -114,6 +117,7 @@ const OTHER_EXAMPLE_CARD_ID = "0d4f6b8a-3e5c-4a7b-9c1d-5e7f9a1b3c5d";
 const EXAMPLE_ENTRY_ID = "4a7c9e1b-6d2f-4b8a-9e3c-1f5a7b9d2e4c";
 const OTHER_EXAMPLE_ENTRY_ID = "8e2d5a9c-3b7f-4c1e-a6d4-9f3b1e7c5a28";
 const EXAMPLE_FRIENDSHIP_ID = "3e8b1d6f-9a2c-4f7e-b5d1-6c9a3f2e8b47";
+const EXAMPLE_GUILD_ID = "2f9d4b7a-8c1e-4a3f-b6d2-5e8a1c4f7b93";
 const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
 const EXAMPLE_PLAYER_ID = "5c8e2a4f-7b1d-4e9a-b3c6-2d4f6a8b0c1e";
 const EXAMPLE_TRADE_ID = "7d3a9f1c-2e6b-4a8d-b5c7-3f1e9a2d6b84";
@@ -649,6 +653,25 @@ friend
         await acceptFriendRequest(session, asFriendshipId(friendshipId)),
         format(),
       ),
+    );
+  });
+
+const guild = program.command("guild").description("Manage your guild");
+
+guild
+  .command("join")
+  .description(
+    "Accept a guild's invitation to join it, in a single request, and print the guild id; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<guild-id>",
+    "the guild's id, as given by the guild_id in the data of a guild_invite notification notifications list prints",
+  )
+  .addHelpText("after", examples(`wikimasters guild join ${EXAMPLE_GUILD_ID}`))
+  .action(async (guildId: string) => {
+    const session = await openSession();
+    console.log(
+      formatGuildJoin(await joinGuild(session, asGuildId(guildId)), format()),
     );
   });
 

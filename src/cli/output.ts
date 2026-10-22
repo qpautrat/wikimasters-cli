@@ -18,6 +18,7 @@ import type {
   FriendshipStatus,
   GlobalCollectionCard,
   GlobalCollectionSearch,
+  GuildJoin,
   Label,
   LabelDeletion,
   MyProfile,
@@ -355,6 +356,14 @@ export function formatFriendships(
         `${friendshipId}  ${kind}  ${playerId}  ${username}`,
     )
     .join("\n");
+}
+
+export function formatGuildJoin(
+  { guildId, ok }: GuildJoin,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ guildId, ok });
+  return `Guild ${guildId} invitation accepted.`;
 }
 
 export function formatTradeStatus(

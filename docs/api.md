@@ -286,6 +286,15 @@ Source: the `/friends` page's JavaScript and requests on the account (2026-10-22
 - Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown or malformed id gets HTTP 404 `{"error":"Demande introuvable"}`, accepting an accepted request HTTP 409 `{"error":"Demande déjà traitée"}`.
 - `acceptFriendRequest`: sends the friendship id given with `accept`, reports `status`, and reports a refusal with its body.
 
+## `POST /api/guilds/join`: accept a guild invitation
+
+Source: the `/guild` page's JavaScript and requests on the account (2026-10-22).
+
+- Body `{"guild_id": <guilds.id>}`. The game has no invitation id: a `guild_invite` notification carries the inviting guild's `guild_id`, which the page reads from its `/guild?invite=<guild_id>` link and sends when the user accepts.
+- Response HTTP 200 `{"ok": true}` on a guild that invited the user; `GET /api/guilds` then returns that guild and a `membership` with `role` `member`.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown or malformed guild id gets HTTP 404 `{"error":"Guilde introuvable"}`; a user already in a guild gets HTTP 409 `{"error":"Vous êtes déjà dans une guilde"}`, whatever the id. An attempt got HTTP 500 `{"error":"Erreur serveur"}` while the site answered 504 and 525, without joining; the next one, on the same invitation, got HTTP 404 `{"error":"Guilde introuvable"}`, and a new invitation from the guild let the user join.
+- `joinGuild`: sends the guild id given, reports `ok`, and reports a refusal with its body.
+
 ## `POST /api/trades`: propose a trade
 
 Source: the trade form's JavaScript on `/trades` and proposals on the account (2026-10-17).

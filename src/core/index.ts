@@ -60,6 +60,8 @@ export {
 } from "./friend-list.js";
 export { asFriendshipId, type FriendshipId } from "./friendship-id.js";
 export type { FriendshipStatus } from "./friendship-status.js";
+export { asGuildId, type GuildId } from "./guild-id.js";
+export { joinGuild, type GuildJoin } from "./guild-join.js";
 export {
   CARD_SEARCH_FIELDS,
   parseCardSearchField,
