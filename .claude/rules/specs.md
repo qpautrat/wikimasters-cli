@@ -34,6 +34,7 @@ A command sends exactly one request to the API and nothing more: it takes the id
 - Any user-visible behaviour needs a spec before it is implemented, including behaviour forced by a technical constraint (e.g. the captcha that imposed browser login). Write or amend the spec first.
 - Change an implemented spec in `specs/` only in the commit that makes the code meet it. A change planned for later goes into a correction spec in `specs/backlog/`, whose implementation amends or removes the implemented spec in the same commit.
 - A new spec states only the intent: the context, the user story and acceptance criteria on the expected outcome, never a solution, tool or mechanism. Work out the solution only when its implementation starts, and amend the spec with the decisions taken and what is coded, so that it matches the code at the end of the increment.
+- Write a backlog spec from what the user states; API discovery starts with its implementation.
 - Propose the design with the fewest new components, manual user steps included, and keep every existing behaviour unless the user asks to drop it.
 - Work in small batches: one atomic spec, implemented and delivered, before the next. Atomicity is mandatory, submission is not.
 - When confident in a spec, commit it and implement it without waiting, then name each decision taken on the user's behalf when reporting the delivery. Submit it first when confidence is low, all the more for a functional spec.
