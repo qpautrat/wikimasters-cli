@@ -1,12 +1,11 @@
 import { WikiMastersError } from "./errors.js";
+import { FRIENDS_PAGE } from "./friends-page.js";
 import { isFullPage } from "./page.js";
 import type { PlayerId } from "./player-id.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
 export const PLAYER_SEARCH_LIMIT = 10;
-
-const FRIENDS_PAGE = "/friends";
 
 export interface FoundPlayer {
   id: PlayerId;
