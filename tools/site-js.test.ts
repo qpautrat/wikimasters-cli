@@ -7,6 +7,7 @@ describe("chunkPaths", () => {
       '<script src="/_next/static/chunks/0o9x~z9.js?dpl=dpl_abc"></script>',
       '<link href="/_next/static/chunks/0ci.ba~kz.css?dpl=dpl_abc">',
       '"static/chunks/0o9x~z9.js?dpl=dpl_abc\\"',
+      '"static/chunks/manifest.json"',
     ].join("");
     expect(chunkPaths(html)).toEqual(["static/chunks/0o9x~z9.js"]);
   });

@@ -1,4 +1,4 @@
-const CHUNK_PATH = /static\/chunks\/[\w~./-]+\.js/g;
+const CHUNK_PATH = /static\/chunks\/[\w~./-]+\.js(?!\w)/g;
 const CONTEXT_LENGTH = 200;
 
 export interface Occurrence {

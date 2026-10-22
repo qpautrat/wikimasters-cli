@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 import { openSession, reportFailure } from "../src/cli/session.js";
-import {
-  AuthRequiredError,
-  SITE_URL,
-  type Session,
-  WikiMastersError,
-} from "../src/core/index.js";
+import { apiFailure } from "../src/core/errors.js";
+import { SITE_URL, WikiMastersError } from "../src/core/index.js";
 import { sendSiteRequest, siteCookie } from "../src/core/site.js";
 import { downloadChunks, findOccurrences } from "./site-js.js";
 
@@ -20,29 +16,29 @@ function parseSearch(args: readonly string[]): { page: string; text: string } {
   return { page, text };
 }
 
-async function downloadSiteFile(
-  session: Session,
-  cookie: string,
-  page: string,
-  path: string,
-): Promise<string> {
-  const action = `GET ${SITE_URL}${path}`;
-  const response = await sendSiteRequest(session, cookie, action, page, path, {
-    method: "GET",
-  });
-  if (response.ok) return response.body;
-  const failure = `${action} failed (HTTP ${response.status})`;
-  throw response.status === 401
-    ? new AuthRequiredError(failure)
-    : new WikiMastersError(failure);
-}
-
 try {
   const { page, text } = parseSearch(process.argv.slice(2));
   const session = await openSession();
   const cookie = await siteCookie(session);
-  const download = (path: string) =>
-    downloadSiteFile(session, cookie, page, path);
+  const download = async (path: string): Promise<string> => {
+    const action = `GET ${SITE_URL}${path}`;
+    const response = await sendSiteRequest(
+      session,
+      cookie,
+      action,
+      page,
+      path,
+      { method: "GET" },
+    );
+    if (response.ok) return response.body;
+    throw apiFailure(
+      action,
+      response.status,
+      response.location === null
+        ? "response body not shown"
+        : `redirected to ${response.location}`,
+    );
+  };
   const html = await download(page);
   const chunks = await downloadChunks(html, (chunkPath) =>
     download(`/_next/${chunkPath}`),
