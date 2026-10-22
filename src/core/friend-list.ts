@@ -1,4 +1,5 @@
 import { WikiMastersError } from "./errors.js";
+import type { FriendshipId } from "./friendship-id.js";
 import { FRIENDS_PAGE } from "./friends-page.js";
 import { isObject } from "./object.js";
 import type { PlayerId } from "./player-id.js";
@@ -8,7 +9,7 @@ import { siteCookie, siteRequest } from "./site.js";
 export type FriendshipKind = "friend" | "received" | "sent";
 
 export interface Friendship {
-  friendshipId: string;
+  friendshipId: FriendshipId;
   kind: FriendshipKind;
   playerId: PlayerId;
   username: string;
@@ -20,7 +21,7 @@ interface FriendshipPlayer {
 }
 
 interface FriendshipRow {
-  id: string;
+  id: FriendshipId;
   status: string;
   requester_id: string;
   addressee_id: string;

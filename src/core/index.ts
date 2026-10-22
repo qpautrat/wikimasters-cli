@@ -51,12 +51,15 @@ export {
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
 export { asEntryId, type EntryId } from "./entry-id.js";
+export { acceptFriendRequest } from "./friend-accept.js";
 export { sendFriendRequest, type FriendRequest } from "./friend-add.js";
 export {
   listFriendships,
   type Friendship,
   type FriendshipKind,
 } from "./friend-list.js";
+export { asFriendshipId, type FriendshipId } from "./friendship-id.js";
+export type { FriendshipStatus } from "./friendship-status.js";
 export {
   CARD_SEARCH_FIELDS,
   parseCardSearchField,

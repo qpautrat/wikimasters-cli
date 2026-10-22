@@ -15,6 +15,7 @@ import type {
   FriendOwner,
   FriendRequest,
   Friendship,
+  FriendshipStatus,
   GlobalCollectionCard,
   GlobalCollectionSearch,
   Label,
@@ -330,6 +331,14 @@ export function formatFriendRequest(
 ): string {
   if (format === "json") return JSON.stringify(request);
   return `Friend request ${request.id} ${request.status}.`;
+}
+
+export function formatFriendshipStatus(
+  { friendshipId, status }: FriendshipStatus,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ friendshipId, status });
+  return `Friend request ${friendshipId} ${status}.`;
 }
 
 export function formatFriendships(

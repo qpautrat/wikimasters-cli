@@ -4,7 +4,7 @@
 
 Retirer un joueur de mes amis demande aujourd'hui d'ouvrir la page « Amis » du jeu.
 
-Dépend de : [Accepter une demande d'ami](friend-accept.md), [Lister mes amis et mes demandes en attente](../friend-list.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Accepter une demande d'ami](../friend-accept.md), [Lister mes amis et mes demandes en attente](../friend-list.md), [Sortie JSON des commandes](../json-output.md).
 
 ## User story
 

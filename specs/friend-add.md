@@ -20,7 +20,7 @@ En tant que joueur, je donne l'identifiant d'un joueur et la commande lui envoie
 
 ## Hors périmètre
 
-- [Accepter une demande d'ami](backlog/friend-accept.md).
+- [Accepter une demande d'ami](friend-accept.md).
 - [Refuser une demande d'ami](backlog/friend-decline.md).
 - [Annuler une demande d'ami que j'ai envoyée](backlog/friend-cancel.md).
 - [Retirer un ami](backlog/friend-remove.md).

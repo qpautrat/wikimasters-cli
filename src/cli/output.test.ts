@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   asEntryId,
+  asFriendshipId,
   asLabelId,
   asPlayerId,
   asTradeId,
@@ -24,6 +25,7 @@ import {
   formatEntryTag,
   formatEntryUntag,
   formatFriendRequest,
+  formatFriendshipStatus,
   formatFriendships,
   formatGlobalCollection,
   formatLabelCreation,
@@ -181,18 +183,22 @@ const friendRequest = {
 };
 const friendships = [
   {
-    friendshipId: "6f0e0f2d-0174-47f3-9da7-928bc1c05a7e",
+    friendshipId: asFriendshipId("6f0e0f2d-0174-47f3-9da7-928bc1c05a7e"),
     kind: "friend" as const,
     playerId: friendId,
     username: "LucasPerso",
   },
   {
-    friendshipId: "d7c954fe-94fa-4f0c-8598-de8aba3d146c",
+    friendshipId: asFriendshipId("d7c954fe-94fa-4f0c-8598-de8aba3d146c"),
     kind: "sent" as const,
     playerId: asPlayerId("debf5111-f4d7-4ab5-ace8-5449c0701dac"),
     username: "Smarkwood",
   },
 ];
+const acceptedFriendRequest = {
+  friendshipId: asFriendshipId("c33d11f8-973d-43f5-8045-18f22caaa6d7"),
+  status: "accepted",
+};
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -309,6 +315,15 @@ describe("JSON output", () => {
 
   it("reports no friendship as an empty list", () => {
     expect(JSON.parse(formatFriendships([], "json"))).toEqual([]);
+  });
+
+  it("reports the accepted friend request's id and the status the game gives", () => {
+    expect(
+      JSON.parse(formatFriendshipStatus(acceptedFriendRequest, "json")),
+    ).toEqual({
+      friendshipId: acceptedFriendRequest.friendshipId,
+      status: "accepted",
+    });
   });
 
   it("reports the accepted trade's id and the status the game gives", () => {
@@ -716,6 +731,12 @@ describe("text output", () => {
   it("says when there is no friend and no pending request", () => {
     expect(formatFriendships([], "text")).toBe(
       "You have no friend and no pending friend request.",
+    );
+  });
+
+  it("prints the accepted friend request's id and the status the game gives", () => {
+    expect(formatFriendshipStatus(acceptedFriendRequest, "text")).toBe(
+      `Friend request ${acceptedFriendRequest.friendshipId} accepted.`,
     );
   });
 

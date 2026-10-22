@@ -273,9 +273,18 @@ Source: the `/friends` page's JavaScript and reads on the account (2026-10-22).
 
 - No query. The page lists the response's `friendships` as is: `accepted` ones as friends, `pending` ones whose `addressee_id` is the user as received requests, `pending` ones whose `requester_id` is the user as sent requests.
 - Response `{"friendships": [...], "counts": {"accepted", "incoming", "outgoing"}}`. Each friendship holds the `friendships` row (`id`, `requester_id`, `addressee_id`, `status`, `created_at`, `updated_at`) and the `requester` and `addressee` players (`id`, `username`, `avatar_url`, `avatar_pos_x`, `avatar_pos_y`, `activity_blocked_until`).
-- The route can return fewer rows than PostgREST's `friendships`: on the account, it leaves out two `pending` received requests that `friendships?select=*` returns.
+- The route can return fewer rows than PostgREST's `friendships`: on the account, it leaves out two received requests that `friendships?select=*` returns, and still leaves out one of them once accepted (2026-10-22).
 - Without a session, HTTP 401 `{"error":"Non autorisé"}`.
 - `listFriendships`: maps each friendship, in the response's order, to its `id`, whether it is a friend, a received or a sent request, and the other player's `id` and `username`; reports a refusal with its body, and a status other than `accepted` or `pending`, or a friendship the user is not part of, as an unexpected response.
+
+## `PATCH /api/friends/<friendship id>`: accept a friend request
+
+Source: the `/friends` page's JavaScript and requests on the account (2026-10-22).
+
+- Body `{"action": <action>}`; the page sends `accept` and `decline` on a received request, and ignores the response. The core sends `accept`.
+- `accept`: response HTTP 200 `{"status": "accepted"}` on a `pending` request another player sent to the user; the `friendships` row then has `status` `accepted`.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown or malformed id gets HTTP 404 `{"error":"Demande introuvable"}`, accepting an accepted request HTTP 409 `{"error":"Demande déjà traitée"}`.
+- `acceptFriendRequest`: sends the friendship id given with `accept`, reports `status`, and reports a refusal with its body.
 
 ## `POST /api/trades`: propose a trade
 
