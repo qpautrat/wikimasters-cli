@@ -94,21 +94,21 @@ describe.each([
   it.each([
     {
       reason: "an unknown request",
-      refusal: 404,
+      httpStatus: 404,
       body: { error: "Demande introuvable" },
       expected: /\(HTTP 404\).*Demande introuvable/,
     },
     {
       reason: "a request already answered",
-      refusal: 409,
+      httpStatus: 409,
       body: { error: "Demande déjà traitée" },
       expected: /\(HTTP 409\).*Demande déjà traitée/,
     },
   ])(
     "reports the game's refusal for $reason with its reason",
-    async ({ refusal, body, expected }) => {
+    async ({ httpStatus, body, expected }) => {
       const { session } = await sessionWith(
-        answerRoute({ status: refusal, body }),
+        answerRoute({ status: httpStatus, body }),
       );
 
       const failure = answerFriendRequest(session, friendshipId);

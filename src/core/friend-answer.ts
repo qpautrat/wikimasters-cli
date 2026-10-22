@@ -6,8 +6,8 @@ import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
 const ANSWERS = {
-  accept: { doing: "Accepting", effect: "accepted" },
-  decline: { doing: "Declining", effect: "declined" },
+  accept: { verb: "Accepting", effect: "accepted" },
+  decline: { verb: "Declining", effect: "declined" },
 } as const;
 
 async function answerFriendRequest(
@@ -15,8 +15,8 @@ async function answerFriendRequest(
   friendshipId: FriendshipId,
   answer: keyof typeof ANSWERS,
 ): Promise<FriendshipStatus> {
-  const { doing, effect } = ANSWERS[answer];
-  const action = `${doing} friend request ${friendshipId}`;
+  const { verb, effect } = ANSWERS[answer];
+  const action = `${verb} friend request ${friendshipId}`;
   const body = await siteRequest(
     session,
     await siteCookie(session),
