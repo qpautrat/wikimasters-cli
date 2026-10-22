@@ -14,6 +14,7 @@ import type {
   EntryUntag,
   FriendOwner,
   FriendRequest,
+  Friendship,
   GlobalCollectionCard,
   GlobalCollectionSearch,
   Label,
@@ -329,6 +330,22 @@ export function formatFriendRequest(
 ): string {
   if (format === "json") return JSON.stringify(request);
   return `Friend request ${request.id} ${request.status}.`;
+}
+
+export function formatFriendships(
+  friendships: readonly Friendship[],
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify(friendships);
+  if (friendships.length === 0) {
+    return "You have no friend and no pending friend request.";
+  }
+  return friendships
+    .map(
+      ({ friendshipId, kind, playerId, username }) =>
+        `${friendshipId}  ${kind}  ${playerId}  ${username}`,
+    )
+    .join("\n");
 }
 
 export function formatTradeStatus(

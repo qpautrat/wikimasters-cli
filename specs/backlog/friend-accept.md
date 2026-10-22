@@ -4,7 +4,7 @@
 
 Un autre joueur peut m'envoyer une demande d'ami, et l'accepter demande aujourd'hui d'ouvrir la page « Amis » du jeu.
 
-Dépend de : [Lister mes amis et mes demandes en attente](friend-list.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Lister mes amis et mes demandes en attente](../friend-list.md), [Sortie JSON des commandes](../json-output.md).
 
 ## User story
 

@@ -267,6 +267,16 @@ Source: the `/friends` page's JavaScript and requests on the account (2026-10-22
 - Past the daily limit, 10 requests for a free account and 100 for a Pro one, HTTP 429 `{"error", "code": "friend_request_daily_limit", "limit", "is_pro", "resets_at"}`. Any other refusal carries `error`: an unknown player id gets HTTP 500 `{"error":"Erreur serveur"}`, the user's own id HTTP 400 `{"error":"Vous ne pouvez pas vous ajouter vous-même"}`, a friend's id HTTP 409 `{"error":"Déjà amis"}`, a player already sent a pending request HTTP 409 `{"error":"Demande déjà envoyée"}`.
 - `sendFriendRequest`: sends the player id given as `addressee_id`, returns `friendship` as given, and reports a refusal with its body.
 
+## `GET /api/friends`: list the friends and pending friend requests
+
+Source: the `/friends` page's JavaScript and reads on the account (2026-10-22).
+
+- No query. The page lists the response's `friendships` as is: `accepted` ones as friends, `pending` ones whose `addressee_id` is the user as received requests, `pending` ones whose `requester_id` is the user as sent requests.
+- Response `{"friendships": [...], "counts": {"accepted", "incoming", "outgoing"}}`. Each friendship holds the `friendships` row (`id`, `requester_id`, `addressee_id`, `status`, `created_at`, `updated_at`) and the `requester` and `addressee` players (`id`, `username`, `avatar_url`, `avatar_pos_x`, `avatar_pos_y`, `activity_blocked_until`).
+- The route can return fewer rows than PostgREST's `friendships`: on the account, it leaves out two `pending` received requests that `friendships?select=*` returns.
+- Without a session, HTTP 401 `{"error":"Non autorisé"}`.
+- `listFriendships`: maps each friendship, in the response's order, to its `id`, whether it is a friend, a received or a sent request, and the other player's `id` and `username`; reports a refusal with its body, and a status other than `accepted` or `pending`, or a friendship the user is not part of, as an unexpected response.
+
 ## `POST /api/trades`: propose a trade
 
 Source: the trade form's JavaScript on `/trades` and proposals on the account (2026-10-17).

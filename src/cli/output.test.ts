@@ -24,6 +24,7 @@ import {
   formatEntryTag,
   formatEntryUntag,
   formatFriendRequest,
+  formatFriendships,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -178,6 +179,20 @@ const friendRequest = {
   created_at: "2026-10-22T14:26:28.503781+00:00",
   updated_at: "2026-10-22T14:26:28.503781+00:00",
 };
+const friendships = [
+  {
+    friendshipId: "6f0e0f2d-0174-47f3-9da7-928bc1c05a7e",
+    kind: "friend" as const,
+    playerId: friendId,
+    username: "LucasPerso",
+  },
+  {
+    friendshipId: "d7c954fe-94fa-4f0c-8598-de8aba3d146c",
+    kind: "sent" as const,
+    playerId: asPlayerId("debf5111-f4d7-4ab5-ace8-5449c0701dac"),
+    username: "Smarkwood",
+  },
+];
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -284,6 +299,16 @@ describe("JSON output", () => {
     expect(JSON.parse(formatFriendRequest(friendRequest, "json"))).toEqual(
       friendRequest,
     );
+  });
+
+  it("reports each friendship with the fields printed as text", () => {
+    expect(JSON.parse(formatFriendships(friendships, "json"))).toEqual(
+      friendships,
+    );
+  });
+
+  it("reports no friendship as an empty list", () => {
+    expect(JSON.parse(formatFriendships([], "json"))).toEqual([]);
   });
 
   it("reports the accepted trade's id and the status the game gives", () => {
@@ -676,6 +701,21 @@ describe("text output", () => {
   it("prints the friend request's id and the status the game gives", () => {
     expect(formatFriendRequest(friendRequest, "text")).toBe(
       `Friend request ${friendRequest.id} pending.`,
+    );
+  });
+
+  it("prints each friendship's id, kind, player id and pseudo, one per line", () => {
+    expect(formatFriendships(friendships, "text")).toBe(
+      [
+        `6f0e0f2d-0174-47f3-9da7-928bc1c05a7e  friend  ${friendId}  LucasPerso`,
+        "d7c954fe-94fa-4f0c-8598-de8aba3d146c  sent  debf5111-f4d7-4ab5-ace8-5449c0701dac  Smarkwood",
+      ].join("\n"),
+    );
+  });
+
+  it("says when there is no friend and no pending request", () => {
+    expect(formatFriendships([], "text")).toBe(
+      "You have no friend and no pending friend request.",
     );
   });
 

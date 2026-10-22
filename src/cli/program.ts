@@ -20,6 +20,7 @@ import {
   discardEntries,
   listAuctions,
   listCollection,
+  listFriendships,
   listLabels,
   listNotifications,
   listRunningBids,
@@ -75,6 +76,7 @@ import {
   formatEntryTag,
   formatEntryUntag,
   formatFriendRequest,
+  formatFriendships,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -608,6 +610,18 @@ friend
         await sendFriendRequest(session, asPlayerId(playerId)),
         format(),
       ),
+    );
+  });
+
+friend
+  .command("list")
+  .description(
+    "List your friends and your pending friend requests, received and sent, in a single request and in the game's order, each with the friendship id, whether it is a friend, a received or a sent request, and the player's id and pseudo",
+  )
+  .addHelpText("after", examples("wikimasters friend list"))
+  .action(async () => {
+    console.log(
+      formatFriendships(await listFriendships(await openSession()), format()),
     );
   });
 
