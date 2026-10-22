@@ -23,6 +23,7 @@ import {
   formatEntryFavourite,
   formatEntryTag,
   formatEntryUntag,
+  formatFriendRequest,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -169,6 +170,14 @@ const playerEntry = {
   labels: [],
   pendingTrade: false,
 };
+const friendRequest = {
+  id: "cdee9111-6a3d-4ce4-a1ab-278de345831d",
+  requester_id: "8896a517-9221-44a0-8081-79bc4a5674ba",
+  addressee_id: friendId,
+  status: "pending",
+  created_at: "2026-10-22T14:26:28.503781+00:00",
+  updated_at: "2026-10-22T14:26:28.503781+00:00",
+};
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -269,6 +278,12 @@ describe("JSON output", () => {
     expect(JSON.parse(formatProposedTrade(proposedTrade, "json"))).toEqual({
       tradeId: proposedTrade.tradeId,
     });
+  });
+
+  it("reports the friend request as the game returns it", () => {
+    expect(JSON.parse(formatFriendRequest(friendRequest, "json"))).toEqual(
+      friendRequest,
+    );
   });
 
   it("reports the accepted trade's id and the status the game gives", () => {
@@ -655,6 +670,12 @@ describe("text output", () => {
   it("prints the proposed trade's id", () => {
     expect(formatProposedTrade(proposedTrade, "text")).toBe(
       `Trade ${proposedTrade.tradeId} proposed.`,
+    );
+  });
+
+  it("prints the friend request's id and the status the game gives", () => {
+    expect(formatFriendRequest(friendRequest, "text")).toBe(
+      `Friend request ${friendRequest.id} pending.`,
     );
   });
 

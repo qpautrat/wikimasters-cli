@@ -4,7 +4,7 @@
 
 Une demande d'ami que j'ai envoyée reste en attente tant que l'autre joueur n'y a pas répondu, et l'annuler demande aujourd'hui d'ouvrir la page « Amis » du jeu.
 
-Dépend de : [Ajouter un ami](friend-add.md), [Lister mes amis et mes demandes en attente](friend-list.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Ajouter un ami](../friend-add.md), [Lister mes amis et mes demandes en attente](friend-list.md), [Sortie JSON des commandes](../json-output.md).
 
 ## User story
 

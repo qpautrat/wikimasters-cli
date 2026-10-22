@@ -258,6 +258,15 @@ Source: the `/friends` page's JavaScript and reads on the account (2026-10-22).
 - `q=%'"(` gets HTTP 500 `{"error":"Erreur serveur"}`; a 3000-character text answers `"users": []`.
 - `searchPlayers`: sends the text given as `q`, maps each player to its `id` and `username`, reports whether the response holds 10 players, and reports a refusal with its body.
 
+## `POST /api/friends`: send a friend request
+
+Source: the `/friends` page's JavaScript and requests on the account (2026-10-22).
+
+- Body `{"addressee_id": <profiles id>}`.
+- Response `{"friendship": {"id", "requester_id", "addressee_id", "status", "created_at", "updated_at"}}`, a `friendships` row, `status` being `pending` until the player answers.
+- Past the daily limit, 10 requests for a free account and 100 for a Pro one, HTTP 429 `{"error", "code": "friend_request_daily_limit", "limit", "is_pro", "resets_at"}`. Any other refusal carries `error`: an unknown player id gets HTTP 500 `{"error":"Erreur serveur"}`, the user's own id HTTP 400 `{"error":"Vous ne pouvez pas vous ajouter vous-même"}`, a friend's id HTTP 409 `{"error":"Déjà amis"}`, a player already sent a pending request HTTP 409 `{"error":"Demande déjà envoyée"}`.
+- `sendFriendRequest`: sends the player id given as `addressee_id`, returns `friendship` as given, and reports a refusal with its body.
+
 ## `POST /api/trades`: propose a trade
 
 Source: the trade form's JavaScript on `/trades` and proposals on the account (2026-10-17).

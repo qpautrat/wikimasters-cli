@@ -13,6 +13,7 @@ import type {
   EntryTag,
   EntryUntag,
   FriendOwner,
+  FriendRequest,
   GlobalCollectionCard,
   GlobalCollectionSearch,
   Label,
@@ -320,6 +321,14 @@ export function formatProposedTrade(
 ): string {
   if (format === "json") return JSON.stringify({ tradeId });
   return `Trade ${tradeId} proposed.`;
+}
+
+export function formatFriendRequest(
+  request: FriendRequest,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify(request);
+  return `Friend request ${request.id} ${request.status}.`;
 }
 
 export function formatTradeStatus(

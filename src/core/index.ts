@@ -51,6 +51,7 @@ export {
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
 export { asEntryId, type EntryId } from "./entry-id.js";
+export { sendFriendRequest, type FriendRequest } from "./friend-add.js";
 export {
   CARD_SEARCH_FIELDS,
   parseCardSearchField,

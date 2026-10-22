@@ -48,6 +48,7 @@ import {
   searchCards,
   searchGlobalCollection,
   searchPlayers,
+  sendFriendRequest,
   showAuction,
   starEntry,
   tagEntry,
@@ -73,6 +74,7 @@ import {
   formatEntryFavourite,
   formatEntryTag,
   formatEntryUntag,
+  formatFriendRequest,
   formatGlobalCollection,
   formatLabelCreation,
   formatLabelDeletion,
@@ -582,6 +584,28 @@ collection
     console.log(
       formatEntryUntag(
         await untagEntry(session, asEntryId(entryId), asLabelId(labelId)),
+        format(),
+      ),
+    );
+  });
+
+const friend = program.command("friend").description("Manage your friends");
+
+friend
+  .command("add")
+  .description(
+    "Send a friend request to the player of that id, in a single request, and print the request id and the status the game gives; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<player-id>",
+    "the player's id, as given by player search or cards global",
+  )
+  .addHelpText("after", examples(`wikimasters friend add ${EXAMPLE_PLAYER_ID}`))
+  .action(async (playerId: string) => {
+    const session = await openSession();
+    console.log(
+      formatFriendRequest(
+        await sendFriendRequest(session, asPlayerId(playerId)),
         format(),
       ),
     );
