@@ -27,6 +27,7 @@ import type {
   PlayerSearch,
   ProfileCollectionPage,
   ProposedTrade,
+  RemovedFriendship,
   RunningBidPage,
   TradeStatus,
   WishlistAddition,
@@ -340,6 +341,14 @@ export function formatFriendshipStatus(
 ): string {
   if (format === "json") return JSON.stringify({ friendshipId, status });
   return `Friend request ${friendshipId} ${status}.`;
+}
+
+export function formatRemovedFriendship(
+  { friendshipId, success }: RemovedFriendship,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ friendshipId, success });
+  return `Friendship ${friendshipId} removed.`;
 }
 
 export function formatFriendships(

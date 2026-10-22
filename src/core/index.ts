@@ -57,6 +57,10 @@ export {
 } from "./friend-answer.js";
 export { sendFriendRequest, type FriendRequest } from "./friend-add.js";
 export {
+  removeFriendship,
+  type RemovedFriendship,
+} from "./friend-remove.js";
+export {
   listFriendships,
   type Friendship,
   type FriendshipKind,

@@ -16,6 +16,7 @@ import {
   formatAuctions,
   formatBid,
   formatCancelledAuction,
+  formatRemovedFriendship,
   formatTradeStatus,
   formatCardSearch,
   formatCardValues,
@@ -209,6 +210,10 @@ const declinedFriendRequest = {
   friendshipId: asFriendshipId("cdee9111-6a3d-4ce4-a1ab-278de345831d"),
   status: "declined",
 };
+const removedFriendship = {
+  friendshipId: asFriendshipId("d7c954fe-94fa-4f0c-8598-de8aba3d146c"),
+  success: true as const,
+};
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -349,6 +354,15 @@ describe("JSON output", () => {
     ).toEqual({
       friendshipId: declinedFriendRequest.friendshipId,
       status: "declined",
+    });
+  });
+
+  it("reports the removed friendship's id and the success the game gives", () => {
+    expect(
+      JSON.parse(formatRemovedFriendship(removedFriendship, "json")),
+    ).toEqual({
+      friendshipId: removedFriendship.friendshipId,
+      success: true,
     });
   });
 
@@ -775,6 +789,12 @@ describe("text output", () => {
   it("prints the declined friend request's id and the status the game gives", () => {
     expect(formatFriendshipStatus(declinedFriendRequest, "text")).toBe(
       `Friend request ${declinedFriendRequest.friendshipId} declined.`,
+    );
+  });
+
+  it("prints the removed friendship's id", () => {
+    expect(formatRemovedFriendship(removedFriendship, "text")).toBe(
+      `Friendship ${removedFriendship.friendshipId} removed.`,
     );
   });
 

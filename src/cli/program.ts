@@ -49,6 +49,7 @@ import {
   readCardValues,
   readMyProfile,
   readProfileCollection,
+  removeFriendship,
   removeFromWishlist,
   searchAuctions,
   searchCards,
@@ -95,6 +96,7 @@ import {
   formatProfileCollection,
   formatProposedTrade,
   formatRemoval,
+  formatRemovedFriendship,
   formatRunningBids,
   formatWishlist,
   type Format,
@@ -675,6 +677,29 @@ friend
     console.log(
       formatFriendshipStatus(
         await declineFriendRequest(session, asFriendshipId(friendshipId)),
+        format(),
+      ),
+    );
+  });
+
+friend
+  .command("remove")
+  .description(
+    "Remove a friend, or a friend request you sent, in a single request, and print the friendship id once the game reports success; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<friendship-id>",
+    "the friendshipId of a friend or sent row of friend list",
+  )
+  .addHelpText(
+    "after",
+    examples(`wikimasters friend remove ${EXAMPLE_FRIENDSHIP_ID}`),
+  )
+  .action(async (friendshipId: string) => {
+    const session = await openSession();
+    console.log(
+      formatRemovedFriendship(
+        await removeFriendship(session, asFriendshipId(friendshipId)),
         format(),
       ),
     );

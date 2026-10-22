@@ -287,6 +287,15 @@ Source: the `/friends` page's JavaScript and requests on the account (2026-10-22
 - Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown or malformed id gets HTTP 404 `{"error":"Demande introuvable"}`, accepting an accepted request HTTP 409 `{"error":"Demande déjà traitée"}`, declining a declined request HTTP 404 `{"error":"Demande introuvable"}`.
 - `acceptFriendRequest` and `declineFriendRequest`: send the friendship id given with `accept` and `decline` respectively, report `status`, and report a refusal with its body.
 
+## `DELETE /api/friends/<friendship id>`: remove a friend or a sent friend request
+
+Source: the JavaScript of the `/friends` page and of the profile page `/profile/<pseudo>`, and requests on the account (2026-10-22).
+
+- No body. The `/friends` page sends it from the « Annuler » button of a sent request; the profile page of a friend sends it from the « Retirer des amis » button, with the `friendshipId` that `GET /api/profile/<pseudo>` returns. Both ignore the response body.
+- The route deletes the `friendships` row, whether `pending` or `accepted`. Response HTTP 200 `{"success": true}` on a `pending` request the user sent, after which `friendships?select=*` no longer returns the row and `GET /api/friends` no longer lists it; and on an `accepted` friendship, after which `friendships?select=*` no longer returns the row.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown or malformed id, and a row already deleted, get HTTP 404 `{"error":"Introuvable"}`.
+- `removeFriendship`: sends the friendship id given, reports `success`, reports any other response as an unexpected response, and reports a refusal with its body.
+
 ## `POST /api/guilds/join`: accept a guild invitation
 
 Source: the `/guild` page's JavaScript and requests on the account (2026-10-22).
