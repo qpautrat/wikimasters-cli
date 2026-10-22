@@ -12,7 +12,7 @@ En tant que joueur, je donne un ami, les cartes que je lui offre, celles que je 
 
 ## Critères d'acceptation
 
-1. `wikimasters trade propose <joueur-id>` prend l'identifiant du joueur, tel que le donne `cards global`.
+1. `wikimasters trade propose <joueur-id>` prend l'identifiant du joueur, tel que le donnent `player search` ou `cards global`.
 2. L'option `--give <entrée-id>:<card-id>`, répétable, prend l'identifiant d'une entrée de ma collection et celui de sa carte, tels que les donne `collection list`.
 3. L'option `--take <entrée-id>:<card-id>`, répétable, prend l'identifiant d'une entrée de la collection du joueur et celui de sa carte, tels que les donne `profile collection`.
 4. Les options `--give-wikibidous <n>` et `--take-wikibidous <n>` valent 0 par défaut ; une valeur qui n'est pas un nombre entier est refusée sans rien envoyer.

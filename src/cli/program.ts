@@ -785,7 +785,10 @@ trade
   .description(
     "Propose a trade of cards and wikibidous to a player, in a single request, and print the trade id; the game accepts or refuses it and gives its reason",
   )
-  .argument("<player-id>", "the player's id, as given by cards global")
+  .argument(
+    "<player-id>",
+    "the player's id, as given by player search or cards global",
+  )
   .option(
     "--give <entry-id:card-id>",
     "an entry of your collection and its card, as given by collection list; repeat to give several",
