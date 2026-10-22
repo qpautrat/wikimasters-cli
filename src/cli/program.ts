@@ -112,6 +112,9 @@ const EXAMPLE_LABEL_ID = "0b6c1f5e-2d8a-4f3e-9c41-7a2b9e8d1c34";
 const EXAMPLE_PLAYER_ID = "5c8e2a4f-7b1d-4e9a-b3c6-2d4f6a8b0c1e";
 const EXAMPLE_TRADE_ID = "7d3a9f1c-2e6b-4a8d-b5c7-3f1e9a2d6b84";
 
+const PLAYER_ID_HELP =
+  "the player's id, as given by player search or cards global";
+
 function examples(...calls: string[]): string {
   return `\nExamples:\n${calls.map((call) => `  $ ${call}`).join("\n")}`;
 }
@@ -596,10 +599,7 @@ friend
   .description(
     "Send a friend request to the player of that id, in a single request, and print the request id and the status the game gives; the game accepts or refuses it and gives its reason",
   )
-  .argument(
-    "<player-id>",
-    "the player's id, as given by player search or cards global",
-  )
+  .argument("<player-id>", PLAYER_ID_HELP)
   .addHelpText("after", examples(`wikimasters friend add ${EXAMPLE_PLAYER_ID}`))
   .action(async (playerId: string) => {
     const session = await openSession();
@@ -809,10 +809,7 @@ trade
   .description(
     "Propose a trade of cards and wikibidous to a player, in a single request, and print the trade id; the game accepts or refuses it and gives its reason",
   )
-  .argument(
-    "<player-id>",
-    "the player's id, as given by player search or cards global",
-  )
+  .argument("<player-id>", PLAYER_ID_HELP)
   .option(
     "--give <entry-id:card-id>",
     "an entry of your collection and its card, as given by collection list; repeat to give several",
