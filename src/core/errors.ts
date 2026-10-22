@@ -27,6 +27,16 @@ export function outcomeUnknown(
   );
 }
 
+export function unexpectedWriteResponse(
+  action: string,
+  body: unknown,
+  effect: string,
+): WikiMastersError {
+  return new WikiMastersError(
+    `${action} returned an unexpected response, which may have ${effect} it: ${JSON.stringify(body)}`,
+  );
+}
+
 export function isUniqueViolation(error: { code?: string } | null): boolean {
   return error?.code === "23505";
 }

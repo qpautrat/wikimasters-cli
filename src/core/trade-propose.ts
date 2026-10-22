@@ -1,6 +1,6 @@
 import { asCardId, type CardId } from "./card-id.js";
 import { asEntryId, type EntryId } from "./entry-id.js";
-import { WikiMastersError } from "./errors.js";
+import { WikiMastersError, unexpectedWriteResponse } from "./errors.js";
 import { parseInteger } from "./integer.js";
 import { isObject } from "./object.js";
 import type { PlayerId } from "./player-id.js";
@@ -96,9 +96,7 @@ export async function proposeTrade(
   );
   const tradeId = proposedTradeId(body);
   if (tradeId === undefined) {
-    throw new WikiMastersError(
-      `${action} returned an unexpected response, which may have proposed it: ${JSON.stringify(body)}`,
-    );
+    throw unexpectedWriteResponse(action, body, "proposed");
   }
   return { tradeId: tradeId as TradeId };
 }

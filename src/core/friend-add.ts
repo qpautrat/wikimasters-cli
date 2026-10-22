@@ -1,4 +1,4 @@
-import { WikiMastersError } from "./errors.js";
+import { unexpectedWriteResponse } from "./errors.js";
 import type { FriendshipId } from "./friendship-id.js";
 import { FRIENDS_PAGE } from "./friends-page.js";
 import { isObject } from "./object.js";
@@ -33,9 +33,7 @@ export async function sendFriendRequest(
     { method: "POST", body: { addressee_id: playerId } },
   );
   if (!isObject(body) || !isFriendRequest(body.friendship)) {
-    throw new WikiMastersError(
-      `${action} returned an unexpected response, which may have sent it: ${JSON.stringify(body)}`,
-    );
+    throw unexpectedWriteResponse(action, body, "sent");
   }
   return body.friendship;
 }
