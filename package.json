@@ -1,6 +1,6 @@
 {
   "name": "wikimasters-cli",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Interact with WikiMasters from the command line",
   "license": "MIT",
   "type": "module",
