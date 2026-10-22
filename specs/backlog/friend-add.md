@@ -22,7 +22,7 @@ En tant que joueur, je donne l'identifiant d'un joueur et la commande lui envoie
 ## Hors périmètre
 
 - [Accepter une demande d'ami](friend-accept.md).
-- Refuser une demande d'ami.
+- [Refuser une demande d'ami](friend-decline.md).
 - Annuler une demande d'ami que j'ai envoyée.
 - Retirer un ami.
 - [Lister mes amis et mes demandes en attente](friend-list.md).
