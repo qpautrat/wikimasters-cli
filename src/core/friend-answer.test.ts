@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
-import { acceptFriendRequest } from "./friend-answer.js";
+import { acceptFriendRequest, declineFriendRequest } from "./friend-answer.js";
 import { asFriendshipId } from "./friendship-id.js";
 import { resumeSession } from "./session.js";
 import {
@@ -41,6 +41,11 @@ describe.each([
     answerFriendRequest: acceptFriendRequest,
     action: "accept",
     status: "accepted",
+  },
+  {
+    answerFriendRequest: declineFriendRequest,
+    action: "decline",
+    status: "declined",
   },
 ])("$answerFriendRequest.name", ({ answerFriendRequest, action, status }) => {
   const gameAnswers = answerRoute({ status: 200, body: { status } });

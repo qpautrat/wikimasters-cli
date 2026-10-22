@@ -17,6 +17,7 @@ import {
   asTradeId,
   cancelAuction,
   cancelTrade,
+  declineFriendRequest,
   createAuction,
   createLabel,
   deleteLabel,
@@ -651,6 +652,29 @@ friend
     console.log(
       formatFriendshipStatus(
         await acceptFriendRequest(session, asFriendshipId(friendshipId)),
+        format(),
+      ),
+    );
+  });
+
+friend
+  .command("decline")
+  .description(
+    "Decline a friend request another player sent you, in a single request, and print the request id and the status the game gives; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<friendship-id>",
+    "the request's friendship id, as given by friend list",
+  )
+  .addHelpText(
+    "after",
+    examples(`wikimasters friend decline ${EXAMPLE_FRIENDSHIP_ID}`),
+  )
+  .action(async (friendshipId: string) => {
+    const session = await openSession();
+    console.log(
+      formatFriendshipStatus(
+        await declineFriendRequest(session, asFriendshipId(friendshipId)),
         format(),
       ),
     );

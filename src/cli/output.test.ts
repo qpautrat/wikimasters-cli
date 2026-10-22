@@ -205,6 +205,10 @@ const guildJoin = {
   guildId: asGuildId("768c8705-546d-44c8-a495-cffd0bf1d29f"),
   ok: true as const,
 };
+const declinedFriendRequest = {
+  friendshipId: asFriendshipId("cdee9111-6a3d-4ce4-a1ab-278de345831d"),
+  status: "declined",
+};
 const foundPlayer = { id: friendId, username: "Luc" };
 const profile = {
   username: "Joueur",
@@ -336,6 +340,15 @@ describe("JSON output", () => {
     expect(JSON.parse(formatGuildJoin(guildJoin, "json"))).toEqual({
       guildId: guildJoin.guildId,
       ok: true,
+    });
+  });
+
+  it("reports the declined friend request's id and the status the game gives", () => {
+    expect(
+      JSON.parse(formatFriendshipStatus(declinedFriendRequest, "json")),
+    ).toEqual({
+      friendshipId: declinedFriendRequest.friendshipId,
+      status: "declined",
     });
   });
 
@@ -756,6 +769,12 @@ describe("text output", () => {
   it("prints the id of the guild whose invitation was accepted", () => {
     expect(formatGuildJoin(guildJoin, "text")).toBe(
       `Guild ${guildJoin.guildId} invitation accepted.`,
+    );
+  });
+
+  it("prints the declined friend request's id and the status the game gives", () => {
+    expect(formatFriendshipStatus(declinedFriendRequest, "text")).toBe(
+      `Friend request ${declinedFriendRequest.friendshipId} declined.`,
     );
   });
 

@@ -7,6 +7,7 @@ import { siteCookie, siteRequest } from "./site.js";
 
 const ANSWERS = {
   accept: { doing: "Accepting", effect: "accepted" },
+  decline: { doing: "Declining", effect: "declined" },
 } as const;
 
 async function answerFriendRequest(
@@ -32,4 +33,11 @@ export function acceptFriendRequest(
   friendshipId: FriendshipId,
 ): Promise<FriendshipStatus> {
   return answerFriendRequest(session, friendshipId, "accept");
+}
+
+export function declineFriendRequest(
+  session: Session,
+  friendshipId: FriendshipId,
+): Promise<FriendshipStatus> {
+  return answerFriendRequest(session, friendshipId, "decline");
 }

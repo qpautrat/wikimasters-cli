@@ -51,7 +51,10 @@ export {
 } from "./browser-login.js";
 export { parseCardId, type CardId } from "./card-id.js";
 export { asEntryId, type EntryId } from "./entry-id.js";
-export { acceptFriendRequest } from "./friend-answer.js";
+export {
+  acceptFriendRequest,
+  declineFriendRequest,
+} from "./friend-answer.js";
 export { sendFriendRequest, type FriendRequest } from "./friend-add.js";
 export {
   listFriendships,
