@@ -27,6 +27,7 @@ TypeScript (ESM, `nodenext`) on Node, `@supabase/supabase-js` for auth and Postg
 | Query a table read-only with the stored session (compiles the tool first) | `mise exec -- npm run -s api:get -- 'user_cards?select=*&limit=1'` |
 | Send one request to the Next.js site with the stored session; status on stderr, body on stdout (compiles the tool first) | `mise exec -- npm run -s api:site -- GET /api/wikibidous` |
 | Search a page's JavaScript, chunks loaded on demand included, for a text with the stored session; each occurrence with its file, offset and 200 characters around it on stdout (compiles the tool first) | `mise exec -- npm run -s api:js -- /collection '"/api/marketplace"'` |
+| Run the increment of a backlog spec, from its move up to the release, through the steps of `tools/workflow/steps.ts`; the agent's questions on the terminal, the summary on stdout, exits 1 naming the step where the run stopped (compiles the tool first) | `mise exec -- npm run -s feature:run -- update-notice` |
 | Bump the version by SemVer from the commits since the last `v*` tag, commit and tag it `v<version>`, then push the commit and the tag, which `.github/workflows/publish.yml` publishes to npm; does nothing without a `feat`, `fix`, `perf` or breaking change | `mise exec -- scripts/release.sh` |
 
 The lefthook pre-commit hook (`lefthook.yml`) runs on every commit. It refuses any `.env` file, any `.har` capture and any secret `betterleaks` (pinned in `mise.toml`) finds in the staged changes. When the commit changes `package.json` or `package-lock.json`, `scripts/audit-staged.sh` runs `npm audit` on the production dependencies of the staged `package-lock.json` and refuses any known vulnerability, whatever its severity, naming each package and its severity; when the npm registry is unreachable it warns and lets the commit through. Then `scripts/verify-staged.sh` exports the staged content to a temporary directory, installs the staged dependencies there with `npm ci`, and runs the typecheck, lint, format check, tests, build and tools build there, so each commit is checked as it will be recorded, whatever the working tree holds. A failing check refuses the commit. Never pass `--no-verify`, including with `--amend`.
@@ -35,7 +36,7 @@ The tracked agent configuration (`CLAUDE.md`, `.claude/settings.json`, `.claude/
 
 Tests sit next to the code as `*.test.ts` and never hit the network: they pass a fake `fetch` from `src/core/testing/fake-supabase.ts` to `resumeSession`, which simulates Supabase's auth and PostgREST responses. `tsconfig.json` covers every file and serves the typecheck and the editor; `tsconfig.build.json` builds `src/` to `dist/`, without test files and `testing/`.
 
-Before committing a command, run it on the account against data in the state its spec targets, read just before the run (e.g. an auction with `status=eq.active` and `end_at` a few minutes ahead), and check its output against each acceptance criterion.
+Run a new or changed command on the account against data in the state its spec targets, read just before the run (e.g. an auction with `status=eq.active` and `end_at` a few minutes ahead), and check its output against each acceptance criterion.
 
 Update `README.md` in the commit that changes anything it describes: a command, a global option, an exit code, the sign-in, a file it names or the installation.
 

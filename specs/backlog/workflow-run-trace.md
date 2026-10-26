@@ -4,7 +4,7 @@
 
 Une fois un run terminé, je ne peux ni observer ni analyser ce que l'agent a fait : seule la conversation en garde la trace, sans structure.
 
-Dépend de : [Dérouler le workflow de développement d'une feature toujours de la même façon](feature-workflow.md).
+Dépend de : [Dérouler le workflow de développement d'une feature toujours de la même façon](../feature-workflow.md).
 
 ## User story
 
