@@ -1,6 +1,7 @@
 import { createInterface } from "node:readline/promises";
 import {
   type CanUseTool,
+  type HookCallback,
   type PermissionResult,
   query,
 } from "@anthropic-ai/claude-agent-sdk";
@@ -10,6 +11,7 @@ export type JsonSchema = Record<string, unknown>;
 export interface AgentTurn<T> {
   readonly output: T;
   readonly questionsAsked: number;
+  readonly skillsInvoked: readonly string[];
 }
 
 export interface Agent {
@@ -29,10 +31,23 @@ interface Question {
   readonly multiSelect?: boolean;
 }
 
-const AGENT_FORBIDDEN_TOOLS = [
-  "Bash(git push *)",
-  "Bash(*scripts/release.sh*)",
-];
+const RUN_BY_THE_WORKFLOW = /\bgit\b[^|;&]*\bpush\b|release\.sh/;
+
+const denyPushAndRelease: HookCallback = async (input) => {
+  if (input.hook_event_name !== "PreToolUse") return {};
+  const { command } = (input.tool_input ?? {}) as { command?: unknown };
+  if (typeof command !== "string" || !RUN_BY_THE_WORKFLOW.test(command)) {
+    return {};
+  }
+  return {
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      permissionDecision: "deny",
+      permissionDecisionReason:
+        "The workflow pushes and releases itself; the agent never does.",
+    },
+  };
+};
 
 function chosenLabels(
   reply: string,
@@ -82,6 +97,7 @@ export function claudeAgent(cwd: string): Agent {
     },
     async perform<T>(instructions: string, schema: JsonSchema) {
       let questionsAsked = 0;
+      const skillsInvoked: string[] = [];
       const canUseTool: CanUseTool = async (
         toolName,
         input,
@@ -102,7 +118,9 @@ export function claudeAgent(cwd: string): Agent {
           systemPrompt: { type: "preset", preset: "claude_code" },
           permissionMode: "default",
           canUseTool,
-          disallowedTools: AGENT_FORBIDDEN_TOOLS,
+          hooks: {
+            PreToolUse: [{ matcher: "Bash", hooks: [denyPushAndRelease] }],
+          },
           outputFormat: { type: "json_schema", schema },
           ...(sessionId === null ? {} : { resume: sessionId }),
         },
@@ -112,6 +130,10 @@ export function claudeAgent(cwd: string): Agent {
         } else if (message.type === "assistant") {
           for (const block of message.message.content) {
             if (block.type === "text") process.stderr.write(`${block.text}\n`);
+            if (block.type === "tool_use" && block.name === "Skill") {
+              const { skill } = block.input as { skill?: unknown };
+              if (typeof skill === "string") skillsInvoked.push(skill);
+            }
           }
         } else if (message.type === "result") {
           if (message.subtype !== "success") {
@@ -123,7 +145,7 @@ export function claudeAgent(cwd: string): Agent {
       if (output === undefined) {
         throw new Error("l'agent n'a rendu aucun résultat structuré");
       }
-      return { output, questionsAsked };
+      return { output, questionsAsked, skillsInvoked };
     },
   };
 }

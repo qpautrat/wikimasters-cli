@@ -18,7 +18,7 @@ export interface Step {
   run(): Promise<StepResult>;
 }
 
-export interface Noted {
+export interface StepNote {
   readonly step: string;
   readonly text: string;
 }
@@ -30,9 +30,9 @@ export interface Blocker {
 
 export interface RunReport {
   readonly blocker: Blocker | null;
-  readonly decisions: readonly Noted[];
-  readonly openQuestions: readonly Noted[];
-  readonly unfixedFindings: readonly Noted[];
+  readonly decisions: readonly StepNote[];
+  readonly openQuestions: readonly StepNote[];
+  readonly unfixedFindings: readonly StepNote[];
 }
 
 async function unmetChecks(checks: readonly Check[]): Promise<string[]> {
@@ -47,9 +47,9 @@ export async function runWorkflow(
   steps: readonly Step[],
   onStepStart: (step: Step) => void = () => {},
 ): Promise<RunReport> {
-  const decisions: Noted[] = [];
-  const openQuestions: Noted[] = [];
-  const unfixedFindings: Noted[] = [];
+  const decisions: StepNote[] = [];
+  const openQuestions: StepNote[] = [];
+  const unfixedFindings: StepNote[] = [];
   const report = (blocker: Blocker | null): RunReport => ({
     blocker,
     decisions,
@@ -103,7 +103,7 @@ function section(
   return `## ${title}\n\n${body}`;
 }
 
-function bullets(items: readonly Noted[]): string[] {
+function bullets(items: readonly StepNote[]): string[] {
   return items.map(({ step, text }) => `- [${step}] ${text}`);
 }
 
@@ -111,17 +111,19 @@ export function formatSummary(
   report: RunReport,
   sessionId: string | null,
 ): string {
+  const { blocker } = report;
   const blockers =
-    report.blocker === null
+    blocker === null
       ? []
-      : report.blocker.reasons.map(
-          (reason) =>
-            `- Run arrêté à l'étape ${report.blocker?.step} : ${reason}`,
+      : blocker.reasons.map(
+          (reason) => `- Run arrêté à l'étape ${blocker.step} : ${reason}`,
         );
   const retro =
     sessionId === null
-      ? "Aucune session agent à analyser."
-      : `Lancer \`/mattpocock-skills:retro\` sur la session ? \`claude --resume ${sessionId}\``;
+      ? []
+      : [
+          `Lancer \`/mattpocock-skills:retro\` sur la session ? \`claude --resume ${sessionId}\``,
+        ];
   return [
     section("Bloquants", blockers, "Aucun."),
     section("Questions", bullets(report.openQuestions), "Aucune."),
@@ -135,6 +137,6 @@ export function formatSummary(
       bullets(report.unfixedFindings),
       "Aucun.",
     ),
-    `## Rétro\n\n${retro}`,
+    section("Rétro", retro, "Aucune session agent à analyser."),
   ].join("\n\n");
 }
