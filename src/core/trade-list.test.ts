@@ -202,6 +202,20 @@ describe("listTrades", () => {
     expect(listRequests()[0]?.url.search).toBe("");
   });
 
+  it("keeps the proposed and the received trades in the status given", async () => {
+    const proposed = { ...sent, status: "pending" };
+    const { session } = await sessionAnswering(
+      listed([received, proposed, { ...sent, status: "accepted" }]),
+    );
+
+    const trades = await listTrades(session, "pending");
+
+    expect(trades.map(({ initiator }) => initiator.playerId)).toEqual([
+      asPlayerId(OTHER_ID),
+      asPlayerId(USER_ID),
+    ]);
+  });
+
   it("returns no trade when none is in the status given", async () => {
     const { session } = await sessionAnswering(listed([received, sent]));
 

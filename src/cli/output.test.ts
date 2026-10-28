@@ -1183,4 +1183,14 @@ describe("formatTrades", () => {
   it("says when there is no trade", () => {
     expect(formatTrades([], "text")).toBe("You have no trade.");
   });
+
+  it("names the status when there is no trade in it", () => {
+    expect(formatTrades([], "text", "accepted")).toBe(
+      "You have no accepted trade.",
+    );
+  });
+
+  it("prints no trade in a status as an empty JSON list", () => {
+    expect(JSON.parse(formatTrades([], "json", "accepted"))).toEqual([]);
+  });
 });
