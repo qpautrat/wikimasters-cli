@@ -19,7 +19,8 @@ const agent = claudeAgent(root);
 const base = (await repo.run("git", ["rev-parse", "HEAD"])).stdout.trim();
 const report = await runWorkflow(
   featureWorkflow({ spec, base, agent, repo }),
-  (step) => console.error(`\n▶ ${step.name}`),
+  (step, position, total) =>
+    console.error(`\n━━ Étape ${position}/${total} : ${step.name} ━━`),
 );
 console.log(formatSummary(report, agent.sessionId));
 if (report.blocker !== null) process.exitCode = 1;

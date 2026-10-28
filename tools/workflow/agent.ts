@@ -129,7 +129,8 @@ export function claudeAgent(cwd: string): Agent {
           sessionId = message.session_id;
         } else if (message.type === "assistant") {
           for (const block of message.message.content) {
-            if (block.type === "text") process.stderr.write(`${block.text}\n`);
+            if (block.type === "text")
+              process.stderr.write(`\n${block.text}\n`);
             if (block.type === "tool_use" && block.name === "Skill") {
               const { skill } = block.input as { skill?: unknown };
               if (typeof skill === "string") skillsInvoked.push(skill);

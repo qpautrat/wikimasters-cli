@@ -45,6 +45,7 @@ function agentStep<T>(run: FeatureRun, step: AgentStep<T>): Step {
     decides,
     "Ask the user, through AskUserQuestion only, solely when the spec is ambiguous or conflicts with the code, when your confidence in the spec is low and you submit your design, or before a write on the account during API discovery.",
     "List in `decisions` each decision taken on the user's behalf in this step, and in `openQuestions` each question for the user that does not block the run.",
+    "Write in French: your text between tool calls, every string of the result, and the questions you ask.",
   ].join("\n\n");
   return {
     name: step.name,
@@ -241,8 +242,8 @@ export function featureWorkflow(run: FeatureRun): readonly Step[] {
       requires: [check.cleanTree, check.committed],
       produces: [check.cleanTree],
       agentDecides: [],
-      instructions: `Run /${CODE_REVIEW_SKILL} with ${run.base} as the fixed point. Fix nothing yet.`,
-      properties: {},
+      instructions: `Run /${CODE_REVIEW_SKILL} with ${run.base} as the fixed point. Fix nothing yet. Wait for both reports before answering, and list each finding in \`findings\`, one line each.`,
+      properties: { findings: stringList },
       verify: ({ skillsInvoked }) =>
         skillsInvoked.includes(CODE_REVIEW_SKILL)
           ? []

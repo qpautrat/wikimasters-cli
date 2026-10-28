@@ -45,7 +45,7 @@ async function unmetChecks(checks: readonly Check[]): Promise<string[]> {
 
 export async function runWorkflow(
   steps: readonly Step[],
-  onStepStart: (step: Step) => void = () => {},
+  onStepStart: (step: Step, position: number, total: number) => void = () => {},
 ): Promise<RunReport> {
   const decisions: StepNote[] = [];
   const openQuestions: StepNote[] = [];
@@ -59,7 +59,7 @@ export async function runWorkflow(
   const noted = (step: Step, texts: readonly string[] = []) =>
     texts.map((text) => ({ step: step.name, text }));
 
-  for (const step of steps) {
+  for (const [index, step] of steps.entries()) {
     const missing = await unmetChecks(step.requires);
     if (missing.length > 0) {
       return report({
@@ -67,7 +67,7 @@ export async function runWorkflow(
         reasons: missing.map((reason) => `prérequis manquant : ${reason}`),
       });
     }
-    onStepStart(step);
+    onStepStart(step, index + 1, steps.length);
     let result: StepResult;
     try {
       result = await step.run();
