@@ -125,7 +125,10 @@ function toTrade(row: TradeRow): Trade {
   };
 }
 
-export async function listTrades(session: Session): Promise<Trade[]> {
+export async function listTrades(
+  session: Session,
+  status?: string,
+): Promise<Trade[]> {
   const action = "Reading your trades";
   const body = await siteRequest(
     session,
@@ -144,5 +147,8 @@ export async function listTrades(session: Session): Promise<Trade[]> {
       `${action} returned an unexpected response: ${JSON.stringify(body)}`,
     );
   }
-  return body.trades.map(toTrade);
+  const trades = body.trades.map(toTrade);
+  return status === undefined
+    ? trades
+    : trades.filter((trade) => trade.status === status);
 }

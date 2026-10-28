@@ -321,7 +321,8 @@ Source: the `/trades` page's JavaScript and reads on the account (2026-10-28).
 - No query: the page sends `fetch("/api/trades")` and reads `trades`. Response HTTP 200 `{"trades": [...]}`, most recent `created_at` first, every status mixed (`pending`, `accepted`, `cancelled`), proposed and received alike.
 - Each trade holds `id`, `status`, `created_at`, `updated_at`, `initiator_id`, `recipient_id`, `parent_trade_id` (`null` unless a counter-offer), `initiator_wikibidous`, `recipient_wikibidous`, `initiator` and `recipient` (`id`, `username`, `avatar_url`, `avatar_pos_x`, `avatar_pos_y`) and `items`.
 - Each item holds `id`, `trade_id`, `user_card_id`, `card_id`, `offered_by` (the `profiles.id` of the player giving it), `is_shiny`, `snapshot_atk`, `snapshot_def`, `snapshot_rarity` and `card` (the `cards` row: `wikipedia_title`, `rarity`, `atk`, `def`…).
-- `listTrades`: sends the request, maps each trade with, for each player, the items the player offers (entry id, card id, `card.wikipedia_title`) and the player's wikibidous, and reports a refusal with its body.
+- Query: `status=<status>` is ignored (pending, accepted and cancelled trades come back mixed); `active=1`, which the trade form sends, keeps only the `pending` trades, and `active=<other value>` is ignored (observed 2026-10-28).
+- `listTrades`: sends the request without query, keeps only the trades whose `status` is the one given when there is one, maps each trade with, for each player, the items the player offers (entry id, card id, `card.wikipedia_title`) and the player's wikibidous, and reports a refusal with its body.
 
 ## `PATCH /api/trades/<trade id>`: cancel or accept a trade
 

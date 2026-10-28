@@ -971,11 +971,27 @@ trade
 trade
   .command("list")
   .description(
-    "List the trades you proposed and those proposed to you, in a single request and in the game's order, each with its id, status, date, the player who proposes it and the one who receives it, the trade it answers if any, and for each player the cards given, with entry id, card id and title, and the wikibidous given",
+    "List the trades you proposed and those proposed to you, all or only those in the status given, in a single request and in the game's order, each with its id, status, date, the player who proposes it and the one who receives it, the trade it answers if any, and for each player the cards given, with entry id, card id and title, and the wikibidous given",
   )
-  .addHelpText("after", examples("wikimasters trade list"))
-  .action(async () => {
-    console.log(formatTrades(await listTrades(await openSession()), format()));
+  .option(
+    "--status <status>",
+    "only the trades in this status, as trade list prints it, e.g. pending",
+  )
+  .addHelpText(
+    "after",
+    examples(
+      "wikimasters trade list",
+      "wikimasters trade list --status pending",
+    ),
+  )
+  .action(async (options: { status?: string }) => {
+    console.log(
+      formatTrades(
+        await listTrades(await openSession(), options.status),
+        format(),
+        options.status,
+      ),
+    );
   });
 
 trade

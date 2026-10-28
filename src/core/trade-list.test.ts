@@ -190,6 +190,24 @@ describe("listTrades", () => {
     );
   });
 
+  it("keeps only the trades in the status given, with a single request and no query", async () => {
+    const { session, listRequests } = await sessionAnswering(
+      listed([received, sent]),
+    );
+
+    const trades = await listTrades(session, "cancelled");
+
+    expect(trades.map(({ tradeId }) => tradeId)).toEqual([asTradeId(SENT_ID)]);
+    expect(listRequests()).toHaveLength(1);
+    expect(listRequests()[0]?.url.search).toBe("");
+  });
+
+  it("returns no trade when none is in the status given", async () => {
+    const { session } = await sessionAnswering(listed([received, sent]));
+
+    await expect(listTrades(session, "accepted")).resolves.toEqual([]);
+  });
+
   it("returns no trade on an empty response", async () => {
     const { session } = await sessionAnswering(listed([]));
 

@@ -395,9 +395,17 @@ function formatTradeSide({
   ].join("\n");
 }
 
-export function formatTrades(trades: readonly Trade[], format: Format): string {
+export function formatTrades(
+  trades: readonly Trade[],
+  format: Format,
+  status?: string,
+): string {
   if (format === "json") return JSON.stringify(trades);
-  if (trades.length === 0) return "You have no trade.";
+  if (trades.length === 0) {
+    return status === undefined
+      ? "You have no trade."
+      : `You have no ${status} trade.`;
+  }
   return trades
     .map(({ tradeId, status, createdAt, initiator, recipient, counterTo }) =>
       [
