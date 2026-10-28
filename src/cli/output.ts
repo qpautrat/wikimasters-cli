@@ -398,13 +398,13 @@ function formatTradeSide({
 export function formatTrades(
   trades: readonly Trade[],
   format: Format,
-  status?: string,
+  statusFilter?: string,
 ): string {
   if (format === "json") return JSON.stringify(trades);
   if (trades.length === 0) {
-    return status === undefined
+    return statusFilter === undefined
       ? "You have no trade."
-      : `You have no ${status} trade.`;
+      : `You have no ${statusFilter} trade.`;
   }
   return trades
     .map(({ tradeId, status, createdAt, initiator, recipient, counterTo }) =>
