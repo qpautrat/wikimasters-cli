@@ -45,6 +45,7 @@ import {
   parseTradeCard,
   parseTradeWikibidous,
   placeBid,
+  listTrades,
   proposeTrade,
   readCardValues,
   readMyProfile,
@@ -72,6 +73,7 @@ import {
   formatAuctions,
   formatBid,
   formatCancelledAuction,
+  formatTrades,
   formatTradeStatus,
   formatCardSearch,
   formatCardValues,
@@ -964,6 +966,16 @@ trade
     console.log(
       formatProposedTrade(await proposeTrade(session, proposal), format()),
     );
+  });
+
+trade
+  .command("list")
+  .description(
+    "List the trades you proposed and those proposed to you, in a single request and in the game's order, each with its id, status, date, the player who proposes it and the one who receives it, the trade it answers if any, and for each player the cards given, with entry id, card id and title, and the wikibidous given",
+  )
+  .addHelpText("after", examples("wikimasters trade list"))
+  .action(async () => {
+    console.log(formatTrades(await listTrades(await openSession()), format()));
   });
 
 trade

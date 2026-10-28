@@ -153,6 +153,12 @@ export { asTradeId, type TradeId } from "./trade-id.js";
 export { acceptTrade } from "./trade-accept.js";
 export { cancelTrade } from "./trade-cancel.js";
 export {
+  listTrades,
+  type Trade,
+  type TradeGivenCard,
+  type TradeSide,
+} from "./trade-list.js";
+export {
   parseTradeCard,
   parseTradeWikibidous,
   proposeTrade,

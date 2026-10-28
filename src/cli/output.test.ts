@@ -17,6 +17,7 @@ import {
   formatBid,
   formatCancelledAuction,
   formatRemovedFriendship,
+  formatTrades,
   formatTradeStatus,
   formatCardSearch,
   formatCardValues,
@@ -222,6 +223,33 @@ const profile = {
   ban_words: ["spoiler"],
 };
 const discard = { discarded: 3, gained: 3, balance: 7430, failed: [] };
+
+const trades = [
+  {
+    tradeId: asTradeId("422842f0-1111-4111-8111-111111111111"),
+    status: "pending",
+    createdAt: "2026-10-27T10:00:00+00:00",
+    initiator: {
+      playerId: friendId,
+      username: "LucasPerso",
+      cards: [
+        {
+          entryId,
+          cardId: parseCardId("d9fdb14c-0000-4000-8000-000000000001"),
+          title: "Escalade",
+        },
+      ],
+      wikibidous: 0,
+    },
+    recipient: {
+      playerId: asPlayerId("debf5111-f4d7-4ab5-ace8-5449c0701dac"),
+      username: "Moi",
+      cards: [],
+      wikibidous: 20,
+    },
+    counterTo: asTradeId("57202da8-3e09-40d6-9c0b-b42a4e149133"),
+  },
+];
 
 describe("JSON output", () => {
   it("lists each bid on a running auction with its state in its own field, and whether the page is full", () => {
@@ -1131,5 +1159,28 @@ describe("text output", () => {
     expect(
       formatEntryUntag({ entryId, labelId: label.id, removed: false }, "text"),
     ).toBe(`Entry ${entryId} did not have the label ${label.id}.`);
+  });
+});
+
+describe("formatTrades", () => {
+  it("prints the trades with their content, as JSON", () => {
+    expect(JSON.parse(formatTrades(trades, "json"))).toEqual(trades);
+    expect(JSON.parse(formatTrades([], "json"))).toEqual([]);
+  });
+
+  it("prints each trade with the cards and wikibidous each player gives", () => {
+    expect(formatTrades(trades, "text")).toBe(
+      [
+        "422842f0-1111-4111-8111-111111111111  pending  2026-10-27T10:00:00+00:00  counter-offer to 57202da8-3e09-40d6-9c0b-b42a4e149133",
+        `  LucasPerso (${friendId}) gives:`,
+        `    ${entryId}  d9fdb14c-0000-4000-8000-000000000001  Escalade`,
+        "  Moi (debf5111-f4d7-4ab5-ace8-5449c0701dac) gives:",
+        "    20 wikibidous",
+      ].join("\n"),
+    );
+  });
+
+  it("says when there is no trade", () => {
+    expect(formatTrades([], "text")).toBe("You have no trade.");
   });
 });

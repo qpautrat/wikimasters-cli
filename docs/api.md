@@ -314,6 +314,15 @@ Source: the trade form's JavaScript on `/trades` and proposals on the account (2
 - The form opens only with a friend and refuses, before sending, more than 100 cards, more than 10 000 wikibidous per player and a balance below the wikibidous given. The route accepted a second pending trade offering the same entry as a first one, and the offered entry stays in the collection under the same id while the trade is pending (observed 2026-10-17).
 - `proposeTrade`: sends the player id, the cards and the amounts given, each card given offered by the user and each card taken by the player, and the counter-offered trade when given, in a single request, reports `trade.id`, and reports a refusal with its body.
 
+## `GET /api/trades`: list my trades
+
+Source: the `/trades` page's JavaScript and reads on the account (2026-10-28).
+
+- No query: the page sends `fetch("/api/trades")` and reads `trades`. Response HTTP 200 `{"trades": [...]}`, most recent `created_at` first, every status mixed (`pending`, `accepted`, `cancelled`), proposed and received alike.
+- Each trade holds `id`, `status`, `created_at`, `updated_at`, `initiator_id`, `recipient_id`, `parent_trade_id` (`null` unless a counter-offer), `initiator_wikibidous`, `recipient_wikibidous`, `initiator` and `recipient` (`id`, `username`, `avatar_url`, `avatar_pos_x`, `avatar_pos_y`) and `items`.
+- Each item holds `id`, `trade_id`, `user_card_id`, `card_id`, `offered_by` (the `profiles.id` of the player giving it), `is_shiny`, `snapshot_atk`, `snapshot_def`, `snapshot_rarity` and `card` (the `cards` row: `wikipedia_title`, `rarity`, `atk`, `def`…).
+- `listTrades`: sends the request, maps each trade with, for each player, the items the player offers (entry id, card id, `card.wikipedia_title`) and the player's wikibidous, and reports a refusal with its body.
+
 ## `PATCH /api/trades/<trade id>`: cancel or accept a trade
 
 Source: the trade card's JavaScript on `/trades`, cancellations on the account (2026-10-17, 2026-10-18) and an acceptance on the account (2026-10-20).

@@ -29,6 +29,8 @@ import type {
   ProposedTrade,
   RemovedFriendship,
   RunningBidPage,
+  Trade,
+  TradeSide,
   TradeStatus,
   WishlistAddition,
   WishlistCard,
@@ -373,6 +375,40 @@ export function formatGuildJoin(
 ): string {
   if (format === "json") return JSON.stringify({ guildId, ok });
   return `Guild ${guildId} invitation accepted.`;
+}
+
+function formatTradeSide({
+  playerId,
+  username,
+  cards,
+  wikibidous,
+}: TradeSide): string {
+  const given = [
+    ...cards.map(
+      ({ entryId, cardId, title }) => `    ${entryId}  ${cardId}  ${title}`,
+    ),
+    ...(wikibidous > 0 ? [`    ${wikibidous} wikibidous`] : []),
+  ];
+  return [
+    `  ${username} (${playerId}) gives:`,
+    ...(given.length > 0 ? given : ["    nothing"]),
+  ].join("\n");
+}
+
+export function formatTrades(trades: readonly Trade[], format: Format): string {
+  if (format === "json") return JSON.stringify(trades);
+  if (trades.length === 0) return "You have no trade.";
+  return trades
+    .map(({ tradeId, status, createdAt, initiator, recipient, counterTo }) =>
+      [
+        `${tradeId}  ${status}  ${createdAt}${
+          counterTo === null ? "" : `  counter-offer to ${counterTo}`
+        }`,
+        formatTradeSide(initiator),
+        formatTradeSide(recipient),
+      ].join("\n"),
+    )
+    .join("\n\n");
 }
 
 export function formatTradeStatus(

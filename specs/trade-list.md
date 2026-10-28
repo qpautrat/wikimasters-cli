@@ -4,7 +4,7 @@
 
 Quand un joueur me propose un échange, la notification `trade_offer` de `notifications list` donne l'identifiant de l'échange et le joueur qui le propose, mais pas son contenu. `trade accept`, `trade cancel` et `trade propose --counter` agissent sur un échange sans qu'aucune commande ne montre ce qu'il contient. La page `/trades` du site lit `GET /api/trades`, qui liste mes échanges avec leur statut et les cartes de chacun (observé le 2026-10-17).
 
-Dépend de : [Proposer un échange](../trade-propose.md), [Sortie JSON des commandes](../json-output.md).
+Dépend de : [Proposer un échange](trade-propose.md), [Sortie JSON des commandes](json-output.md).
 
 ## User story
 
@@ -18,6 +18,12 @@ En tant que joueur, je lis les échanges que j'ai proposés et ceux qu'on m'a pr
 4. Une liste vide n'est pas une erreur : la commande le signale et sort avec le code 0.
 5. Quand le jeu refuse la lecture, la commande échoue en affichant le motif donné par le jeu.
 6. Avec `--json`, stdout porte la liste des échanges avec les données des critères 2 et 3.
+
+## Décisions et code
+
+- `listTrades` (`src/core/trade-list.ts`) envoie `GET /api/trades` sans paramètre et rend les échanges dans l'ordre du jeu. Chaque `Trade` porte `tradeId`, `status`, `createdAt`, `initiator` et `recipient`, et `counterTo` (`null` hors contre-offre). Chaque côté (`TradeSide`) porte `playerId`, `username`, `cards` (`entryId`, `cardId`, `title`, les `items` dont `offered_by` est ce joueur) et `wikibidous`.
+- Les statuts ne sont pas filtrés : la commande rend tous les échanges que le jeu renvoie, proposés et reçus, `pending` ou non.
+- Texte : une ligne d'en-tête par échange (identifiant, statut, date, contre-offre), puis ce que donne chaque joueur ; `nothing` quand un joueur ne donne rien. Avec `--json`, stdout porte la liste des `Trade`.
 
 ## Hors périmètre
 
