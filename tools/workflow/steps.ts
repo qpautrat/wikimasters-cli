@@ -195,7 +195,7 @@ export function featureWorkflow(run: FeatureRun): readonly Step[] {
       requires: [check.specInBacklog],
       produces: [check.changedTree, ...check.codeChecksPass],
       agentDecides: ["the design of the code"],
-      instructions: `Implement ${specPath}: code, tests, docs/api.md and README.md where the rules require it, and amend the spec with the decisions taken and what is coded, as .claude/rules/specs.md says. Do not commit.`,
+      instructions: `Implement ${specPath}: code, tests, docs/api.md and README.md where the rules require it, and amend the spec with the decisions taken and what is coded, as .claude/rules/specs.md says. Leave the spec in specs/backlog/: the commit step moves it. Do not commit.`,
       properties: {},
     }),
     agentStep<Acceptance>(run, {
