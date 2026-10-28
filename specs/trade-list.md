@@ -21,9 +21,9 @@ En tant que joueur, je lis les échanges que j'ai proposés et ceux qu'on m'a pr
 
 ## Décisions et code
 
-- `listTrades` (`src/core/trade-list.ts`) envoie `GET /api/trades` sans paramètre et rend les échanges dans l'ordre du jeu. Chaque `Trade` porte `tradeId`, `status`, `createdAt`, `initiator` et `recipient`, et `counterTo` (`null` hors contre-offre). Chaque côté (`TradeSide`) porte `playerId`, `username`, `cards` (des `TradeGivenCard` : `entryId`, `cardId`, `title`, tirés des `items` dont `offered_by` est ce joueur) et `wikibidous`.
+- `listTrades` (`src/core/trade-list.ts`) envoie `GET /api/trades` sans paramètre, ne garde que les échanges du statut donné quand il y en a un ([Filtrer mes échanges par statut](trade-list-status.md)), et rend les échanges dans l'ordre du jeu. Chaque `Trade` porte `tradeId`, `status`, `createdAt`, `initiator` et `recipient`, et `counterTo` (`null` hors contre-offre). Chaque côté (`TradeSide`) porte `playerId`, `username`, `cards` (des `TradeGivenCard` : `entryId`, `cardId`, `title`, tirés des `items` dont `offered_by` est ce joueur) et `wikibidous`.
 - Une réponse dont un échange, un joueur ou une carte n'a pas la forme attendue fait échouer toute la commande (`unexpected response`), comme `friend list`.
-- Les statuts ne sont pas filtrés : la commande rend tous les échanges que le jeu renvoie, proposés et reçus, `pending` ou non.
+- Sans `--status`, les statuts ne sont pas filtrés : la commande rend tous les échanges que le jeu renvoie, proposés et reçus, `pending` ou non. Avec `--status`, voir [Filtrer mes échanges par statut](trade-list-status.md).
 - Texte : une ligne d'en-tête par échange (identifiant, statut, date, contre-offre), puis ce que donne chaque joueur : ses cartes, puis ses wikibidous seulement s'ils sont supérieurs à 0 ; `nothing` quand un joueur ne donne ni carte ni wikibidous. Avec `--json`, stdout porte la liste des `Trade`.
 
 ## Hors périmètre

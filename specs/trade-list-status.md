@@ -2,7 +2,7 @@
 
 ## Contexte
 
-`wikimasters trade list` rend tous mes échanges que le jeu renvoie, quel que soit leur statut : les échanges acceptés et annulés s'y mêlent à ceux encore en attente. La page `/trades` lit `GET /api/trades` sans paramètre ; observé le 2026-10-28, elle ignore un paramètre `status`, et `active=1` ne garde que les échanges `pending`.
+`wikimasters trade list` rend tous mes échanges que le jeu renvoie, quel que soit leur statut : les échanges acceptés et annulés s'y mêlent à ceux encore en attente. La page `/trades` lit `GET /api/trades` sans paramètre ; observé le 2026-10-28, la route ignore un paramètre `status`, et `active=1` ne garde que les échanges `pending`.
 
 Dépend de : [Lister mes échanges](trade-list.md).
 
