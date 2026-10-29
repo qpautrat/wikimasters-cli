@@ -22,7 +22,6 @@ pre-commit:
       run: scripts/audit-staged.sh
     - name: verify staged content
       exclude:
-        - "specs/**"
         - "docs/**"
         - "*.md"
       run: scripts/verify-staged.sh

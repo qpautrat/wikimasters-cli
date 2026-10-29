@@ -135,4 +135,4 @@ Then run every command from the repository root as `mise run wikimasters -- <com
 
 - [`docs/api.md`](docs/api.md): the tables and routes of the site's API the CLI uses.
 - [`docs/game-rules.md`](docs/game-rules.md): the game rules the API enforces.
-- To contribute, read [`CLAUDE.md`](CLAUDE.md) for the architecture and commands, and [`specs/`](specs/) for the specifications that drive the project.
+- To contribute, read [`CLAUDE.md`](CLAUDE.md) for the architecture and commands.
