@@ -77,6 +77,10 @@ const cancelledTrade = {
   tradeId: asTradeId("57202da8-3e09-40d6-9c0b-b42a4e149133"),
   status: "cancelled",
 };
+const declinedTrade = {
+  tradeId: asTradeId("fb050707-72cc-43dd-9467-d2c917321216"),
+  status: "declined",
+};
 const bid = {
   auctionId: parseAuctionId("d6669009-683d-44b6-b6e7-2c0960c37f2f"),
   amount: 359,
@@ -398,6 +402,13 @@ describe("JSON output", () => {
     expect(JSON.parse(formatTradeStatus(acceptedTrade, "json"))).toEqual({
       tradeId: acceptedTrade.tradeId,
       status: "accepted",
+    });
+  });
+
+  it("reports the declined trade's id and the status the game gives", () => {
+    expect(JSON.parse(formatTradeStatus(declinedTrade, "json"))).toEqual({
+      tradeId: declinedTrade.tradeId,
+      status: "declined",
     });
   });
 
@@ -829,6 +840,12 @@ describe("text output", () => {
   it("prints the accepted trade's id and the status the game gives", () => {
     expect(formatTradeStatus(acceptedTrade, "text")).toBe(
       `Trade ${acceptedTrade.tradeId} accepted.`,
+    );
+  });
+
+  it("prints the declined trade's id and the status the game gives", () => {
+    expect(formatTradeStatus(declinedTrade, "text")).toBe(
+      `Trade ${declinedTrade.tradeId} declined.`,
     );
   });
 

@@ -152,6 +152,7 @@ export {
 export { asTradeId, type TradeId } from "./trade-id.js";
 export { acceptTrade } from "./trade-accept.js";
 export { cancelTrade } from "./trade-cancel.js";
+export { declineTrade } from "./trade-decline.js";
 export {
   listTrades,
   type Trade,

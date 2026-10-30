@@ -184,6 +184,7 @@ Source: read-only queries and the site's JavaScript, 2026-10-16.
 Source: capture `place-bid.har`, the auction page's JavaScript for the error codes, and refused bids on the account (2026-10-06).
 
 - Body `{"amount": <wikibidous>}`; response `{"auction_id", "current_bid": <amount>, "bidder_balance": <wikibidous left>}`.
+- `decline`: response HTTP 200 `{"status": "declined"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `declined`.
 - Refusal: a non-2xx status with `{"error": <message>, "code": …}`. The page handles `bid_too_low` (with `min`, the minimum it accepts), `insufficient_balance` and `human_verification_required` (the page then shows a captcha).
 - Observed refusals: an ended auction gets HTTP 409 `{"error":"Cette enchère est terminée"}`, without `code`; a bid below the minimum gets HTTP 409 `{"error":"Mise trop basse (minimum 28 wikibidous)","code":"bid_too_low","min":28}`.
 - The page hides the bid form from the seller and once `end_at` is past, but not from the current bidder.
@@ -318,18 +319,18 @@ Source: the trade form's JavaScript on `/trades` and proposals on the account (2
 
 Source: the `/trades` page's JavaScript and reads on the account (2026-10-28).
 
-- No query: the page sends `fetch("/api/trades")` and reads `trades`. Response HTTP 200 `{"trades": [...]}`, most recent `created_at` first, every status mixed (`pending`, `accepted`, `cancelled`), proposed and received alike.
+- No query: the page sends `fetch("/api/trades")` and reads `trades`. Response HTTP 200 `{"trades": [...]}`, most recent `created_at` first, every status mixed (`pending`, `accepted`, `cancelled`, `declined`), proposed and received alike.
 - Each trade holds `id`, `status`, `created_at`, `updated_at`, `initiator_id`, `recipient_id`, `parent_trade_id` (`null` unless a counter-offer), `initiator_wikibidous`, `recipient_wikibidous`, `initiator` and `recipient` (`id`, `username`, `avatar_url`, `avatar_pos_x`, `avatar_pos_y`) and `items`.
 - Each item holds `id`, `trade_id`, `user_card_id`, `card_id`, `offered_by` (the `profiles.id` of the player giving it), `is_shiny`, `snapshot_atk`, `snapshot_def`, `snapshot_rarity` and `card` (the `cards` row: `wikipedia_title`, `rarity`, `atk`, `def`…).
 - Query: `status=<status>` is ignored (pending, accepted and cancelled trades come back mixed); `active=1`, which the trade form sends, keeps only the `pending` trades, and `active=<other value>` is ignored (observed 2026-10-28).
 - `listTrades`: sends the request without query, keeps only the trades whose `status` is the one given when there is one, maps each trade with, for each player, the items the player offers (entry id, card id, `card.wikipedia_title`) and the player's wikibidous, and reports a refusal with its body.
 
-## `PATCH /api/trades/<trade id>`: cancel or accept a trade
+## `PATCH /api/trades/<trade id>`: cancel, accept or decline a trade
 
-Source: the trade card's JavaScript on `/trades`, cancellations on the account (2026-10-17, 2026-10-18) and an acceptance on the account (2026-10-20).
+Source: the trade card's JavaScript on `/trades`, cancellations on the account (2026-10-17, 2026-10-18) an acceptance on the account (2026-10-20) and a refusal on the account (2026-10-30).
 
-- Body `{"action": <action>}`; the card sends `cancel` on a trade the user proposed, `accept` and `decline` on a trade the user received. The core sends `cancel` and `accept`.
+- Body `{"action": <action>}`; the card sends `cancel` on a trade the user proposed, `accept` and `decline` on a trade the user received. The core sends `cancel`, `accept` and `decline`.
 - `cancel`: response HTTP 200 `{"status": "cancelled"}`; `GET /api/trades` then lists the trade as `cancelled`, and a card the user offered stays in the collection under the same entry.
 - `accept`: response HTTP 200 `{"status": "accepted"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `accepted`, and the entry the user gave no longer appears in the user's `user_cards`.
-- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha, then sends the same action again once it is solved. Observed: cancelling an already cancelled or an accepted trade, and accepting an accepted trade, get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
-- `cancelTrade` and `acceptTrade`: send the trade id given with their action, report `status`, and report a refusal with its body.
+- Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha, then sends the same action again once it is solved. Observed: cancelling an already cancelled or an accepted trade, accepting an accepted trade and declining a declined trade, get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
+- `cancelTrade`, `acceptTrade` and `declineTrade`: send the trade id given with their action, report `status`, and report a refusal with its body.

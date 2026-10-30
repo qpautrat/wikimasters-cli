@@ -17,6 +17,7 @@ import {
   asTradeId,
   cancelAuction,
   cancelTrade,
+  declineTrade,
   createAuction,
   createLabel,
   declineFriendRequest,
@@ -1033,6 +1034,27 @@ trade
     const session = await openSession();
     console.log(
       formatTradeStatus(await acceptTrade(session, tradeId), format()),
+    );
+  });
+
+trade
+  .command("decline")
+  .description(
+    "Decline a trade another player proposed to you, in a single request, and print the trade id and the status the game gives; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<trade-id>",
+    "the trade's id, as given by the trade_id of a notification",
+  )
+  .addHelpText(
+    "after",
+    examples(`wikimasters trade decline ${EXAMPLE_TRADE_ID}`),
+  )
+  .action(async (rawTradeId: string) => {
+    const tradeId = asTradeId(rawTradeId);
+    const session = await openSession();
+    console.log(
+      formatTradeStatus(await declineTrade(session, tradeId), format()),
     );
   });
 
