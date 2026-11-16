@@ -334,3 +334,11 @@ Source: the trade card's JavaScript on `/trades`, cancellations on the account (
 - `decline`: response HTTP 200 `{"status": "declined"}` on a `pending` trade another player proposed to the user; `GET /api/trades` then lists the trade as `declined`.
 - Refusal: a non-2xx status with `{"error": <message>}`, or `{"code": "human_verification_required"}`, on which the page shows a captcha, then sends the same action again once it is solved. Observed: cancelling an already cancelled or an accepted trade, accepting an accepted trade and declining a declined trade, get HTTP 409 `{"error":"Cet échange n'est plus en attente"}`.
 - `cancelTrade`, `acceptTrade` and `declineTrade`: send the trade id given with their action, report `status`, and report a refusal with its body.
+
+## `POST /api/chat/<profiles id>`: send a message to a player
+
+Source: the friends chat's JavaScript on `/friends` and a message on the account (2026-11-16).
+
+- Body `{"content": <text>}`; the page sends the text trimmed and ignores an empty one. Response HTTP 200 `{"message": {"id", "sender_id", "recipient_id", "content", "read", "created_at", "sender": {"id", "username", "avatar_url", "avatar_pos_x", "avatar_pos_y"}}}`; `chat_messages` holds the same row without `sender`.
+- Refusal: the page treats HTTP 403 as a blocked sending (`sending_blocked`, which `GET /api/chat/<profiles id>` also returns with `messages` and `trades`). Observed: an unknown player id gets HTTP 500 `{"error":"Erreur serveur"}` (2026-11-16). The refusals for a refused text were not observed; the core reports any non-2xx status with its body.
+- `sendMessage`: sends the player id given and the text as given, in a single request, reports `message.id`, and reports a refusal with its body.

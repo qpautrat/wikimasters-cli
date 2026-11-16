@@ -43,6 +43,7 @@ import {
   formatProposedTrade,
   formatRemoval,
   formatRunningBids,
+  formatSentMessage,
   formatWishlist,
 } from "./output.js";
 
@@ -346,6 +347,12 @@ describe("JSON output", () => {
     expect(JSON.parse(formatProposedTrade(proposedTrade, "json"))).toEqual({
       tradeId: proposedTrade.tradeId,
     });
+  });
+
+  it("reports the sent message's id as messageId", () => {
+    expect(JSON.parse(formatSentMessage({ messageId: "m-1" }, "json"))).toEqual(
+      { messageId: "m-1" },
+    );
   });
 
   it("reports the friend request as the game returns it", () => {
@@ -783,6 +790,12 @@ describe("text output", () => {
   it("prints the created auction's id", () => {
     expect(formatCreatedAuction(createdAuction, "text")).toBe(
       `Auction ${createdAuction.auctionId} created.`,
+    );
+  });
+
+  it("prints the sent message's id", () => {
+    expect(formatSentMessage({ messageId: "m-1" }, "text")).toBe(
+      "Message m-1 sent.",
     );
   });
 

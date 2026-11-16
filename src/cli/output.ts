@@ -27,6 +27,7 @@ import type {
   PlayerSearch,
   ProfileCollectionPage,
   ProposedTrade,
+  SentMessage,
   RemovedFriendship,
   RunningBidPage,
   Trade,
@@ -327,6 +328,14 @@ export function formatProposedTrade(
 ): string {
   if (format === "json") return JSON.stringify({ tradeId });
   return `Trade ${tradeId} proposed.`;
+}
+
+export function formatSentMessage(
+  { messageId }: SentMessage,
+  format: Format,
+): string {
+  if (format === "json") return JSON.stringify({ messageId });
+  return `Message ${messageId} sent.`;
 }
 
 export function formatFriendRequest(

@@ -57,6 +57,7 @@ import {
   searchCards,
   searchGlobalCollection,
   searchPlayers,
+  sendMessage,
   sendFriendRequest,
   showAuction,
   starEntry,
@@ -98,6 +99,7 @@ import {
   formatPlayerSearch,
   formatProfileCollection,
   formatProposedTrade,
+  formatSentMessage,
   formatRemoval,
   formatRemovedFriendship,
   formatRunningBids,
@@ -1055,6 +1057,32 @@ trade
     const session = await openSession();
     console.log(
       formatTradeStatus(await declineTrade(session, tradeId), format()),
+    );
+  });
+
+const message = program
+  .command("message")
+  .description("Write to other players");
+
+message
+  .command("send")
+  .description(
+    "Send a message to a player, in a single request, and print the id of the message sent; the game accepts or refuses it and gives its reason",
+  )
+  .argument(
+    "<player-id>",
+    "the player's id, as given by player search or the initiator_id of a trade notification",
+  )
+  .argument("<text>", "the message, sent to the game as given")
+  .addHelpText(
+    "after",
+    examples(`wikimasters message send ${EXAMPLE_PLAYER_ID} "Hello"`),
+  )
+  .action(async (rawPlayerId: string, text: string) => {
+    const playerId = asPlayerId(rawPlayerId);
+    const session = await openSession();
+    console.log(
+      formatSentMessage(await sendMessage(session, playerId, text), format()),
     );
   });
 
