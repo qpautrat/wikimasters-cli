@@ -149,6 +149,7 @@ export {
   type FoundPlayer,
   type PlayerSearch,
 } from "./player-search.js";
+export { asMessageId, type MessageId } from "./message-id.js";
 export { sendMessage, type SentMessage } from "./message-send.js";
 export { asTradeId, type TradeId } from "./trade-id.js";
 export { acceptTrade } from "./trade-accept.js";

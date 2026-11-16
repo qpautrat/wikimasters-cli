@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AUTH_COOKIE_NAME } from "./auth-cookie.js";
 import { AuthRequiredError, WikiMastersError } from "./errors.js";
+import { asMessageId } from "./message-id.js";
 import { sendMessage } from "./message-send.js";
 import { asPlayerId } from "./player-id.js";
 import { resumeSession } from "./session.js";
@@ -46,7 +47,7 @@ describe("sendMessage", () => {
 
     await expect(
       sendMessage(session, playerId, "  Hello, a counter-offer  "),
-    ).resolves.toEqual({ messageId });
+    ).resolves.toEqual({ messageId: asMessageId(messageId) });
 
     const [chat] = chatRequests(requests);
     expect(JSON.parse(chat?.body ?? "{}")).toEqual({

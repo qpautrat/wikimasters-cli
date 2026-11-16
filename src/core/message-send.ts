@@ -1,12 +1,13 @@
 import { unexpectedWriteResponse } from "./errors.js";
 import { FRIENDS_PAGE } from "./friends-page.js";
+import { asMessageId, type MessageId } from "./message-id.js";
 import { isObject } from "./object.js";
 import type { PlayerId } from "./player-id.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
 export interface SentMessage {
-  messageId: string;
+  messageId: MessageId;
 }
 
 export async function sendMessage(
@@ -28,7 +29,7 @@ export async function sendMessage(
     isObject(body.message) &&
     typeof body.message.id === "string"
   ) {
-    return { messageId: body.message.id };
+    return { messageId: asMessageId(body.message.id) };
   }
   throw unexpectedWriteResponse(action, body, "sent");
 }

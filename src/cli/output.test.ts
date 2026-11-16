@@ -4,6 +4,7 @@ import {
   asFriendshipId,
   asGuildId,
   asLabelId,
+  asMessageId,
   asPlayerId,
   asTradeId,
   parseAuctionId,
@@ -350,9 +351,9 @@ describe("JSON output", () => {
   });
 
   it("reports the sent message's id as messageId", () => {
-    expect(JSON.parse(formatSentMessage({ messageId: "m-1" }, "json"))).toEqual(
-      { messageId: "m-1" },
-    );
+    expect(
+      JSON.parse(formatSentMessage({ messageId: asMessageId("m-1") }, "json")),
+    ).toEqual({ messageId: asMessageId("m-1") });
   });
 
   it("reports the friend request as the game returns it", () => {
@@ -794,7 +795,7 @@ describe("text output", () => {
   });
 
   it("prints the sent message's id", () => {
-    expect(formatSentMessage({ messageId: "m-1" }, "text")).toBe(
+    expect(formatSentMessage({ messageId: asMessageId("m-1") }, "text")).toBe(
       "Message m-1 sent.",
     );
   });
