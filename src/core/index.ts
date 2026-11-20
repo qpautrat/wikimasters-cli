@@ -151,6 +151,7 @@ export {
 } from "./player-search.js";
 export { asMessageId, type MessageId } from "./message-id.js";
 export { sendMessage, type SentMessage } from "./message-send.js";
+export { openPack, type PackCard } from "./pack-open.js";
 export { asTradeId, type TradeId } from "./trade-id.js";
 export { acceptTrade } from "./trade-accept.js";
 export { cancelTrade } from "./trade-cancel.js";

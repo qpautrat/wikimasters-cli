@@ -342,3 +342,11 @@ Source: the friends chat's JavaScript on `/friends` and a message on the account
 - Body `{"content": <text>}`; the page sends the text trimmed and ignores an empty one. Response HTTP 200 `{"message": {"id", "sender_id", "recipient_id", "content", "read", "created_at", "sender": {"id", "username", "avatar_url", "avatar_pos_x", "avatar_pos_y"}}}`; `chat_messages` holds the same row without `sender`.
 - Refusal: the page treats HTTP 403 as a blocked sending (`sending_blocked`, which `GET /api/chat/<profiles id>` also returns with `messages` and `trades`). Observed: an unknown player id gets HTTP 500 `{"error":"Erreur serveur"}` (2026-11-16). The refusals for a refused text were not observed; the core reports any non-2xx status with its body.
 - `sendMessage`: sends the player id given and the text as given, in a single request, reports `message.id`, and reports a refusal with its body.
+
+## `POST /api/packs/open`: open a pack
+
+Source: the pulls page's JavaScript on `/pulls` and a pack opened on the account (2026-11-20).
+
+- No body. Response HTTP 200 `{"cards", "owned_copies", "packs_remaining", "packs_last_regen_at"}`: `cards` holds 5 cards, each with the catalogue columns (`id`, `wikipedia_title`, `rarity`, `atk`, `def`, `category`, …) and `user_card_id`, the id of the collection entry created; `owned_copies` lists those entries (`id`, `card_id`, `starred`, `is_shiny`, `user_card_tags`).
+- Refusal: the page reads a non-2xx status as `{"error": <message>, "packs_remaining"?}` and, on `human_verification_required`, shows a captcha. The refusal for no pack left was not observed; the core reports any non-2xx status with its body.
+- `openPack`: sends the request without body, reports each card's `id`, `user_card_id`, `wikipedia_title` and `rarity`, and reports a refusal with its body.

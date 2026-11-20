@@ -64,6 +64,7 @@ Run every command from any directory as `wikimasters <command>`. `wikimasters <c
 | `trade accept <trade-id>` | Accepts a trade another player proposed to you, in a single request, and prints the trade id and the status the game gives; the game accepts or refuses it and gives its reason | `wikimasters trade accept <trade-uuid>` |
 | `trade decline <trade-id>` | Declines a trade another player proposed to you, in a single request, and prints the trade id and the status the game gives; the game accepts or refuses it and gives its reason | `wikimasters trade decline <trade-uuid>` |
 | `message send <player-id> <text>` | Sends the text, as given, to the player of that id, in a single request, and prints the id of the message sent; the game accepts or refuses it and gives its reason | `wikimasters message send <player-uuid> "Hello"` |
+| `pack open` | Opens a pack, in a single request, and prints each card obtained with its entry id, card id, title and rarity; the game accepts or refuses it and gives its reason; with `--json`, stdout carries the list of cards | `wikimasters pack open` |
 | `wishlist list` | Lists your wishlist, most recently added first, marking the cards already in your collection | `wikimasters wishlist list` |
 | `wishlist add <card-id>` | Adds a catalogue card to your wishlist | `wikimasters wishlist add <card-uuid>` |
 | `wishlist remove <card-id>` | Removes a card from your wishlist | `wikimasters wishlist remove <card-uuid>` |

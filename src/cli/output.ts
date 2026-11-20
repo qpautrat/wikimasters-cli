@@ -23,6 +23,7 @@ import type {
   LabelDeletion,
   MyProfile,
   NotificationPage,
+  PackCard,
   PlacedBid,
   PlayerSearch,
   ProfileCollectionPage,
@@ -336,6 +337,16 @@ export function formatSentMessage(
 ): string {
   if (format === "json") return JSON.stringify({ messageId });
   return `Message ${messageId} sent.`;
+}
+
+export function formatPackCards(cards: PackCard[], format: Format): string {
+  if (format === "json") return JSON.stringify(cards);
+  return cards
+    .map(
+      ({ entryId, cardId, title, rarity }) =>
+        `${entryId}  ${cardId}  ${title} (${rarity})`,
+    )
+    .join("\n");
 }
 
 export function formatFriendRequest(

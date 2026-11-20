@@ -57,6 +57,7 @@ import {
   searchCards,
   searchGlobalCollection,
   searchPlayers,
+  openPack,
   sendMessage,
   sendFriendRequest,
   showAuction,
@@ -99,6 +100,7 @@ import {
   formatPlayerSearch,
   formatProfileCollection,
   formatProposedTrade,
+  formatPackCards,
   formatSentMessage,
   formatRemoval,
   formatRemovedFriendship,
@@ -1084,6 +1086,19 @@ message
     console.log(
       formatSentMessage(await sendMessage(session, playerId, text), format()),
     );
+  });
+
+const pack = program.command("pack").description("Open your packs");
+
+pack
+  .command("open")
+  .description(
+    "Open a pack, in a single request, and print each card obtained with its entry id, card id, title and rarity; the game accepts or refuses it and gives its reason",
+  )
+  .addHelpText("after", examples("wikimasters pack open"))
+  .action(async () => {
+    const session = await openSession();
+    console.log(formatPackCards(await openPack(session), format()));
   });
 
 const wishlist = program
