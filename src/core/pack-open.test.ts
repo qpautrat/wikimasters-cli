@@ -93,19 +93,52 @@ describe("openPack", () => {
     expect(packRequests(requests)).toHaveLength(1);
   });
 
-  it("reports the game's refusal with its reason", async () => {
-    const { session } = await sessionWith(
-      packRoute({
-        status: 403,
-        body: { error: "Aucun paquet disponible", packs_remaining: 0 },
-      }),
-    );
+  it.each([
+    {
+      reason: "no pack left",
+      status: 403,
+      body: {
+        error: "Plus de paquets disponibles",
+        packs_remaining: 0,
+        next_regen_at: "2026-11-20T14:25:09.926Z",
+      },
+      expected: /Plus de paquets disponibles/,
+    },
+    {
+      reason: "an opening too fast",
+      status: 429,
+      body: {
+        error:
+          "Ouverture trop rapide. Attends un instant avant d'ouvrir un autre paquet.",
+        rate_limited: true,
+        rate_limit_daily: false,
+        retry_after: "2026-11-20T14:13:51.475Z",
+        packs_remaining: 10,
+      },
+      expected: /Ouverture trop rapide/,
+    },
+    {
+      reason: "a human verification",
+      status: 403,
+      body: {
+        error:
+          "Vérification anti-bot requise pour continuer à ouvrir des paquets.",
+        human_verification_required: true,
+        code: "human_verification_required",
+      },
+      expected: /human_verification_required/,
+    },
+  ])(
+    "reports the game's refusal for $reason with its reason",
+    async ({ status, body, expected }) => {
+      const { session } = await sessionWith(packRoute({ status, body }));
 
-    const failure = openPack(session);
+      const failure = openPack(session);
 
-    await expect(failure).rejects.toThrow(WikiMastersError);
-    await expect(failure).rejects.toThrow(/Aucun paquet disponible/);
-  });
+      await expect(failure).rejects.toThrow(WikiMastersError);
+      await expect(failure).rejects.toThrow(expected);
+    },
+  );
 
   it("fails on a response without cards", async () => {
     const { session } = await sessionWith(
