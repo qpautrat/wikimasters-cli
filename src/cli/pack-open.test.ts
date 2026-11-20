@@ -49,6 +49,14 @@ describe("wikimasters pack open", () => {
     expect(lines).toEqual([`${entryId}  ${cardId}  1934 (R)`]);
   });
 
+  it("says so when the pack holds no card", async () => {
+    openPack.mockResolvedValue([]);
+
+    const lines = await run("pack", "open");
+
+    expect(lines).toEqual(["The pack held no card."]);
+  });
+
   it("prints only the list of cards on stdout with --json", async () => {
     const lines = await run("--json", "pack", "open");
 

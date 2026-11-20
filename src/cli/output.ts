@@ -341,6 +341,7 @@ export function formatSentMessage(
 
 export function formatPackCards(cards: PackCard[], format: Format): string {
   if (format === "json") return JSON.stringify(cards);
+  if (cards.length === 0) return "The pack held no card.";
   return cards
     .map(
       ({ entryId, cardId, title, rarity }) =>
