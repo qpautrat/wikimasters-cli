@@ -8,7 +8,6 @@ import {
 import { apiFailure } from "./errors.js";
 import { isFullPage, pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
-import { siteCookie } from "./site.js";
 
 export const RUNNING_BIDS_LIMIT = 20;
 
@@ -48,17 +47,13 @@ export async function listRunningBids(
     .overrideTypes<BidRow[], { merge: false }>();
   if (error) throw apiFailure("Listing your bids", status, error.message);
 
-  const cookie = await siteCookie(session);
   const auctions = new Map<AuctionId, AuctionRow>();
-  for (const { auction_id } of data) {
-    if (!auctions.has(auction_id)) {
-      auctions.set(auction_id, await readAuction(session, cookie, auction_id));
-    }
-  }
   const now = Date.now();
   const bids: RunningBid[] = [];
   for (const { auction_id, amount, placed_at } of data) {
-    const auction = auctions.get(auction_id) as AuctionRow;
+    const auction =
+      auctions.get(auction_id) ?? (await readAuction(session, auction_id));
+    auctions.set(auction_id, auction);
     if (auction.status !== "active" || Date.parse(auction.end_at) <= now) {
       continue;
     }

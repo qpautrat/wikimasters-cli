@@ -99,13 +99,12 @@ function isAuctionDetail(body: unknown): body is { auction: AuctionRow } {
 
 export async function readAuction(
   session: Session,
-  cookie: string,
   auctionId: AuctionId,
 ): Promise<AuctionRow> {
   const action = "Reading the auction";
   const body = await siteRequest(
     session,
-    cookie,
+    await siteCookie(session),
     action,
     `/marketplace/${auctionId}`,
     `/api/marketplace/${auctionId}`,
@@ -138,10 +137,7 @@ export async function showAuction(
   session: Session,
   auctionId: AuctionId,
 ): Promise<Auction> {
-  return toAuction(
-    session,
-    await readAuction(session, await siteCookie(session), auctionId),
-  );
+  return toAuction(session, await readAuction(session, auctionId));
 }
 
 function isBidResponse(body: unknown): body is BidResponse {
