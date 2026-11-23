@@ -4,37 +4,57 @@ import { WikiMastersError } from "./errors.js";
 import type { Session } from "./session.js";
 import { siteCookie, siteRequest } from "./site.js";
 
+export interface CardSale {
+  price: number;
+  settledAt: string;
+}
+
 export interface CardValue {
   id: CardId;
-  title: string;
-  averages: Record<string, number>;
+  sales: Record<string, CardSale[]>;
 }
 
-interface SalesSummaryResponse {
-  wikipedia_title: string;
-  summary: Record<string, { average: number }>;
+interface RecentSale {
+  final_price: number;
+  settled_at: string;
+  rarity: string;
 }
 
-function isRarityAverage(value: unknown): value is { average: number } {
+interface RecentSalesResponse {
+  recent: RecentSale[];
+}
+
+function isRecentSale(value: unknown): value is RecentSale {
   return (
     typeof value === "object" &&
     value !== null &&
-    "average" in value &&
-    typeof value.average === "number"
+    "final_price" in value &&
+    typeof value.final_price === "number" &&
+    "settled_at" in value &&
+    typeof value.settled_at === "string" &&
+    "rarity" in value &&
+    typeof value.rarity === "string"
   );
 }
 
-function isSalesSummaryResponse(body: unknown): body is SalesSummaryResponse {
+function isRecentSalesResponse(body: unknown): body is RecentSalesResponse {
   return (
     typeof body === "object" &&
     body !== null &&
-    "wikipedia_title" in body &&
-    typeof body.wikipedia_title === "string" &&
-    "summary" in body &&
-    typeof body.summary === "object" &&
-    body.summary !== null &&
-    Object.values(body.summary).every(isRarityAverage)
+    "recent" in body &&
+    Array.isArray(body.recent) &&
+    body.recent.every(isRecentSale)
   );
+}
+
+function salesByRarity(recent: readonly RecentSale[]): CardValue["sales"] {
+  const sales: CardValue["sales"] = {};
+  for (const { rarity, final_price, settled_at } of recent) {
+    const raritySales = sales[rarity] ?? [];
+    raritySales.push({ price: final_price, settledAt: settled_at });
+    sales[rarity] = raritySales;
+  }
+  return sales;
 }
 
 async function readCardValue(
@@ -51,21 +71,12 @@ async function readCardValue(
     `/api/marketplace/cards/${cardId}/sales?scope=summary`,
     { method: "GET" },
   );
-  if (!isSalesSummaryResponse(body)) {
+  if (!isRecentSalesResponse(body)) {
     throw new WikiMastersError(
       `${action} returned an unexpected response: ${JSON.stringify(body)}`,
     );
   }
-  return {
-    id: cardId,
-    title: body.wikipedia_title,
-    averages: Object.fromEntries(
-      Object.entries(body.summary).map(([rarity, { average }]) => [
-        rarity,
-        average,
-      ]),
-    ),
-  };
+  return { id: cardId, sales: salesByRarity(body.recent) };
 }
 
 export async function readCardValues(

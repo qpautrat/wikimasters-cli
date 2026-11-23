@@ -32,15 +32,32 @@ function salesRoute(cardId: string, response: FakeResponse): Route {
 const soldCard = salesRoute(soldCardId, {
   status: 200,
   body: {
-    wikipedia_title: "Dent d'Arclusaz",
-    summary: { R: { average: 19 }, PC: { average: 56 } },
-    isPro: false,
+    recent: [
+      {
+        id: "a",
+        final_price: 10,
+        settled_at: "2026-11-22T19:49:23+00:00",
+        rarity: "PC",
+      },
+      {
+        id: "b",
+        final_price: 19,
+        settled_at: "2026-09-25T10:00:00+00:00",
+        rarity: "R",
+      },
+      {
+        id: "c",
+        final_price: 1,
+        settled_at: "2026-08-29T08:57:44+00:00",
+        rarity: "PC",
+      },
+    ],
   },
 });
 
 const unsoldCard = salesRoute(unsoldCardId, {
   status: 200,
-  body: { wikipedia_title: "Stephansen", summary: {}, isPro: false },
+  body: { recent: [] },
 });
 
 const unknownCard = salesRoute(unknownCardId, {
@@ -63,23 +80,28 @@ function salesRequests(requests: RecordedRequest[]) {
 }
 
 describe("readCardValues", () => {
-  it("returns each card's title and average sale price per rarity", async () => {
+  it("returns each card's recent sales grouped by rarity", async () => {
     const { session } = await sessionWith(soldCard);
 
     await expect(readCardValues(session, [soldCardId])).resolves.toEqual([
       {
         id: soldCardId,
-        title: "Dent d'Arclusaz",
-        averages: { R: 19, PC: 56 },
+        sales: {
+          PC: [
+            { price: 10, settledAt: "2026-11-22T19:49:23+00:00" },
+            { price: 1, settledAt: "2026-08-29T08:57:44+00:00" },
+          ],
+          R: [{ price: 19, settledAt: "2026-09-25T10:00:00+00:00" }],
+        },
       },
     ]);
   });
 
-  it("returns no average for a card never sold", async () => {
+  it("returns no sale for a card never sold", async () => {
     const { session } = await sessionWith(unsoldCard);
 
     await expect(readCardValues(session, [unsoldCardId])).resolves.toEqual([
-      { id: unsoldCardId, title: "Stephansen", averages: {} },
+      { id: unsoldCardId, sales: {} },
     ]);
   });
 
@@ -116,7 +138,7 @@ describe("readCardValues", () => {
     ]);
   });
 
-  it("fails on a response without a title or a summary", async () => {
+  it("fails on a response without recent sales", async () => {
     const { session } = await sessionWith(
       salesRoute(soldCardId, { status: 200, body: { summary: {} } }),
     );
@@ -126,11 +148,11 @@ describe("readCardValues", () => {
     );
   });
 
-  it("fails on a rarity without an average", async () => {
+  it("fails on a sale without a price", async () => {
     const { session } = await sessionWith(
       salesRoute(soldCardId, {
         status: 200,
-        body: { wikipedia_title: "Dent d'Arclusaz", summary: { R: {} } },
+        body: { recent: [{ settled_at: "2026-11-22", rarity: "R" }] },
       }),
     );
 

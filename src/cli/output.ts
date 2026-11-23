@@ -112,14 +112,19 @@ export function formatCardValues(
 ): string {
   if (format === "json") return JSON.stringify(values);
   return values
-    .map(({ id, title, averages }) => {
-      const prices = Object.entries(averages).map(
-        ([rarity, average]) => `${rarity} ${wikibidous(average)}`,
+    .map(({ id, sales }) => {
+      const rarities = Object.entries(sales).map(
+        ([rarity, raritySales]) =>
+          `${rarity} ${raritySales
+            .map(
+              ({ price, settledAt }) => `${wikibidous(price)} (${settledAt})`,
+            )
+            .join(", ")}`,
       );
-      return `${id}  ${title}: ${
-        prices.length === 0
+      return `${id}: ${
+        rarities.length === 0
           ? "never sold"
-          : `average sale price ${prices.join(", ")}`
+          : `recent sales ${rarities.join("; ")}`
       }`;
     })
     .join("\n");

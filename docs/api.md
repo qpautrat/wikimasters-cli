@@ -205,13 +205,13 @@ Source: the auction page `/marketplace/<id>` and a cancellation on the account (
 - Refusal: a non-2xx status with `{"error": <message>}`. Observed: an already cancelled auction gets HTTP 409 `{"error":"Cette enchère n'est plus active"}`.
 - `cancelAuction`: sends the auction id given, reports `status`, and reports a refusal with its body.
 
-## `GET /api/marketplace/cards/<card id>/sales?scope=summary`: a card's average sale price
+## `GET /api/marketplace/cards/<card id>/sales?scope=summary`: a card's recent sales
 
-Source: the auction form, reached from `/collection`, and reads on the account (2026-10-09).
+Source: the auction form, reached from `/collection`, and reads on the account (2026-11-23).
 
-- `<card id>` is `cards.id`, owned or not. Response HTTP 200 `{"wikipedia_title", "summary", "isPro"}`; for an account that is not PRO, `summary` maps each rarity the card sold under to `{"average": <wikibidous>}`, e.g. `{"R":{"average":19},"PC":{"average":56}}`, and is `{}` for a card never sold. The route does not say over which period the average runs.
-- Refusal: a non-2xx status with `{"error": <message>}`. Observed: an unknown card gets HTTP 404 `{"error":"Carte introuvable"}`.
-- `readCardValues`: sends one request per card id given, in order, reports `wikipedia_title` and each rarity's `average`, and stops at the first refusal, reported with its body.
+- `<card id>` is `cards.id`, owned or not. Response HTTP 200 `{"recent": [{"id", "final_price", "settled_at", "rarity"}]}`, the card's latest sales, most recent first (up to 5 observed), with no title and no average; `{"recent":[]}` for a card never sold. Until 2026-11-22 the route answered `{"wikipedia_title", "summary", "isPro"}`.
+- Refusal: a non-2xx status with `{"error": <message>}`. Observed: a malformed id gets HTTP 404 `{"error":"Carte introuvable"}`; a well-formed unknown UUID gets HTTP 200 `{"recent":[]}`.
+- `readCardValues`: sends one request per card id given, in order, reports each sale's `final_price` and `settled_at` grouped by `rarity` in the order the route gives them, and stops at the first refusal, reported with its body.
 
 ## `GET /api/marketplace`: search the auctions
 

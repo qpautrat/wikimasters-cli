@@ -396,7 +396,7 @@ cards
 cards
   .command("value")
   .description(
-    "Show the average sale price of each given card for each rarity it sold under, whether you own it or not; stops at the first card the game refuses",
+    "Show the recent sales of each given card per rarity, whether you own it or not; stops at the first card the game refuses",
   )
   .argument("<card-id...>", "card UUIDs")
   .addHelpText(

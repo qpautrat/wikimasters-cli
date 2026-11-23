@@ -136,10 +136,15 @@ const owned = {
 };
 const soldCard = {
   id: cardId,
-  title: "Pointe de la Sambuy",
-  averages: { R: 19, PC: 56 },
+  sales: {
+    PC: [
+      { price: 10, settledAt: "2026-11-22T19:49:23+00:00" },
+      { price: 1, settledAt: "2026-11-10T00:51:42+00:00" },
+    ],
+    R: [{ price: 19, settledAt: "2026-09-25T10:00:00+00:00" }],
+  },
 };
-const unsoldCard = { id: cardId, title: "Pointe de la Sambuy", averages: {} };
+const unsoldCard = { id: cardId, sales: {} };
 
 const friendId = asPlayerId("37fe4f31-003f-40c1-9eb6-1f39e0947037");
 const globalCard = {
@@ -458,12 +463,21 @@ describe("JSON output", () => {
     });
   });
 
-  it("lists each card with its id, title and average sale price per rarity, empty when never sold", () => {
+  it("lists each card with its id and recent sales per rarity, empty when never sold", () => {
     expect(
       JSON.parse(formatCardValues([soldCard, unsoldCard], "json")),
     ).toEqual([
-      { id: cardId, title: "Pointe de la Sambuy", averages: { R: 19, PC: 56 } },
-      { id: cardId, title: "Pointe de la Sambuy", averages: {} },
+      {
+        id: cardId,
+        sales: {
+          PC: [
+            { price: 10, settledAt: "2026-11-22T19:49:23+00:00" },
+            { price: 1, settledAt: "2026-11-10T00:51:42+00:00" },
+          ],
+          R: [{ price: 19, settledAt: "2026-09-25T10:00:00+00:00" }],
+        },
+      },
+      { id: cardId, sales: {} },
     ]);
   });
 
@@ -971,15 +985,15 @@ describe("text output", () => {
     );
   });
 
-  it("prints one line per card with its average sale price per rarity, in the game's order", () => {
+  it("prints one line per card with its recent sales per rarity, in the game's order", () => {
     expect(formatCardValues([soldCard], "text")).toBe(
-      `${cardId}  Pointe de la Sambuy: average sale price R 19 wikibidous, PC 56 wikibidous`,
+      `${cardId}: recent sales PC 10 wikibidous (2026-11-22T19:49:23+00:00), 1 wikibidou (2026-11-10T00:51:42+00:00); R 19 wikibidous (2026-09-25T10:00:00+00:00)`,
     );
   });
 
   it("says when a card was never sold", () => {
     expect(formatCardValues([unsoldCard], "text")).toBe(
-      `${cardId}  Pointe de la Sambuy: never sold`,
+      `${cardId}: never sold`,
     );
   });
 
