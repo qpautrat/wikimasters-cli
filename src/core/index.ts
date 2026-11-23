@@ -78,7 +78,11 @@ export {
   type CardSearchField,
   type CatalogueCard,
 } from "./card-search.js";
-export { readCardValues, type CardValue } from "./card-value.js";
+export {
+  readCardValues,
+  type CardSale,
+  type CardValue,
+} from "./card-value.js";
 export {
   asLabelId,
   createLabel,

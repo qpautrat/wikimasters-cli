@@ -3,6 +3,7 @@ import type {
   AuctionId,
   AuctionSearch,
   CancelledAuction,
+  CardSale,
   CardSearch,
   CardValue,
   CatalogueCard,
@@ -106,6 +107,13 @@ export function formatCardSearch(
   ].join("\n");
 }
 
+function formatRaritySales(rarity: string, sales: readonly CardSale[]): string {
+  const prices = sales.map(
+    ({ price, settledAt }) => `${wikibidous(price)} (${settledAt})`,
+  );
+  return `${rarity} ${prices.join(", ")}`;
+}
+
 export function formatCardValues(
   values: readonly CardValue[],
   format: Format,
@@ -113,13 +121,8 @@ export function formatCardValues(
   if (format === "json") return JSON.stringify(values);
   return values
     .map(({ id, sales }) => {
-      const rarities = Object.entries(sales).map(
-        ([rarity, raritySales]) =>
-          `${rarity} ${raritySales
-            .map(
-              ({ price, settledAt }) => `${wikibidous(price)} (${settledAt})`,
-            )
-            .join(", ")}`,
+      const rarities = Object.entries(sales).map(([rarity, raritySales]) =>
+        formatRaritySales(rarity, raritySales),
       );
       return `${id}: ${
         rarities.length === 0
