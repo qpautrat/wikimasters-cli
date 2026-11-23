@@ -1,7 +1,6 @@
 import {
   toAuction,
   type Auction,
-  type AuctionId,
   type AuctionLimit,
   type AuctionRow,
 } from "./auction.js";
@@ -26,17 +25,14 @@ export interface AuctionSearch {
   truncated: boolean;
 }
 
-type FoundAuctionRow = Omit<AuctionRow, "cards"> & {
-  id: AuctionId;
-  card: AuctionRow["cards"];
-};
-
-interface MarketplaceResponse {
-  auctions: FoundAuctionRow[];
+export interface MarketplaceResponse {
+  auctions: AuctionRow[];
   hasMore: boolean;
 }
 
-function isMarketplaceResponse(body: unknown): body is MarketplaceResponse {
+export function isMarketplaceResponse(
+  body: unknown,
+): body is MarketplaceResponse {
   return (
     typeof body === "object" &&
     body !== null &&
@@ -75,9 +71,7 @@ export async function searchAuctions(
     );
   }
   return {
-    auctions: body.auctions.map(({ id, card, ...row }) =>
-      toAuction(session, id, { ...row, cards: card }),
-    ),
+    auctions: body.auctions.map((row) => toAuction(session, row)),
     truncated: body.hasMore,
   };
 }

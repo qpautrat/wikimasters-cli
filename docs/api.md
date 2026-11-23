@@ -41,8 +41,7 @@ Source: read-only query.
 - The whole catalogue is readable, owned or not: more than 100,000 cards.
 - PostgREST turns every `*` of a `like`/`ilike` pattern into `%`, a backslash-escaped one included; an `imatch` regex keeps it literal. An anchored `imatch` alone hits the statement timeout (HTTP 500); paired with an `ilike` on the same column, it answers in under a second (observed 2026-10-05).
 - `searchCards`: `GET` of `id, wikipedia_title, rarity`, ordered by `wikipedia_title` then `id`, filtered twice on `wikipedia_title`: `ilike.%<text>%`, with `%`, `_` and `\` escaped and `*` turned into `_`, and `imatch.<text>`, with the regex metacharacters escaped; limited to 51 to tell whether more than 50 cards match. With a field other than the title, both filters apply to `category` or `summary` instead, still ordered by `wikipedia_title` then `id` (observed 2026-10-09: `summary` and `category` answer in seconds).
-- `showAuction` and `listAuctions` embed it in `auctions` as `cards(wikipedia_title)` to give the auctioned card's title.
-- `listRunningBids` embeds it the same way through `auction_bids` → `auctions`.
+- The auctioned card's title comes from `card.wikipedia_title` in `GET /api/marketplace` and `GET /api/marketplace/<auction id>`; `auctions` is no longer read directly.
 - `addToWishlist`: `GET` of `wikipedia_title, wishlist_items(card_id)`, filtered on `id` and `wishlist_items.user_id`, to refuse a card absent from the catalogue and skip one already wished.
 
 ## `user_cards`: the collection
@@ -143,9 +142,7 @@ Source: read-only queries, 2026-10-02 and 2026-10-05.
 | `snapshot_rarity` | rarity of the auctioned copy |
 | `is_shiny` | whether the auctioned copy is shiny |
 
-- `showAuction`: `GET` of `status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)` filtered on `id`.
-- `listAuctions`: `GET` of `id` and the same columns, filtered on `status` when given, limited to `limit`, without `order`. An unknown `status` value returns `[]` (observed 2026-10-08). Without a status filter, a read with `limit=3` answers (observed 2026-10-08); each status holds more than 100,000 auctions, and a read of the whole table times out (observed 2026-10-05).
-- `listRunningBids` embeds it in `auction_bids` as `auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))`, filtered on `auctions.status=eq.active` and `auctions.end_at=gt.<now>`; see `auction_bids` for the read. A `GET` on `auctions` filtered through an `auction_bids!inner` embed times out (HTTP 500 `canceling statement due to statement timeout`, observed 2026-10-06).
+- Since 2026-11-23 a read of `auctions`, direct or embedded, gets HTTP 403 `permission denied for table auctions`; the core reads auctions through `GET /api/marketplace` and `GET /api/marketplace/<auction id>`.
 
 ## `auction_bids`: the bids
 
@@ -161,7 +158,8 @@ Source: read-only queries, 2026-10-06.
 
 - Row-level security returns only the user's own bids: none of another bidder's, even on an auction they lead.
 - One row per bid: an auction the user bid on several times appears several times.
-- `listRunningBids`: `GET` of `auction_id, amount, placed_at` and the `auctions` embed above, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. An `offset` beyond the rows answers `[]`; `limit=0` answers `[]`; a negative `limit` gets HTTP 416 `Requested range not satisfiable`, as on `user_cards` (observed 2026-10-10).
+- Since 2026-11-23 an embed of `auctions` in a read of `auction_bids` gets HTTP 403 `permission denied for table auctions`; `auction_bids` alone stays readable (observed 2026-11-23).
+- `listRunningBids`: `GET` of `auction_id, amount, placed_at`, filtered on `bidder_id`, ordered by `placed_at` then `id`, reading the requested page in one request: `offset` (page − 1) × limit and `limit` the limit. It then reads each distinct auction of the page once through `GET /api/marketplace/<auction id>`, in the order of the bids, and keeps the bids on auctions whose `status` is `active` and whose `end_at` is not passed. An `offset` beyond the rows answers `[]`; `limit=0` answers `[]`; a negative `limit` gets HTTP 416 `Requested range not satisfiable`, as on `user_cards` (observed 2026-10-10).
 
 ## `notifications`: the notifications the game sent the user
 
@@ -224,7 +222,18 @@ Source: the `/marketplace` page's JavaScript and reads on the account (2026-10-0
 - Response `{"auctions": [...], "page", "limit", "hasMore"}`. Each auction holds the `auctions` columns, `card` (the `cards` row, `wikipedia_title` included), `seller`, `current_bidder` and `owned`. No match gives `"auctions": []`.
 - A `limit` above 50 gets HTTP 403 `{"code":"automation_limit","error":"Trop de requêtes automatisées. L'automatisation n'est pas autorisée — voir le règlement."}`; `limit=0` answers 50 auctions at most (observed 2026-10-08).
 - `page` starts at 1 and gives the next `limit` auctions; a page beyond the matches answers `"auctions": []` and `"hasMore": false` (observed 2026-10-08).
-- `searchAuctions`: sends the `page` given, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, `card` standing for `cards`, reports `hasMore`, and reports a refusal with its body.
+- Without parameter, the answer holds 50 auctions, all `active`, `"page": 1`, `"limit": 50` and `"hasMore": true` (observed 2026-11-23); the route takes no status filter.
+- `searchAuctions`: sends the `page` given, the `limit` given, `sort=recent` and the trimmed text as `q`, left out when empty, maps each auction as `showAuction` does, reports `hasMore`, and reports a refusal with its body.
+- `listAuctions`: sends only the `limit` given, maps each auction as `showAuction` does, and reports a refusal with its body, an `automation_limit` one included.
+
+## `GET /api/marketplace/<auction id>`: read an auction
+
+Source: the marketplace page's JavaScript and reads on the account (2026-11-23).
+
+- Response `{"auction": {...}, "bids": [{"id", "auction_id", "bidder_id", "amount", "placed_at", "bidder"}, ...]}`, HTTP 200. `auction` holds the `auctions` columns, `card` (the `cards` row, `wikipedia_title` included), `seller`, `current_bidder`, `winner` and `owned`. An auction of any status is readable, a `settled_sold` one included.
+- `owned` is true for an ended auction the user won: it does not tell that the user sells the auction.
+- An unknown or malformed id gets HTTP 404 `{"error":"Enchère introuvable"}`.
+- `showAuction`: sends the auction id given and maps `auction` to the auction's card title (`card.wikipedia_title`), `snapshot_rarity`, `is_shiny`, `status`, `end_at`, `base_amount` and `current_bid`; the user leads when `current_bidder_id` is theirs and sells when `seller_id` is theirs. It reports a refusal with its body.
 
 ## `GET /api/cards`: search the global collection
 

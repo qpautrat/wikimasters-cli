@@ -284,7 +284,7 @@ describe("JSON output", () => {
   });
 
   it("prints an empty auction list as []", () => {
-    expect(formatAuctions([], "json", "active")).toBe("[]");
+    expect(formatAuctions([], "json")).toBe("[]");
   });
 
   it("lists the found auctions with their state in their own fields, and whether more match", () => {
@@ -705,9 +705,6 @@ describe("text output", () => {
 
   it("says when there is no auction to list", () => {
     expect(formatAuctions([], "text")).toBe("No auction to list.");
-    expect(formatAuctions([], "text", "cancelled")).toBe(
-      "No auction with status cancelled.",
-    );
   });
 
   it("prints one line per notification with its message and its other data", () => {

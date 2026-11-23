@@ -5,6 +5,7 @@ import {
   CARD_SEARCH_FIELDS,
   NOTIFICATION_LIMIT,
   PAGE_LIMIT,
+  RUNNING_BIDS_LIMIT,
   PLAYER_SEARCH_LIMIT,
   acceptFriendRequest,
   acceptTrade,
@@ -65,7 +66,6 @@ import {
   tagEntry,
   unstarEntry,
   untagEntry,
-  type AuctionFilter,
   type CollectionFilter,
 } from "../core/index.js";
 import { loadConfig } from "./config.js";
@@ -229,7 +229,7 @@ auction
   .option(
     "--limit <n>",
     "number of bids per page, an integer sent to the game as given",
-    String(PAGE_LIMIT),
+    String(RUNNING_BIDS_LIMIT),
   )
   .addHelpText(
     "after",
@@ -299,22 +299,15 @@ auction
     "List auctions in the order the game returns them, with their card, status, end time, starting price, current bid, and whether you lead or sell them",
   )
   .option(
-    "--status <status>",
-    "list only the auctions of this status, e.g. active",
-  )
-  .option(
     "--limit <n>",
     "maximum number of auctions, a strictly positive integer",
     String(AUCTION_LIMIT),
   )
-  .addHelpText(
-    "after",
-    examples("wikimasters auction list --status active --limit 10"),
-  )
-  .action(async ({ limit, ...filter }: AuctionFilter & { limit: string }) => {
+  .addHelpText("after", examples("wikimasters auction list --limit 10"))
+  .action(async ({ limit }: { limit: string }) => {
     const maximum = parseAuctionLimit(limit);
-    const auctions = await listAuctions(await openSession(), filter, maximum);
-    console.log(formatAuctions(auctions, format(), filter.status));
+    const auctions = await listAuctions(await openSession(), maximum);
+    console.log(formatAuctions(auctions, format()));
   });
 
 interface AuctionSearchOptions {

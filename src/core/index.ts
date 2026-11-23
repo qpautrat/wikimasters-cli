@@ -1,5 +1,6 @@
 export { SITE_URL } from "./supabase.js";
 export {
+  RUNNING_BIDS_LIMIT,
   listRunningBids,
   type RunningBid,
   type RunningBidPage,
@@ -13,7 +14,7 @@ export {
   type CreatedAuction,
   type StartingPrice,
 } from "./auction-create.js";
-export { listAuctions, type AuctionFilter } from "./auction-list.js";
+export { listAuctions } from "./auction-list.js";
 export {
   parseAuctionSearchPage,
   searchAuctions,

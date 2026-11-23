@@ -1,39 +1,26 @@
-import {
-  AUCTION_COLUMNS,
-  toAuction,
-  type Auction,
-  type AuctionId,
-  type AuctionLimit,
-  type AuctionRow,
-} from "./auction.js";
-import { apiFailure } from "./errors.js";
+import { toAuction, type Auction, type AuctionLimit } from "./auction.js";
+import { isMarketplaceResponse } from "./auction-search.js";
+import { WikiMastersError } from "./errors.js";
 import type { Session } from "./session.js";
-
-export interface AuctionFilter {
-  status?: string;
-}
-
-type ListedAuctionRow = AuctionRow & { id: AuctionId };
+import { siteCookie, siteRequest } from "./site.js";
 
 export async function listAuctions(
   session: Session,
-  { status }: AuctionFilter,
   limit: AuctionLimit,
 ): Promise<Auction[]> {
-  const query = session.client
-    .from("auctions")
-    .select(`id, ${AUCTION_COLUMNS}`)
-    .limit(limit);
-  const {
-    data,
-    error,
-    status: httpStatus,
-  } = await (status === undefined
-    ? query
-    : query.eq("status", status)
-  ).overrideTypes<ListedAuctionRow[], { merge: false }>();
-  if (error) {
-    throw apiFailure("Listing the auctions", httpStatus, error.message);
+  const action = "Listing the auctions";
+  const body = await siteRequest(
+    session,
+    await siteCookie(session),
+    action,
+    "/marketplace",
+    `/api/marketplace?${new URLSearchParams({ limit: String(limit) })}`,
+    { method: "GET" },
+  );
+  if (!isMarketplaceResponse(body)) {
+    throw new WikiMastersError(
+      `${action} returned an unexpected response: ${JSON.stringify(body)}`,
+    );
   }
-  return data.map((row) => toAuction(session, row.id, row));
+  return body.auctions.map((row) => toAuction(session, row));
 }

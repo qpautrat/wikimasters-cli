@@ -1,15 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { listAuctions } from "./auction-list.js";
 import { parseAuctionLimit } from "./auction.js";
-import { WikiMastersError } from "./errors.js";
+import { AuthRequiredError, WikiMastersError } from "./errors.js";
 import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
-  restRequest,
-  restRoute,
   tokenRefresh,
   type FakeResponse,
+  type RecordedRequest,
 } from "./testing/fake-supabase.js";
 
 const AUCTION_ID = "d6669009-683d-44b6-b6e7-2c0960c37f2f";
@@ -28,23 +27,33 @@ function auction(overrides: Record<string, unknown> = {}) {
     current_bidder_id: OTHER_PLAYER_ID,
     snapshot_rarity: "R",
     is_shiny: true,
-    cards: { wikipedia_title: "Musique celtique" },
+    card: { wikipedia_title: "Musique celtique" },
     ...overrides,
   };
 }
 
+function isList({ method, url }: RecordedRequest): boolean {
+  return method === "GET" && url.pathname === "/api/marketplace";
+}
+
 async function sessionAnswering(response: FakeResponse) {
-  const { fetch, requests } = fakeFetch(
-    tokenRefresh,
-    restRoute("GET", "auctions", response),
+  const { fetch, requests } = fakeFetch(tokenRefresh, (request) =>
+    isList(request) ? response : undefined,
   );
   const session = await resumeSession({
     anonKey: "anon-key",
     refreshToken: "stored-token",
     fetch,
   });
-  const listRequest = () => requests.find(restRequest("GET", "auctions"));
+  const listRequest = () => requests.find(isList);
   return { session, listRequest };
+}
+
+function marketplace(auctions: unknown[]): FakeResponse {
+  return {
+    status: 200,
+    body: { auctions, page: 1, limit: 50, hasMore: false },
+  };
 }
 
 describe("listAuctions", () => {
@@ -52,20 +61,16 @@ describe("listAuctions", () => {
     const first = auction();
     const second = auction({
       id: OTHER_AUCTION_ID,
-      status: "settled_sold",
       seller_id: USER_ID,
       current_bid: null,
       current_bidder_id: null,
       snapshot_rarity: "L",
       is_shiny: false,
-      cards: { wikipedia_title: "Lion" },
+      card: { wikipedia_title: "Lion" },
     });
-    const { session } = await sessionAnswering({
-      status: 200,
-      body: [first, second],
-    });
+    const { session } = await sessionAnswering(marketplace([first, second]));
 
-    await expect(listAuctions(session, {}, limit)).resolves.toEqual([
+    await expect(listAuctions(session, limit)).resolves.toEqual([
       {
         auctionId: AUCTION_ID,
         title: "Musique celtique",
@@ -83,7 +88,7 @@ describe("listAuctions", () => {
         title: "Lion",
         rarity: "L",
         shiny: false,
-        status: "settled_sold",
+        status: "active",
         endsAt: second.end_at,
         startingPrice: 200,
         currentBid: null,
@@ -94,56 +99,60 @@ describe("listAuctions", () => {
   });
 
   it("tells when the user leads an auction", async () => {
-    const { session } = await sessionAnswering({
-      status: 200,
-      body: [auction({ current_bidder_id: USER_ID })],
-    });
+    const { session } = await sessionAnswering(
+      marketplace([auction({ current_bidder_id: USER_ID })]),
+    );
 
-    const [listed] = await listAuctions(session, {}, limit);
+    const [listed] = await listAuctions(session, limit);
 
     expect(listed?.leading).toBe(true);
   });
 
-  it("reads every status at most the limit, in the API's order, without a status", async () => {
-    const { session, listRequest } = await sessionAnswering({
-      status: 200,
-      body: [],
-    });
-
-    await listAuctions(session, {}, parseAuctionLimit("7"));
-
-    const params = listRequest()?.url.searchParams;
-    expect(params?.get("limit")).toBe("7");
-    expect(params?.has("status")).toBe(false);
-    expect(params?.has("order")).toBe(false);
-  });
-
-  it("passes the status to the API as given", async () => {
-    const { session, listRequest } = await sessionAnswering({
-      status: 200,
-      body: [],
-    });
+  it("asks the marketplace for the limit, with nothing else", async () => {
+    const { session, listRequest } = await sessionAnswering(marketplace([]));
 
     await expect(
-      listAuctions(session, { status: "bogus" }, limit),
+      listAuctions(session, parseAuctionLimit("7")),
     ).resolves.toEqual([]);
 
-    expect(listRequest()?.url.searchParams.get("status")).toBe("eq.bogus");
+    const params = listRequest()?.url.searchParams;
+    expect([...(params?.keys() ?? [])]).toEqual(["limit"]);
+    expect(params?.get("limit")).toBe("7");
   });
 
-  it("fails with the API's reason", async () => {
+  it("reports the reason the game gives for refusing an automated read", async () => {
     const { session } = await sessionAnswering({
-      status: 500,
+      status: 403,
       body: {
-        code: "57014",
-        message: "canceling statement due to statement timeout",
+        code: "automation_limit",
+        error:
+          "Trop de requêtes automatisées. L'automatisation n'est pas autorisée — voir le règlement.",
       },
     });
 
-    const failure = listAuctions(session, {}, limit);
+    const failure = listAuctions(session, limit);
     await expect(failure).rejects.toThrow(WikiMastersError);
-    await expect(failure).rejects.toThrow(
-      /canceling statement due to statement timeout/,
+    await expect(failure).rejects.toThrow(/HTTP 403/);
+    await expect(failure).rejects.toThrow(/automation_limit/);
+    await expect(failure).rejects.toThrow(/Trop de requêtes automatisées/);
+  });
+
+  it("asks to log in again on HTTP 401", async () => {
+    const { session } = await sessionAnswering({
+      status: 401,
+      body: { error: "Unauthorized" },
+    });
+
+    await expect(listAuctions(session, limit)).rejects.toThrow(
+      AuthRequiredError,
+    );
+  });
+
+  it("fails on a response without auctions", async () => {
+    const { session } = await sessionAnswering({ status: 200, body: {} });
+
+    await expect(listAuctions(session, limit)).rejects.toThrow(
+      /unexpected response/,
     );
   });
 });

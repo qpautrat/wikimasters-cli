@@ -1,12 +1,16 @@
 import {
   auctionedTitle,
   leads,
+  readAuction,
   type AuctionId,
   type AuctionRow,
 } from "./auction.js";
 import { apiFailure } from "./errors.js";
 import { isFullPage, pageRange, type PageRequest } from "./page.js";
 import type { Session } from "./session.js";
+import { siteCookie } from "./site.js";
+
+export const RUNNING_BIDS_LIMIT = 20;
 
 export interface RunningBid {
   auctionId: AuctionId;
@@ -24,13 +28,9 @@ export interface RunningBidPage {
 }
 
 interface BidRow {
-  auction_id: string;
+  auction_id: AuctionId;
   amount: number;
   placed_at: string;
-  auctions: Pick<
-    AuctionRow,
-    "end_at" | "current_bid" | "current_bidder_id" | "cards"
-  >;
 }
 
 export async function listRunningBids(
@@ -40,28 +40,37 @@ export async function listRunningBids(
   const [from, to] = pageRange(request);
   const { data, error, status } = await session.client
     .from("auction_bids")
-    .select(
-      "auction_id, amount, placed_at, auctions!inner(end_at, current_bid, current_bidder_id, cards(wikipedia_title))",
-    )
+    .select("auction_id, amount, placed_at")
     .eq("bidder_id", session.userId)
-    .eq("auctions.status", "active")
-    .gt("auctions.end_at", new Date().toISOString())
     .order("placed_at")
     .order("id")
     .range(from, to)
     .overrideTypes<BidRow[], { merge: false }>();
   if (error) throw apiFailure("Listing your bids", status, error.message);
 
-  return {
-    bids: data.map(({ auction_id, amount, placed_at, auctions: auction }) => ({
-      auctionId: auction_id as AuctionId,
+  const cookie = await siteCookie(session);
+  const auctions = new Map<AuctionId, AuctionRow>();
+  for (const { auction_id } of data) {
+    if (!auctions.has(auction_id)) {
+      auctions.set(auction_id, await readAuction(session, cookie, auction_id));
+    }
+  }
+  const now = Date.now();
+  const bids: RunningBid[] = [];
+  for (const { auction_id, amount, placed_at } of data) {
+    const auction = auctions.get(auction_id) as AuctionRow;
+    if (auction.status !== "active" || Date.parse(auction.end_at) <= now) {
+      continue;
+    }
+    bids.push({
+      auctionId: auction_id,
       title: auctionedTitle(auction_id, auction),
       amount,
       placedAt: placed_at,
       currentBid: auction.current_bid,
       leading: leads(session, auction),
       endsAt: auction.end_at,
-    })),
-    full: isFullPage(data, request.limit),
-  };
+    });
+  }
+  return { bids, full: isFullPage(data, request.limit) };
 }

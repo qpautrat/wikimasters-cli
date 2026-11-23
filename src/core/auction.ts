@@ -1,4 +1,4 @@
-import { WikiMastersError, apiFailure } from "./errors.js";
+import { WikiMastersError } from "./errors.js";
 import type { Session } from "./session.js";
 import { parseStrictlyPositiveInteger } from "./integer.js";
 import { siteCookie, siteRequest } from "./site.js";
@@ -32,6 +32,7 @@ export interface Auction {
 }
 
 export interface AuctionRow {
+  id: AuctionId;
   status: string;
   end_at: string;
   seller_id: string;
@@ -40,11 +41,8 @@ export interface AuctionRow {
   current_bidder_id: string | null;
   snapshot_rarity: string;
   is_shiny: boolean;
-  cards: { wikipedia_title: string } | null;
+  card: { wikipedia_title: string } | null;
 }
-
-export const AUCTION_COLUMNS =
-  "status, end_at, seller_id, base_amount, current_bid, current_bidder_id, snapshot_rarity, is_shiny, cards(wikipedia_title)";
 
 interface BidResponse {
   current_bid: number;
@@ -72,14 +70,14 @@ export function parseBidAmount(raw: string): BidAmount {
 
 export function auctionedTitle(
   auctionId: string,
-  { cards }: Pick<AuctionRow, "cards">,
+  { card }: Pick<AuctionRow, "card">,
 ): string {
-  if (!cards) {
+  if (!card) {
     throw new WikiMastersError(
       `Auction ${auctionId} has no readable card details`,
     );
   }
-  return cards.wikipedia_title;
+  return card.wikipedia_title;
 }
 
 export function leads(
@@ -89,31 +87,42 @@ export function leads(
   return current_bidder_id === session.userId;
 }
 
-async function readAuction(
-  session: Session,
-  auctionId: AuctionId,
-): Promise<AuctionRow> {
-  const { data, error, status } = await session.client
-    .from("auctions")
-    .select(AUCTION_COLUMNS)
-    .eq("id", auctionId)
-    .maybeSingle()
-    .overrideTypes<AuctionRow, { merge: false }>();
-  if (error) {
-    throw apiFailure("Reading the auction", status, error.message);
-  }
-  if (!data) throw new WikiMastersError(`Auction ${auctionId} not found`);
-  return data;
+function isAuctionDetail(body: unknown): body is { auction: AuctionRow } {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    "auction" in body &&
+    typeof body.auction === "object" &&
+    body.auction !== null
+  );
 }
 
-export function toAuction(
+export async function readAuction(
   session: Session,
+  cookie: string,
   auctionId: AuctionId,
-  row: AuctionRow,
-): Auction {
+): Promise<AuctionRow> {
+  const action = "Reading the auction";
+  const body = await siteRequest(
+    session,
+    cookie,
+    action,
+    `/marketplace/${auctionId}`,
+    `/api/marketplace/${auctionId}`,
+    { method: "GET" },
+  );
+  if (!isAuctionDetail(body)) {
+    throw new WikiMastersError(
+      `${action} returned an unexpected response: ${JSON.stringify(body)}`,
+    );
+  }
+  return body.auction;
+}
+
+export function toAuction(session: Session, row: AuctionRow): Auction {
   return {
-    auctionId,
-    title: auctionedTitle(auctionId, row),
+    auctionId: row.id,
+    title: auctionedTitle(row.id, row),
     rarity: row.snapshot_rarity,
     shiny: row.is_shiny,
     status: row.status,
@@ -129,7 +138,10 @@ export async function showAuction(
   session: Session,
   auctionId: AuctionId,
 ): Promise<Auction> {
-  return toAuction(session, auctionId, await readAuction(session, auctionId));
+  return toAuction(
+    session,
+    await readAuction(session, await siteCookie(session), auctionId),
+  );
 }
 
 function isBidResponse(body: unknown): body is BidResponse {

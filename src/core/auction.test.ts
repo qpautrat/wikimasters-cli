@@ -12,9 +12,8 @@ import { resumeSession } from "./session.js";
 import {
   USER_ID,
   fakeFetch,
-  restRequest,
-  restRoute,
   tokenRefresh,
+  type FakeResponse,
   type RecordedRequest,
   type Route,
 } from "./testing/fake-supabase.js";
@@ -26,6 +25,7 @@ const BALANCE_AFTER_BID = 7743;
 
 function auction(overrides: Record<string, unknown> = {}) {
   return {
+    id: auctionId,
     status: "active",
     end_at: new Date(Date.now() + 3_600_000).toISOString(),
     seller_id: SELLER_ID,
@@ -34,13 +34,20 @@ function auction(overrides: Record<string, unknown> = {}) {
     current_bidder_id: BIDDER_ID,
     snapshot_rarity: "R",
     is_shiny: true,
-    cards: { wikipedia_title: "Musique celtique" },
+    card: { wikipedia_title: "Musique celtique" },
     ...overrides,
   };
 }
 
-function auctionSelect(rows: unknown[]): Route {
-  return restRoute("GET", "auctions", { status: 200, body: rows });
+function auctionRead(response: FakeResponse): Route {
+  return ({ method, url }) =>
+    method === "GET" && url.pathname === `/api/marketplace/${auctionId}`
+      ? response
+      : undefined;
+}
+
+function auctionDetail(row: unknown): Route {
+  return auctionRead({ status: 200, body: { auction: row, bids: [] } });
 }
 
 function bidRoute(
@@ -145,7 +152,7 @@ describe("placeBid", () => {
 
     await placeBid(session, auctionId, amount);
 
-    expect(requests.filter(restRequest("GET", "auctions"))).toHaveLength(0);
+    expect(requests.filter(({ method }) => method === "GET")).toHaveLength(0);
   });
 
   it("reports the amount the site records", async () => {
@@ -219,7 +226,7 @@ describe("placeBid", () => {
 describe("showAuction", () => {
   it("returns the auctioned copy and its current bid", async () => {
     const row = auction();
-    const { session, requests } = await sessionWith(auctionSelect([row]));
+    const { session, requests } = await sessionWith(auctionDetail(row));
 
     await expect(showAuction(session, auctionId)).resolves.toEqual({
       auctionId,
@@ -233,16 +240,28 @@ describe("showAuction", () => {
       leading: false,
       selling: false,
     });
-    const select = requests.find(restRequest("GET", "auctions"));
-    expect(select?.url.searchParams.get("id")).toBe(`eq.${auctionId}`);
-    expect(select?.url.searchParams.get("select")).toBe(
-      "status,end_at,seller_id,base_amount,current_bid,current_bidder_id,snapshot_rarity,is_shiny,cards(wikipedia_title)",
+    const reads = requests.filter(({ url }) =>
+      url.pathname.startsWith("/api/marketplace/"),
     );
+    expect(reads).toHaveLength(1);
+    expect(reads[0]?.headers.get("cookie")).toMatch(
+      new RegExp(`^${AUTH_COOKIE_NAME}=base64-`),
+    );
+  });
+
+  it("reads an auction that is no longer active", async () => {
+    const { session } = await sessionWith(
+      auctionDetail(auction({ status: "settled_sold" })),
+    );
+
+    await expect(showAuction(session, auctionId)).resolves.toMatchObject({
+      status: "settled_sold",
+    });
   });
 
   it("tells when the user leads the auction", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction({ current_bidder_id: USER_ID })]),
+      auctionDetail(auction({ current_bidder_id: USER_ID })),
     );
 
     const { leading, selling } = await showAuction(session, auctionId);
@@ -252,7 +271,7 @@ describe("showAuction", () => {
 
   it("tells when the user sells the auctioned card", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction({ seller_id: USER_ID })]),
+      auctionDetail(auction({ seller_id: USER_ID })),
     );
 
     await expect(showAuction(session, auctionId)).resolves.toMatchObject({
@@ -262,7 +281,7 @@ describe("showAuction", () => {
 
   it("reports no bid while nobody has bid", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction({ current_bid: null, current_bidder_id: null })]),
+      auctionDetail(auction({ current_bid: null, current_bidder_id: null })),
     );
 
     await expect(showAuction(session, auctionId)).resolves.toMatchObject({
@@ -273,7 +292,7 @@ describe("showAuction", () => {
 
   it("fails when the auctioned card cannot be read", async () => {
     const { session } = await sessionWith(
-      auctionSelect([auction({ cards: null })]),
+      auctionDetail(auction({ card: null })),
     );
 
     await expect(showAuction(session, auctionId)).rejects.toThrow(
@@ -281,11 +300,26 @@ describe("showAuction", () => {
     );
   });
 
-  it("fails on an unknown auction", async () => {
-    const { session } = await sessionWith(auctionSelect([]));
+  it("reports the game's refusal of an unknown auction", async () => {
+    const { session } = await sessionWith(
+      auctionRead({ status: 404, body: { error: "Enchère introuvable" } }),
+    );
+
+    const failure = showAuction(session, auctionId);
+    await expect(failure).rejects.toThrow(WikiMastersError);
+    await expect(failure).rejects.toThrow(/HTTP 404.*Enchère introuvable/);
+  });
+
+  it("reports the reason the game gives for refusing an automated read", async () => {
+    const { session } = await sessionWith(
+      auctionRead({
+        status: 403,
+        body: { code: "automation_limit", error: "Trop de requêtes" },
+      }),
+    );
 
     await expect(showAuction(session, auctionId)).rejects.toThrow(
-      `Auction ${auctionId} not found`,
+      /automation_limit/,
     );
   });
 });

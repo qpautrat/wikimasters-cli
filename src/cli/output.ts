@@ -531,14 +531,9 @@ function seller(selling: boolean): string {
 export function formatAuctions(
   auctions: readonly Auction[],
   format: Format,
-  requestedStatus?: string,
 ): string {
   if (format === "json") return JSON.stringify(auctions.map(withId));
-  if (auctions.length === 0) {
-    return requestedStatus === undefined
-      ? "No auction to list."
-      : `No auction with status ${requestedStatus}.`;
-  }
+  if (auctions.length === 0) return "No auction to list.";
   return auctions.map(auctionLine).join("\n");
 }
 
